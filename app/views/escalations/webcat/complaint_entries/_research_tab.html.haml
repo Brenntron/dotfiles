@@ -204,6 +204,7 @@
   .col-xs-4.ce-research-column
     %h4.ticket-report-header
       Whois
+    .whois-data-container#whois_data_container
     %label.data-report-label
       Domain
     %table.data-report-table#ce_domain_table
@@ -216,28 +217,8 @@
               IP Address
           %td#domain_title
             = @whois_lookup
-    %label.data-report-label.ce-whois-label#ce_admin_label
-      admin
-    %table.data-report-table.ce-whois-table#ce_admin_table
-      %tbody#ce_admin_tbody
-    %label.data-report-label.ce-whois-label#ce_registrant_label
-      registrant
-    %table.data-report-table.ce-whois-table#ce_registrant_table
-      %tbody#ce_registrant_tbody
-    %label.data-report-label.ce-whois-label#ce_tech_label
-      tech
-    %table.data-report-table.ce-whois-table#ce_tech_table
-      %tbody#ce_tech_tbody
-    %label.data-report-label.ce-whois-label#ce_domain_status_label
-      domain status
-    %table.data-report-table.ce-whois-table#ce_domain_status_table
-      %tbody#ce_domain_status_tbody
-    %table.data-report-table#ce_name_servers_table
-      %thead
-        %tr
-          %th#ce_name_servers_header
-            name servers
-      %tbody#ce_nserver_tbody
 :javascript
-  window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');
-  window.set_tags("#{@tags.join(', ')}");
+  $(document).ready(function() {
+    window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');
+    window.set_tags("#{@tags.join(', ')}");
+  });

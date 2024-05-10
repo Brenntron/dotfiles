@@ -61,7 +61,7 @@
 //= require application/webcat/csam_reports
 //= require application/webcat/bulk_resolution_tool
 //= require application/escalations_users
-//= require application/webcat/webCatRepLookup
+//= require application/webcat/whois
 //= require application/webrep/webrep-report-engine
 //= require application/webrep/autoresolve_disputes
 //= require application/file_rep/file_rep

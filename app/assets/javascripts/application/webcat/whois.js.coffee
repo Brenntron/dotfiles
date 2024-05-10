@@ -1,53 +1,13 @@
-namespace 'WebCat.RepLookup', (exports) ->
-  exports.whoIsLookup = (ipDomain) ->
-    headers = {
-      'Token': $('input[name="token"]').val(),
-      'Xmlrpc-Token': $('input[name="xml_token"]').val()
-    }
-
-    if $('#whoisContent').length > 0
-      $('#whoisContent').dialog(title: "ICANN Whois for: #{ipDomain}").dialog('open')
-    else
-      whoisContent = "<div id='whoisContent' class='webcat-whois-dialog-content' title='ICANN Whois for: #{ipDomain}'>
-                        <div class='dialog-content-wrapper'>
-                          <div id='icann_whois'>
-                            <div id='inline-webcat' class='webcat-loader-wrapper'>
-                              <span class='loader-msg'>
-                                Loading Data...
-                              <span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>"
-
-      $('body').append(whoisContent)
-
-      $('#whoisContent').dialog
-        autoOpen: true
-        classes: { 'ui-dialog': 'webcat-whois-dialog' }
-        minWidth: 800
-        position: { my: "right center", at: "right center", of: window }
-        title: "Whois for: #{ipDomain}"
-
-    $('#icannContent').remove()
-    $('#icann_whois > .webcat-loader-wrapper').show()
-
-    $.ajax(
+namespace 'AC.WebCat.Whois', (exports) ->
+  exports.get_whois_data = (ipDomain, callback) ->
+    std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/cloud_intel/whois/lookup'
-      headers: headers
       data:
         name: ipDomain
       success: (response) ->
-        if response?
-          formattedResponse = WebCat.RepLookup.formatIcannData(response.data)
-
-          $("#icann_whois").append("<div id='icannContent'>#{formattedResponse}</div>")
-        else
-          message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
-          $('#whois_content').append message
-
-        $('#icann_whois > .webcat-loader-wrapper').hide()
+        formattedData = formatIcannData(response.data)
+        callback(formattedData)
       error: (response) ->
         if response?
           { responseJSON } = response
@@ -58,18 +18,18 @@ namespace 'WebCat.RepLookup', (exports) ->
             std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
 
           return $.each(response.responseJSON, (key, value) ->
-            console.log value
+            console.error value
           )
     )
 
   # The cluster whois dialog doesn't require all the iformation returned by TESS.
   # The inline whois dialog may not need all the information either, and may just
   # need what is displayed for clusters.
-  exports.formatIcannData = (whoisData) ->
-    parsedData = WebCat.RepLookup.parseIcannData(whoisData)
+  formatIcannData = (whoisData) ->
+    parsedData = parseIcannData(whoisData)
     return stringifyData(parsedData)
 
-  exports.parseIcannData = (whoisData) ->
+  parseIcannData = (whoisData) ->
     domainStatuses = []
     keyedData = []
     nservers = []
@@ -84,11 +44,14 @@ namespace 'WebCat.RepLookup', (exports) ->
 
       if key == 'domain status'
         domainStatuses.push(value)
-      else if key == 'nserver' || key == 'nservers' || key == 'name server'
+      else if ['nserver', 'nservers', 'name server'].includes(key)
         nservers.push(value)
 
     reducedData = keyedData.reduce((accumulator, currentValue) ->
       key = Object.keys(currentValue)[0].toLowerCase()
+
+      return accumulator if key == 'name server'
+
       value = Object.values(currentValue)[0]
       accumulator[key] = value
       accumulator
@@ -149,12 +112,3 @@ namespace 'WebCat.RepLookup', (exports) ->
     nservers += '</table>' if nservers.length > 0
 
     dataString += "#{domainStatus}#{nservers}"
-
-  name_servers = (server_list)->
-    if undefined == server_list
-      ''
-    else
-      text = ""
-      for server in server_list
-        text += "<tr><td>#{server}</td></tr>"
-      text

@@ -7,7 +7,6 @@
 # Includes tabs for domain history, complaint entry history,
 # and xbrs history of the url.
 window.history_dialog = (id, url) ->
-
   headers = { 'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val() }
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
@@ -169,12 +168,42 @@ window.get_xbrs_history = (url, tab) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
+window.whois_dialog = (ipDomain) ->
+  if $('#whoisContent').length > 0
+    $('#whoisContent').dialog(title: "ICANN Whois for: #{ipDomain}").dialog('open')
+  else
+    whoisContent = "<div id='whoisContent' class='webcat-whois-dialog-content' title='ICANN Whois for: #{ipDomain}'>
+                      <div class='dialog-content-wrapper'>
+                        <div id='icann_whois'>
+                          <div id='inline-webcat' class='webcat-loader-wrapper'>
+                            <span class='loader-msg'>
+                              Loading Data...
+                            <span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>"
 
+    $('body').append(whoisContent)
 
+    $('#whoisContent').dialog
+      autoOpen: true
+      classes: { 'ui-dialog': 'webcat-whois-dialog' }
+      minWidth: 800
+      position: { my: "right center", at: "right center", of: window }
+      title: "Whois for: #{ipDomain}"
 
+  $('#icannContent').remove()
+  $('#icann_whois > .webcat-loader-wrapper').show()
+
+  whois_callback = (formattedData) ->
+    $("#icann_whois").append("<div id='icannContent'>#{formattedData}</div>")
+
+    $('#icann_whois > .webcat-loader-wrapper').hide()
+
+  AC.WebCat.Whois.get_whois_data(ipDomain, whois_callback)
 
 $ ->
-
   # initialize bulk resolution dialog
   $('#index_change_resolution_dialog').dialog
     autoOpen: false

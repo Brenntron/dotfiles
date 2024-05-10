@@ -203,98 +203,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     wrapper = radio.parent()
     wrapper.addClass('selected')
 
-  get_whois_data = (domain) ->
-    $.ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/cloud_intel/whois/lookup'
-      headers: headers
-      data:
-        name: domain
-      success: (response) ->
-        if response?
-          parsed_data = WebCat.RepLookup.parseIcannData(response.data)
+  render_whois_table = (domain) ->
+    whois_callback = (formattedData) ->
+      $('#whois_data_container').append formattedData
 
-          for datum_key, datum_value of parsed_data
-            # Skip to the next iteration if the value is falsy
-            continue unless datum_value
-
-            switch datum_key
-              when 'Domain Name', 'name server' then continue
-              when 'domain status'
-                rows = ''
-                for domain_status in datum_value
-                  continue unless domain_status
-
-                  rows += """
-                  <tr>
-                    <td>
-                      #{domain_status}
-                    </td>
-                  </tr>
-                  """
-
-                $('#ce_domain_status_label').show()
-                $('#ce_domain_status_table').show()
-                $('#ce_domain_status_tbody').append(rows)
-              when 'nserver'
-                for nserver in datum_value
-                  continue unless nserver
-
-                  row = "<tr><td>#{nserver}</td></tr>"
-
-                  $('#ce_nserver_tbody').append(row)
-                  $('#ce_name_servers_table').show()
-              else
-                switch
-                  when datum_key.includes('admin ')
-                    $('#ce_admin_label').show()
-                    $('#ce_admin_table').show()
-                    $tbody = $('#ce_admin_tbody')
-                  when datum_key.includes('registrant ')
-                    $('#ce_registrant_label').show()
-                    $('#ce_registrant_table').show()
-                    $tbody = $('#ce_registrant_tbody')
-                  when datum_key.includes('tech ')
-                    $('#ce_tech_label').show()
-                    $('#ce_tech_table').show()
-                    $tbody = $('#ce_tech_tbody')
-                  else
-                    $tbody = $('#ce_domain_tbody')
-
-                header = datum_key.split(/[\s|\/]/).map((word) -> word[0].toUpperCase() + word[1..-1])
-                  .reduce((acc, word) ->
-                    return acc + (if acc.includes('State') then '/' else ' ') + word
-                  )
-
-                row = """
-                <tr>
-                  <td class='data-report-table-column-header'>
-                    #{header}
-                  </td>
-                  <td id='#{datum_key.split(' ').join('_').replace('/', '_')}'>
-                    #{datum_value}
-                  </td>
-                </tr>
-                """
-
-                $tbody.append(row)
-        else
-          message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
-
-          std_msg_error("Error retrieving WHOIS query.", [message])
-      error: (response) ->
-        if response?
-          { responseJSON } = response
-
-          if !responseJSON
-            std_msg_error("Error retrieving WHOIS query.","")
-          else
-            std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
-
-          return $.each(response.responseJSON, (key, value) ->
-            console.error value
-          )
-    )
+    AC.WebCat.Whois.get_whois_data(domain, whois_callback)
 
   get_current_categories = () ->
     $.ajax(
@@ -775,48 +688,47 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     )
 
   $ ->
-    if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
-      domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
-      entry_id = Number($('#complaint_entry_id')[0].innerText)
-      headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-      resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
+    domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
+    entry_id = Number($('#complaint_entry_id')[0].innerText)
+    headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+    resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
 
-      get_current_categories()
-      get_entry_history()
+    get_current_categories()
+    get_entry_history()
 
-      get_domain_history(domain_title)
-      get_related_history(domain_title)
-      get_whois_data(domain_title)
-      get_xbrs_history(domain_title)
+    get_domain_history(domain_title)
+    get_related_history(domain_title)
+    render_whois_table(domain_title)
+    get_xbrs_history(domain_title)
 
-      get_resolution_templates(resolution, 'individual', [entry_id])
+    get_resolution_templates(resolution, 'individual', [entry_id])
 
-      # Show page resolution select
-      $('.show-action .webcat-ticket-status-radio').click ->
-        if $(this).is(':checked')
-          wrapper = $(this).parent()
-          $('.show-action .status-radio-wrapper').removeClass('selected')
-          $(wrapper).addClass('selected')
+    # Show page resolution select
+    $('.show-action .webcat-ticket-status-radio').click ->
+      if $(this).is(':checked')
+        wrapper = $(this).parent()
+        $('.show-action .status-radio-wrapper').removeClass('selected')
+        $(wrapper).addClass('selected')
 
-        if $(this).attr('id') == 'RESOLVED'
-          $('#show-ticket-resolution-submenu').show()
-          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-          $('#ticket-non-res-submit').hide()
-          $(stat_comment).val('')
-          # check first resolution checkbox (and Fixed-FP parent) if none checked after opening
-          if !($("input.ticket-resolution-radio").is(':checked'))
-            $('input#FIXED').prop('checked', true)
-            is_customer = check_for_customer_show_page_webcat()
-            populate_resolved_webcat_templates('Fixed - FP: Sudden Spike', is_customer)
-        else
-          $('#ticket-non-res-submit').show()
-          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-          $('.ticket-resolution-radio').prop('checked', false)
-          $('#show-ticket-resolution-submenu').hide()
-          $(res_comment[0]).val('')
+      if $(this).attr('id') == 'RESOLVED'
+        $('#show-ticket-resolution-submenu').show()
+        stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+        $('#ticket-non-res-submit').hide()
+        $(stat_comment).val('')
+        # check first resolution checkbox (and Fixed-FP parent) if none checked after opening
+        if !($("input.ticket-resolution-radio").is(':checked'))
+          $('input#FIXED').prop('checked', true)
+          is_customer = check_for_customer_show_page_webcat()
+          populate_resolved_webcat_templates('Fixed - FP: Sudden Spike', is_customer)
+      else
+        $('#ticket-non-res-submit').show()
+        res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+        $('.ticket-resolution-radio').prop('checked', false)
+        $('#show-ticket-resolution-submenu').hide()
+        $(res_comment[0]).val('')
 
-        store_entry_changes(entry_id, 'submit')
+      store_entry_changes(entry_id, 'submit')
 
-      $(document).on 'change', '.resolution_radio_button, .ce-input', ->
-        $('.ce-submit-button').prop('disabled', false)
-        store_entry_changes(entry_id, 'submit')
+    $(document).on 'change', '.resolution_radio_button, .ce-input', ->
+      $('.ce-submit-button').prop('disabled', false)
+      store_entry_changes(entry_id, 'submit')
