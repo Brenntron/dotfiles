@@ -353,6 +353,7 @@ window.reopenComplaint = (entry_id) ->
       $(entry_row).find('.resolution_radio_button').each ->
         $(this).prop('disabled', false)
       $('#edit_uri_input_' + entry_id).removeAttr('disabled')
+      $('#quick_edit_uri_' + entry_id).removeAttr('disabled')
 
       # res comment when avail
       cat_input = $('#input_cat_' + entry_id)

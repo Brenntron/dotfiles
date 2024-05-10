@@ -323,7 +323,7 @@ build_complaints_table = (url) ->
         data: 'uri'
         className: 'uri-col'
         render: (data, type, full, meta) ->
-          if full.status == 'PENDING'
+          if (full.status == 'PENDING') || (full.status == 'COMPLETED')
             disabled = "disabled=true"
           else
             disabled = ''
@@ -365,8 +365,11 @@ build_complaints_table = (url) ->
             path_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.uri + '\', \'uri\');"'
             path_val = full.uri
 
-          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
-            input_uri = full.uri_as_categorized
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.status == 'REOPENED')
+            if full.uri_as_categorized? && full.uri_as_categorized != ''
+              input_uri = full.uri_as_categorized
+            else
+              input_uri = domain
           else if domain? && domain != ''
             input_uri = domain
           else
