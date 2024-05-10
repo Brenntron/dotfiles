@@ -82,23 +82,8 @@
         %p#ce_description
           = @complaint.description
 
-    .external-categories-section.bottom-divider
+    .external-categories-section
       %h4.ticket-report-header Current Categories
-      %label.data-report-label WBRS
-      %table.categories-table#ce_wbrs_categories_table
-        %thead
-          %tr
-            %th conf
-            %th wbrs categories
-            %th certainty
-        %tbody
-      %label.data-report-label SDS
-      %table.categories-table#ce_sds_categories_table
-        %thead
-          %tr
-            %th sds uri category
-            %th sds domain category
-        %tbody
 
     .tags-section
       %h4.ticket-report-header Tags

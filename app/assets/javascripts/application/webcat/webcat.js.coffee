@@ -575,107 +575,11 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
 
 
 fetch_external_categories = (entry_id) ->
-  std_msg_ajax(
-    method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
-    data: {'id': entry_id}
-    success: (response) ->
-      row_id = JSON.parse(this.data).id
-      { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
+  error_callback = (response) ->
+    # maintain this for troubleshooting external api responses
+    console.error response
 
-      # If there are any current categories (WBRS)
-      # Put the top one in the list
-      # All other cat details will be in a tooltip
-      primary_cat = '<span class="missing-data">No current external categories</span>'
-
-      if current_categories || sds_category || sds_domain_category
-        tooltip_table = '<div class="current-external-cat-info">'
-      else
-        tooltip_table = ''
-
-      if current_categories
-        tooltip_table +=
-          '<label class="tooltip-table-label">WBRS</label>' +
-            '<table class="category-tooltip-table"><thead><tr>' +
-            '<th>Conf</th><th>WBRS Categories</th><th>Certainty</th><th colspan="3">Feeds</th>' +
-            '</tr></thead><tbody>'
-
-        $.each current_categories, (key, value) ->
-          active =  $(this).attr("is_active")
-          if active == true
-            { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = this
-            if certainties
-              rowspan = certainties.length
-            else
-              rowspan=''
-
-            tooltip_table +=
-              '<tr><td rowspan="' + rowspan + '">' + value.confidence + '</td>' +
-                '<td rowspan="' + rowspan + '">' + value.mnem + ' - ' + value.descr + '</td>' +
-                '<td rowspan="' + rowspan + '">' + value.top_certainty + '</td>'
-            if certainties
-              $(certainties).each (i) ->
-                { certainty:source_certainty, source_description, source_mnemonic: source_name } = this
-                unless i == 0
-                  tooltip_table += '<tr>'
-
-                tooltip_table +=
-                  '<td class="alt-col">' + this.certainty + '</td>' +
-                    '<td class="alt-col">' + this.source_mnemonic + '</td>' +
-                    '<td class="alt-col">' + this.source_description + '</td>'
-            else
-              tooltip_table += '<td colspan="3"></td>'
-
-            tooltip_table += '</tr></tbody></table>'
-
-            if key == '1.0'
-              primary_cat = '<a class="esc-tooltipped tooltip-underline">' + value.mnem + ' - ' + value.descr + ' <span class="ex-category-source">WBRS</span></a>'
-
-      else if sds_category
-        primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_category + ' <span class="ex-category-source">SDS URI</span></a>'
-
-      else if sds_domain_category
-        primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_domain_category + ' <span class="ex-category-source">SDS Domain</span></a>'
-
-      # build the rest of the tooltip if there is stuff from SDS
-      if sds_category || sds_domain_category
-        tooltip_table +=
-          '<label class="tooltip-table-label">SDS</label>' +
-            '<table class="category-tooltip-table"><thead><tr>' +
-            '<th>SDS URI Category</th><th>SDS Domain Category</th>' +
-            '</tr></thead>' +
-            '<tbody><tr>'
-
-        if sds_category
-          tooltip_table += '<td>' + sds_category + '</td>'
-        else
-          tooltip_table += '<td></td>'
-        if sds_domain_category
-          tooltip_table += '<td>' + sds_domain_category + '</td>'
-        else
-          tooltip_table += '<td></td>'
-
-        tooltip_table +=
-          '</tr></tbody></table>'
-
-      tooltip_table += '</div>'
-
-      $('#current_cat_' + entry_id).html(primary_cat)
-      if tooltip_table != '</div>'
-        $('#current_cat_' + entry_id + ' a.esc-tooltipped').tooltipster
-          content: $(tooltip_table),
-          theme: [
-            'tooltipster-borderless'
-            'tooltipster-borderless-customized'
-          ],
-          minWidth: '820'
-
-    error: (response) ->
-      # maintain this for troubleshooting external api responses
-      console.log response
-      current_categories = ''
-  )
-
+  AC.WebCat.get_current_categories(entry_id, true, error_callback)
 
 # Sending individual entry info to the backend
 process_entry = (entry_data) ->

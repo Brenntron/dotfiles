@@ -1,5 +1,4 @@
 namespace 'AC.WebCat', (exports) ->
-
   ## I think we fetch this entirely too many times per page, there must be a simpler way ##
   exports.getAUPCategories = ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -72,4 +71,141 @@ namespace 'AC.WebCat', (exports) ->
             cat_id = this
             edit_cats_selectize.addItem(cat_id)
 
+    )
+
+  exports.get_current_categories = (entry_id, is_index_page, error_callback) ->
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
+      data: { 'id': entry_id }
+      success: (response) ->
+        { current_category_data: current_categories, master_categories, sds_category, sds_domain_category, id: row_id } = JSON.parse(response)
+        # If sds category or sds domain category is undefined or null, set it to an empty string
+        sds_category = if !sds_category then '' else sds_category
+        sds_domain_category = if !sds_domain_category then '' else sds_domain_category
+        tooltip_table = ''
+
+        if is_index_page
+          # If there are any current categories (WBRS)
+          # Put the top one in the list
+          # All other cat details will be in a tooltip
+          primary_cat = '<span class="missing-data">No current external categories</span>'
+
+          if (current_categories || sds_category || sds_domain_category)
+            tooltip_table = '<div class="current-external-cat-info">'
+
+        if current_categories
+          wbrs_table = "<label class='#{if is_index_page then 'tooltip-table-label' else 'data-report-label'}'>
+                            WBRS
+                          </label>
+                          <table class='#{if is_index_page then 'category-tooltip-table' else 'categories-table'}'>
+                            <thead>
+                              <tr>
+                                <th>
+                                  Conf
+                                </th>
+                                <th>
+                                  WBRS Categories
+                                </th>
+                                <th>
+                                  Certainty
+                                </th>
+                                <th colspan='3'>
+                                  Feeds
+                                </th>
+                            </tr>
+                          </thead>
+                          <tbody>"
+
+          $.each current_categories, (conf, current_category) ->
+            return 'continue' unless current_category.is_active
+
+            { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = current_category
+
+            if certainties
+              rowspan = certainties.length
+
+              certainties.forEach (certainty, index) ->
+                { certainty: source_certainty, source_description, source_mnemonic } = certainty
+
+                certainty_cells = "<tr>
+                                    <td class='alt-col}'>
+                                       #{source_certainty}
+                                     </td>
+                                     <td class='alt-col}'>
+                                       #{source_mnemonic}
+                                     </td>
+                                     <td class='alt-col}'>
+                                       #{source_description}
+                                     </td>
+                                   </tr>"
+            else
+              wbrs_table += "<tr>
+                               <td>
+                                 #{confidence}
+                               </td>
+                               <td>
+                                 #{mnemonic} - #{name}
+                               </td>
+                               <td>
+                                 #{top_certainty}
+                               </td>
+                              <td colspan='3'></td>
+                             </tr>"
+
+            wbrs_table += '</tr></tbody></table>'
+            tooltip_table += wbrs_table if is_index_page
+
+            if conf == '1.0' && is_index_page
+              primary_cat = '<a class="esc-tooltipped tooltip-underline">' + current_category.mnem + ' - ' + current_category.descr + ' <span class="ex-category-source">WBRS</span></a>'
+
+        else if sds_category && is_index_page
+          primary_cat = "<a class='esc-tooltipped tooltip-underline'>
+                          #{sds_category} <span class='ex-category-source'>SDS URI</span>
+                         </a>"
+
+        else if sds_domain_category && is_index_page
+          primary_cat = "<a class='esc-tooltipped tooltip-underline'>
+                          #{sds_domain_category} <span class='ex-category-source'>SDS Domain</span>
+                         </a>"
+
+        # build the rest of the tooltip if there is stuff from SDS
+        if sds_domain_category || sds_category
+          sds_table = "<label class=#{ if is_index_page then 'tooltip-table-label' else 'data-report-label' }>
+                          SDS
+                        </label>
+                        <table class=#{ if is_index_page then 'category-tooltip-table' else 'categories-table' }>
+                          <thead>
+                            <tr>
+                              <th>SDS URI Category</th>
+                              <th>SDS Domain Category</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>#{sds_category}</td>
+                              <td>#{sds_domain_category}</td>
+                            </tr>
+                          </tbody>
+                        </table>"
+
+        if is_index_page
+          tooltip_table += sds_table
+          tooltip_table += '</div>'
+
+          $('#current_cat_' + entry_id).html(primary_cat)
+
+          if tooltip_table != '</div>'
+            $('#current_cat_' + entry_id + ' a.esc-tooltipped').tooltipster
+              content: $(tooltip_table),
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+              ],
+              minWidth: '820'
+        else
+          current_category_tables = wbrs_table + sds_table
+          $('.external-categories-section').append current_category_tables
+      error: (response) ->
+        error_callback(response)
     )

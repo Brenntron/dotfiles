@@ -64,11 +64,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   window.set_complaint_entry_data = (category_data, ce_entry_status) ->
     ce_current_categories = if category_data? then category_data.split(', ') else []
 
-    $.ajax(
-      url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-      method: 'GET'
-      headers: headers
-      success: (response) ->
+    AC.WebCat.getAUPCategories()
+      .then((response) ->
         all_categories = response
         category_ids = []
         cat_options = []
@@ -210,60 +207,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     AC.WebCat.Whois.get_whois_data(domain, whois_callback)
 
   get_current_categories = () ->
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
-      method: 'POST'
-      headers: headers
-      data:
-        'id': entry_id
-      success: (response) ->
-        { current_category_data : current_categories, sds_category, sds_domain_category } = JSON.parse(response)
-        wbrs_table_rows = ""
+    error_callback = (errorResponse) ->
+      std_api_error(errorResponse, "Current Categories for this Entry could not be retrieved.", reload: false)
 
-        if Object.keys(current_categories).length > 0
-          $.each current_categories, (conf, current_category) ->
-            # For $.each returning non-false is the same as a continue statement in a for loop
-            return 'continue' unless current_category.is_active
-
-            { confidence, mnem: mnemonic, top_certainty, certainties } = current_category
-            wbrs_table_rows = ""
-
-            if certainties?
-              certainties.forEach (certainty) ->
-                { certainty: source_certainty, source_description, source_mnemonic } = certainty
-
-                wbrs_table_rows += "<tr>
-                                       <td>
-                                         #{source_certainty}
-                                       </td>
-                                       <td>
-                                         #{source_mnemonic}
-                                       </td>
-                                       <td>
-                                         #{source_description}
-                                       </td>
-                                     </tr>"
-            else
-              wbrs_table_rows += "<tr>
-                                    <td>
-                                      #{confidence}
-                                    </td>
-                                    <td>
-                                      #{mnemonic}
-                                    </td>
-                                    <td>
-                                      #{top_certainty}
-                                    </td>
-                                  </tr>"
-
-          $('#ce_wbrs_categories_table > tbody').append(wbrs_table_rows)
-        if sds_category? || sds_domain_category?
-          sds_table_row = "<td>#{sds_category}</td><td>#{sds_domain_category}</td>"
-
-          $('#ce_sds_categories_table > tbody').append(sds_table_row)
-      error: (errorResponse) ->
-        std_api_error(errorResponse, "Current Categories for this Entry could not be retrieved.", reload: false)
-    )
+    AC.WebCat.get_current_categories(entry_id, false, error_callback)
 
   get_domain_history = (domain) ->
     $.ajax(
