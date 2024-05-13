@@ -159,7 +159,7 @@ namespace 'AC.WebCat', (exports) ->
             if conf == '1.0' && is_index_page
               primary_cat = '<a class="esc-tooltipped tooltip-underline">' + current_category.mnem + ' - ' + current_category.descr + ' <span class="ex-category-source">WBRS</span></a>'
 
-        else if sds_category && is_index_page
+        if sds_category && is_index_page
           primary_cat = "<a class='esc-tooltipped tooltip-underline'>
                           #{sds_category} <span class='ex-category-source'>SDS URI</span>
                          </a>"
