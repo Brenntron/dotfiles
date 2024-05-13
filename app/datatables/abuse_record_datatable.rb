@@ -12,7 +12,7 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
         record_id:          {source: "AbuseRecord.id"},
         complaint_entry_id: {source: "AbuseRecord.complaint_entry_id"},
         url:                {source: "AbuseRecord.url", data: :url},
-        date_resolved:      {source: "ComplaintEntry.case_resolved_at", data: :date_resolved, cond: :date_range},
+        date_resolved:      {source: "ComplaintEntry.case_resolved_at", data: :date_resolved},
         analyst:            {source: "AbuseRecord.submitter", data: :analyst},
         source:             {source: "AbuseRecord.source", data: :source},
         report_id:          {source: "AbuseRecord.report_ident", data: :report_id},
