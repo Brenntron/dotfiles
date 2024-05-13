@@ -5413,6 +5413,12 @@ table > tbody > tr > td.dispute_rep_tools {
 .no-margin-datatable-top-tool {
   margin: 0 !important;
 }
+
+// webrep dispute index datatable
+.custom-margin-datatable-top-tool {
+  margin: 0 0 15px;
+}
+
 .dispute-count, .entry-count {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
@@ -12393,7 +12399,8 @@ input[type="radio"].resolution_radio_button, input[type="radio"].review_radio_bu
 }
 
 
-@media (min-width: 2170px) {
+// toolbar condense breakpoint chosen for browser compatibility
+@media (min-width: 2190px) {
   #webrep-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
