@@ -63,6 +63,7 @@ $ ->
     localStorage.setItem('webcat_search_name', filter_url)
     localStorage.removeItem('webcat_search_conditions')
     $('#complaints-index').DataTable().state.clear()
+    $('.search-condition').remove()
 
     new_url = '/escalations/webcat/complaints' + filter_url
     if $('#complaints-index').length

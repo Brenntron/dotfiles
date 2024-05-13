@@ -64,6 +64,10 @@ window.build_complaints_table = (url) ->
         # Keep this function at top of complete
         $('#complaints-index tbody').removeClass('hide')
 
+        # enable the sort buttons
+        $('#webcat-index-table-sort-button').removeAttr('disabled')
+        $('#sort-btn-group button').removeAttr('disabled')
+
         # Get display prefs
         get_display_prefs()
         # Set active sort, unless its already set
