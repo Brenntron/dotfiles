@@ -87,7 +87,7 @@ build_csam_reports_table = () ->
       {
         targets: [0, 8]
         orderable: false
-        searcheable: false
+        searchable: false
         sortable: false
       }
     ]
