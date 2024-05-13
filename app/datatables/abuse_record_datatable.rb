@@ -39,14 +39,4 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
   def get_raw_records
     AbuseRecord.left_joins(:complaint_entry).all
   end
-
-  def sort_records (records)
-    case datatable.orders.first.column.sort_query
-    when 'complaint_entries.case_resolved_at'
-      records.order("complaint_entries.case_resolved_at #{datatable.orders.first.direction}")
-    else
-      super
-    end
-  end
-
 end
