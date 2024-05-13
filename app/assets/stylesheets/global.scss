@@ -10780,7 +10780,7 @@ hr.thin.form-divider {
   overflow: scroll;
 }
 
-// dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
+// new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
   min-width: 540px;
   margin-left: 35px;
@@ -10795,7 +10795,7 @@ hr.thin.form-divider {
     overflow: hidden;
     padding: 2px 0;
     text-overflow: ellipsis;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
   }
   .search-condition{
     padding: 1px
@@ -10827,9 +10827,8 @@ hr.thin.form-divider {
   }
 }
 
-// dbinebri: file reputation - new ticket specific styles inside the new ticket container
+// file reputation - new ticket specific styles inside the new ticket container
 .escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
-
   // radio specific styles
   .file-rep-radio-wrapper {
     input[type="radio"] {
@@ -12389,31 +12388,24 @@ input[type="radio"].resolution_radio_button, input[type="radio"].review_radio_bu
   }
 }
 
-@media screen and (max-width: 1699px)  and (min-width: 908px ) {
-  #disputes-index_wrapper {
-    top: -55px;
-  }
+#disputes-index_wrapper {
+  top: -55px;
 }
-@media (min-width: 1850px) {
 
+
+@media (min-width: 2170px) {
   #webrep-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
-      padding-left: 13px;
-      padding-right: 7px;
+      padding-left: 14px;
+      padding-right: 8px;
       min-height: 25px;
-      background-size: 14px 14px; // icon size
+      background-size: 15px 15px;
       transition: background-color 0.2s;
       .toolbar-button-text {
         display: inline-block;
       }
     }
-  }
-}
-
-@media (min-width: 2030px) {
-  #disputes-index_wrapper {
-    top: -55px;
   }
 }
 
@@ -14640,3 +14632,8 @@ td > a.ban {
     margin-left: 10px;
   }
 }
+
+.icon-autoresolved {
+  margin-left: 3px;
+}
+
