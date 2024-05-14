@@ -4,6 +4,22 @@ module Escalations::Webcat::ComplaintEntriesHelper
     ComplaintEntry.first_two_time_layers(created_at_in_words)
   end
 
+  def complaint_entry_age_class(complaint_entry)
+    age_class = ''
+
+    unless complaint_entry.status == 'COMPLETED' || complaint_entry.status == 'RESOLVED'
+      age_int = (Time.now - complaint_entry.created_at).to_i
+
+      if age_int > 43200
+        age_class = 'ticket-age-over12hr'
+      elsif age_int > 10800
+        age_class = 'ticket-age-over3hr'
+      end
+    end
+
+    return age_class
+  end
+
   def search_condition_json(named_search)
     named_search.named_search_criteria.pluck(:field_name, :value).to_h.to_json
   end

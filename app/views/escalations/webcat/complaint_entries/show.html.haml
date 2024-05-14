@@ -210,7 +210,7 @@
       .complaint-age-wrapper
         %label.content-label-sm
           Age
-        .complaint-complaint_entry-age.top-info-data
+        .complaint-complaint_entry-age.top-info-data{ class: complaint_entry_age_class(@complaint_entry).to_s }
           = complaint_entry_age @complaint_entry
     .col-xs-2.col-with-divider
       .complaint-submitted-at-wrapper
