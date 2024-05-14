@@ -33,7 +33,7 @@ gem 'inline_svg', '1.3.1'
 gem 'selectize-rails', '~> 0.12.4'
 
 # Database
-gem 'mysql2'
+gem 'mysql2', '0.5.6'
 gem 'paper_trail', '12.0.0'
 gem 'rails_admin', '~> 2.2.1'
 gem 'redis'
