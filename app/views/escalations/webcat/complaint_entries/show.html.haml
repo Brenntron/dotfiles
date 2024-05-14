@@ -217,7 +217,7 @@
         %label.content-label-sm
           Platform
         .submitted-time.top-info-data
-          = @complaint_entry.platform&.public_name || 'None'
+          = @complaint_entry.determine_platform || 'None'
       .complaint-age-wrapper
         %label.content-label-sm
           Source
