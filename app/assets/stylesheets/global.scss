@@ -5415,8 +5415,14 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 // webrep dispute index datatable
-.custom-margin-datatable-top-tool {
+.custom-margin-datatable {
   margin: 0 0 15px;
+  #disputes-index_filter {
+    padding-right: 4px;
+    .table-search-input {
+      margin-left: 4px;
+    }
+  }
 }
 
 .dispute-count, .entry-count {

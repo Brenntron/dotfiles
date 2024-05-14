@@ -1151,7 +1151,7 @@ $ ->
       9
       'desc'
     ] ]
-    dom: '<"datatable-top-tools custom-margin-datatable-top-tool"lf>t<ip>'
+    dom: '<"datatable-top-tools custom-margin-datatable"lf>t<ip>'
     language: {
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
