@@ -72,8 +72,11 @@ $ ->
 
 
 build_csam_reports_table = () ->
+  entries_per_page = localStorage.getItem 'csam_entries_per_page'
+
   csam_table = $('#webcat-csam-reports-index').DataTable(
     select: true
+    pageLength: entries_per_page
     processing: true
     serverSide: true
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
@@ -93,6 +96,11 @@ build_csam_reports_table = () ->
     ]
     ajax:
       url: $('#webcat-scam-reports-index').data('source')
+      complete: () ->
+        # set listener for table length changes and save to localstorage
+        $('#webcat-csam-reports-index').DataTable().on('length.dt', (e, settings, len) ->
+          localStorage.setItem 'csam_entries_per_page', len
+        )
       error: () ->
         console.log 'There has been an error calling the backend data'
     columns: [
