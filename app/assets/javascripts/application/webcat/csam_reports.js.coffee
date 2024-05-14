@@ -10,18 +10,43 @@ $ ->
     $('#resend-csam-reports-button').click ->
       entries = []
       $('#webcat-csam-reports-index tr.selected').each ->
-        entry_id = $(this).find('.report-entry-id-col').text()
-        url = $(this).find('.entry-url-col').text()
+        $this = $(this)
+        entry_id = $this.find('.report-entry-id-col').text()
+
+        return true if entries.some((entry) -> entry.entry_id == entry_id)
+
+        source = $this.find('.report-id-wrapper').attr('data-report-source')
+        url = $this.find('.entry-url-col').text()
         entry_data = {entry_id: entry_id, url: url}
+
+        alternate_source = if source == 'IWF' then 'NCMEC' else 'IWF'
+
+        entry_data["#{source.toLowerCase()}_id"] = $("span[data-report-source='#{source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+        entry_data["#{alternate_source.toLowerCase()}_id"] = $("span[data-report-source='#{alternate_source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+
         entries.push(entry_data)
       open_resubmit_report_dialog(entries)
 
     $('#email-csam-reports-button').click ->
       entries = []
       $('#webcat-csam-reports-index tr.selected').each ->
-        entry_id = $(this).find('.report-entry-id-col').text()
-        url = $(this).find('.entry-url-col').text()
-        entry_data = {entry_id: entry_id, url: url}
+        $this = $(this)
+        entry_id = $this.find('.report-entry-id-col').text()
+
+        return true if entries.some((entry) -> entry.entry_id == entry_id)
+
+        source = $this.find('.report-id-wrapper').attr('data-report-source')
+        url = $this.find('.entry-url-col').text()
+        entry_data = {
+          entry_id: entry_id,
+          url: url
+        }
+
+        alternate_source = if source == 'IWF' then 'NCMEC' else 'IWF'
+
+        entry_data["#{source.toLowerCase()}_id"] = $("span[data-report-source='#{source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+        entry_data["#{alternate_source.toLowerCase()}_id"] = $("span[data-report-source='#{alternate_source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+
         entries.push(entry_data)
       open_forward_report_dialog(entries)
 
@@ -48,7 +73,9 @@ $ ->
 
 
     window.forward_csam_report = () ->
-      cc_email = $('#cc_email_address').val()
+      $cc_email_input = $('#cc_email_address')
+      cc_email = $cc_email_input.val()
+
       $('#forward_csam_reports_table tbody tr').each ->
         entry_id = $(this).find('.report-entry-id-col').text()
         data = {complaint_entry_id: entry_id, cc: cc_email}
@@ -62,6 +89,7 @@ $ ->
             $('#forward_csam_reports_table tbody').empty()
             $('#forward_csam_reports_dialog').dialog 'close'
             std_msg_success('Success', ['Report emailed.'])
+            $cc_email_input.val('')
           error: (response) ->
             console.log response
             $('#forward_csam_reports_table tbody').empty()
@@ -135,7 +163,16 @@ build_csam_reports_table = () ->
         className: 'csam-report-id-col'
         render: (data, type, full, meta) ->
           if full.report_id? && full.report_id != ''
-            return '<span class="report-id-wrapper" data-record-id="' + full.record_id + '" data-report-id="' + full.report_id + '" data-report-source="' + full.source + '">' + full.report_id + '</span>'
+            return """
+                <span
+                  class="report-id-wrapper"
+                  data-entry-id="#{full.complaint_entry_id}"
+                  data-record-id="#{full.record_id}"
+                  data-report-id="#{full.report_id}"
+                  data-report-source="#{full.source}">
+                    #{full.report_id}
+                </span>
+              """
           else
             return ''
       }
@@ -147,9 +184,24 @@ build_csam_reports_table = () ->
         className: 'tools-col'
         render: (data, type, full, meta) ->
 
-          buttons =
-            '<button id="resend_csam_report_' + data + '" class="toolbar-button toolbar-button-spacer icon-reports esc-tooltipped resend-csam-report" title="Resend report" data-entry-id="' + full.complaint_entry_id + '" data-url="' + full.url + '"></button>' +
-            '<button id="forward_csam_report_' + data + '" class="toolbar-button icon-email esc-tooltipped forward-csam-report" title="Forward report to external email address" data-entry-id="' + full.complaint_entry_id + '" data-url="' + full.url + '"></button>'
+          buttons = """
+            <button
+              id="resend_csam_report_#{data}"
+              class="toolbar-button toolbar-button-spacer icon-reports esc-tooltipped resend-csam-report"
+              title="Resend report"
+              data-entry-id="#{full.complaint_entry_id}"
+              data-source="#{full.source}"
+              data-url="#{full.url}">
+            </button>
+            <button
+              id="forward_csam_report_#{data}"
+              class="toolbar-button icon-email esc-tooltipped forward-csam-report"
+              title="Forward report to external email address"
+              data-entry-id="#{full.complaint_entry_id}"
+              data-source="#{full.source}"
+              data-url="#{full.url}">
+            </button>
+          """
           return buttons
       }
     ]
@@ -170,15 +222,39 @@ build_csam_reports_table = () ->
         debug: false
 
       $('.resend-csam-report').click ->
-        entry_id = $(this).attr('data-entry-id')
-        url = $(this).attr('data-url')
-        entry_data = {entry_id: entry_id, url: url}
+        $this = $(this)
+        entry_id = $this.attr('data-entry-id')
+        url = $this.attr('data-url')
+
+        entry_data = {
+          entry_id: entry_id,
+          url: url
+        }
+
+        source = $this.attr('data-source')
+        alternate_source = if source == 'IWF' then 'NCMEC' else 'IWF'
+
+        entry_data["#{source.toLowerCase()}_id"] = $("span[data-report-source='#{source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+        entry_data["#{alternate_source.toLowerCase()}_id"] = $("span[data-report-source='#{alternate_source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+
         open_resubmit_report_dialog([entry_data])
 
       $('.forward-csam-report').click ->
-        entry_id = $(this).attr('data-entry-id')
-        url = $(this).attr('data-url')
-        entry_data = {entry_id: entry_id, url: url}
+        $this = $(this)
+        entry_id = $this.attr('data-entry-id')
+        url = $this.attr('data-url')
+
+        entry_data = {
+          entry_id: entry_id,
+          url: url
+        }
+
+        source = $this.attr('data-source')
+        alternate_source = if source == 'IWF' then 'NCMEC' else 'IWF'
+
+        entry_data["#{source.toLowerCase()}_id"] = $("span[data-report-source='#{source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+        entry_data["#{alternate_source.toLowerCase()}_id"] = $("span[data-report-source='#{alternate_source}'][data-entry-id='#{entry_id}']").attr('data-report-id')
+
         open_forward_report_dialog([entry_data])
   )
 
@@ -208,7 +284,22 @@ open_resubmit_report_dialog = (entries) ->
   $(entries).each ->
     entry_id = this.entry_id
     url = this.url
-    dialog_table_row = "<tr><td class='report-entry-id-col'>#{entry_id}</td><td class='entry-url-col'>#{url}</td></tr>"
+    dialog_table_row = """
+      <tr>
+        <td class='report-entry-id-col'>
+          #{this.entry_id}
+        </td>
+        <td class='entry-url-col'>
+          #{this.url}
+        </td>
+        <td class='entry-iwf-report-col'>
+          #{this.iwf_id}
+        </td>
+        <td class='entry-ncmec-report-col'>
+          #{this.ncmec_id}
+        </td>
+      </tr>
+      """
     $('#resend_csam_reports_table').append(dialog_table_row)
 
   $('#resend_csam_reports_dialog').dialog 'open'
@@ -217,11 +308,23 @@ open_resubmit_report_dialog = (entries) ->
 open_forward_report_dialog = (entries) ->
   $('#forward_csam_reports_table tbody').empty()
   $(entries).each ->
-    entry_id = this.entry_id
-    url = this.url
-    dialog_table_row = "<tr><td class='report-entry-id-col'>#{entry_id}</td><td class='entry-url-col'>#{url}</td></tr>"
+    dialog_table_row = """
+      <tr>
+        <td class='report-entry-id-col'>
+          #{this.entry_id}
+        </td>
+        <td class='entry-url-col'>
+          #{this.url}
+        </td>
+        <td class='entry-iwf-report-col'>
+          #{this.iwf_id}
+        </td>
+        <td class='entry-ncmec-report-col'>
+          #{this.ncmec_id}
+        </td>
+      </tr>
+      """
+
     $('#forward_csam_reports_table').append(dialog_table_row)
 
   $('#forward_csam_reports_dialog').dialog 'open'
-
-
