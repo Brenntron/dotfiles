@@ -53,15 +53,16 @@
       justify-content: center;
     }
 
-    .loader-text {
-      display: flex;
+    .loader-msg {
+      font-size: 10pt;
+      color: #777;
     }
 
     .loader-gears {
       display: flex;
-      height: 40px;
+      height: 30px;
       margin: 0;
-      width: 40px;
+      width: 30px;
     }
   }
 
