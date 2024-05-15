@@ -87,12 +87,13 @@ $ ->
           success: (response) ->
             console.log response
             $('#forward_csam_reports_table tbody').empty()
+            $cc_email_input.val('')
             $('#forward_csam_reports_dialog').dialog 'close'
             std_msg_success('Success', ['Report emailed.'])
-            $cc_email_input.val('')
           error: (response) ->
             console.log response
             $('#forward_csam_reports_table tbody').empty()
+            $cc_email_input.val('')
             $('#forward_csam_reports_dialog').dialog 'close'
             std_msg_error('Error', ['Report was not able to be forwarded.'])
         , this)
