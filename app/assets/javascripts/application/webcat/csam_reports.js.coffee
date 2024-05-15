@@ -101,7 +101,7 @@ $ ->
 
 
 build_csam_reports_table = () ->
-  entries_per_page = localStorage.getItem 'csam_entries_per_page'
+  entries_per_page = localStorage.getItem('csam_entries_per_page') || 10
 
   csam_table = $('#webcat-csam-reports-index').DataTable(
     select: true
