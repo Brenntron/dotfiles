@@ -7,10 +7,10 @@
       Categorize URLs
     .row.categorize-radio-wrapper
       .col-xs-6
-        %input.cat-url-radio{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-diff', value: 'cat-urls-diff', checked: true}
+        %input.cat-url-radio{type: 'radio', autocomplete: 'off', name: 'categorize-url-form-type', id: 'cat-urls-diff', value: 'cat-urls-diff', checked: true}
         %label.radio-label{for: 'cat-urls-diff'} Different categories for each url
       .col-xs-6
-        %input.cat-url-radio{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-same', value: 'cat-urls-same'}
+        %input.cat-url-radio{type: 'radio', autocomplete: 'off', name: 'categorize-url-form-type', id: 'cat-urls-same', value: 'cat-urls-same', checked: false}
         %label.radio-label{for: 'cat-urls-same'} Same categories for all urls
 
     .nav-tool-content-wrapper#categorize-urls-form-wrapper
@@ -138,4 +138,4 @@
               = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
               %span.loader-msg Loading data...
             %button.add-categories-button.primary#cat_multiple_urls{type: "button", onclick: "multiple_url_categorization()"} Categorize URLs
-            %button.remove-categories.secondary{type: "button", onclick: "drop_multiple_url_categories()"} Drop Categories
+            %button.remove-categories.secondary{type: "button", onclick: "drop_multiple_url_categories()"} Drop All Categories
