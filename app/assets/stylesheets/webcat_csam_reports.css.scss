@@ -41,6 +41,30 @@
 }
 
 #webcat-csam-reports-index {
+  &_processing {
+    padding: 0;
+    top: 90px;
+
+    .loader-container {
+      align-items: center;
+      display: flex;
+      font-style: italic;
+      gap: 0 5px;
+      justify-content: center;
+    }
+
+    .loader-text {
+      display: flex;
+    }
+
+    .loader-gears {
+      display: flex;
+      height: 40px;
+      margin: 0;
+      width: 40px;
+    }
+  }
+
   .tools-col {
     padding: 3px 0 0 8px;
     text-align: right;
