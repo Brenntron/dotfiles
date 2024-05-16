@@ -1066,6 +1066,7 @@ $ ->
 
 
   @tableAttributes =
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
