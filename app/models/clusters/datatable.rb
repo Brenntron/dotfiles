@@ -4,7 +4,7 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
     @user = user
     @params = params
     @platforms = prepare_platforms_filter(params[:platform])
-    super(params, {})
+    super(params, {json_content: true})
   end
 
   def view_columns
@@ -117,5 +117,19 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
     return [] if platforms.blank? || platforms.sort == SUPPORTED_PLATFORMS.sort
     
     platforms
+  end
+
+  def sanitize(data)
+    data.map do |record|
+      if record.is_a?(Array)
+        record.map { |td| ERB::Util.html_escape(td) }
+      elsif record.is_a?(Hash)
+        if options[:json_content]
+          record
+        else
+          record.update(record) { |_, v| ERB::Util.html_escape(v) }
+        end
+      end
+    end
   end
 end
