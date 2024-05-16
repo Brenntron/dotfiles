@@ -1,5 +1,5 @@
 namespace 'AC.WebCat.Whois', (exports) ->
-  exports.get_whois_data = (ipDomain, callback) ->
+  exports.get_whois_data = (ipDomain, success_callback, error_callback) ->
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/cloud_intel/whois/lookup'
@@ -7,7 +7,7 @@ namespace 'AC.WebCat.Whois', (exports) ->
         name: ipDomain
       success: (response) ->
         formattedData = formatIcannData(response.data)
-        callback(formattedData)
+        success_callback(formattedData)
       error: (response) ->
         if response?
           { responseJSON } = response
@@ -20,6 +20,7 @@ namespace 'AC.WebCat.Whois', (exports) ->
           return $.each(response.responseJSON, (key, value) ->
             console.error value
           )
+        error_callback()
     )
 
   # The cluster whois dialog doesn't require all the iformation returned by TESS.

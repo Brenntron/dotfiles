@@ -18,6 +18,10 @@
           %th
             category
       %tbody#ce_domain_history_table_body
+    .loader-div#ce_domain_history_loader
+      %span.loader-msg Loading Whois data...
+      .loader-gears
+        = inline_svg 'icon_gears_loader.svg'
     %h5.text-uppercase
       entry history
     %table.data-report-table.bottom-divider#ce_entry_history_table
@@ -29,6 +33,11 @@
             user
           %th
             details
+      %tbody#ce_entry_history_table_body
+    .loader-div#ce_entry_history_loader
+      %span.loader-msg Loading Whois data...
+      .loader-gears
+        = inline_svg 'icon_gears_loader.svg'
     %h5.text-uppercase
       xbrs history
     %table.data-report-table.bottom-divider#ce_xbrs_history_table
@@ -47,6 +56,10 @@
           %th
             rule hits
       %tbody#ce_xbrs_history_table_body
+    .loader-div#ce_xbrs_history_loader
+      %span.loader-msg Loading Whois data...
+      .loader-gears
+        = inline_svg 'icon_gears_loader.svg'
     %h5.text-uppercase
       related history
     %table.data-report-table#ce_related_history_table
@@ -65,3 +78,7 @@
           %th
             last modified
       %tbody#ce_related_history_table_body
+    .loader-div#ce_related_history_loader
+      %span.loader-msg Loading Whois data...
+      .loader-gears
+        = inline_svg 'icon_gears_loader.svg'

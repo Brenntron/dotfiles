@@ -84,6 +84,10 @@
 
     .external-categories-section
       %h4.ticket-report-header Current Categories
+    .loader-div#current_categories_loader
+      %span.loader-msg Loading Whois data...
+      .loader-gears
+        = inline_svg 'icon_gears_loader.svg'
 
     .tags-section
       %h4.ticket-report-header Tags
@@ -190,10 +194,8 @@
     %h4.ticket-report-header
       Whois
     .whois-data-container#whois_data_container
-    %label.data-report-label
-      Domain
-    %table.data-report-table#ce_domain_table
-      %tbody#ce_domain_tbody
+    %table.data-report-table#ce_whois_table
+      %tbody
         %tr
           %td.data-report-table-column-header
             - if @complaint_entry.domain.present?
@@ -202,6 +204,10 @@
               IP Address
           %td#domain_title
             = @whois_lookup
+    .loader-div#whois_loader
+      %span.loader-msg Loading Whois data...
+      .loader-gears
+        = inline_svg 'icon_gears_loader.svg'
 :javascript
   $(document).ready(function() {
     window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');

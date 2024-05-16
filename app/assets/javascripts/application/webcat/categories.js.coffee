@@ -205,6 +205,7 @@ namespace 'AC.WebCat', (exports) ->
               minWidth: '820'
         else
           current_category_tables = wbrs_table + sds_table
+          $('#current_categories_loader').hide()
           $('.external-categories-section').append current_category_tables
       error: (response) ->
         error_callback(response)

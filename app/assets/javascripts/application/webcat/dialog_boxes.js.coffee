@@ -198,10 +198,12 @@ window.whois_dialog = (ipDomain) ->
 
   whois_callback = (formattedData) ->
     $("#icann_whois").append("<div id='icannContent'>#{formattedData}</div>")
-
     $('#icann_whois > .webcat-loader-wrapper').hide()
 
-  AC.WebCat.Whois.get_whois_data(ipDomain, whois_callback)
+  error_callback = () ->
+    $('#icann_whois > .webcat-loader-wrapper').hide()
+
+  AC.WebCat.Whois.get_whois_data(ipDomain, whois_callback, error_callback)
 
 $ ->
   # initialize bulk resolution dialog

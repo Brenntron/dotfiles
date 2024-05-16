@@ -12,6 +12,7 @@ $selectize-border: #E5E5E5;
   &.top-case-info {
     padding-bottom: 15px;
   }
+
   @-moz-document url-prefix() {
     .complaint-owner-buttons-wrapper button#index_change_assign {
       position: relative;
@@ -101,7 +102,6 @@ $selectize-border: #E5E5E5;
     margin: 0 3px;
     width: 20px;
   }
-
 }
 
 .ce-research-tab {
@@ -147,9 +147,11 @@ $selectize-border: #E5E5E5;
   p {
     font-size: 12px;
   }
+
   #ce_description {
     word-break: break-all;
   }
+
   .ce-input:disabled {
     color: $type-lighter-color;
     cursor: not-allowed;
@@ -500,5 +502,21 @@ $selectize-border: #E5E5E5;
     font-weight: 900;
     padding-right: 5px;
     width: 125px;
+  }
+
+  .loader-div {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 15px auto 0 auto;
+    padding: 12px 20px;
+    text-align: center;
+    width: 100%;
+
+    .loader-gears {
+      height: 40px;
+      width: 40px;
+      margin: 5px;
+    }
   }
 }

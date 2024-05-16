@@ -202,9 +202,13 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   render_whois_table = (domain) ->
     whois_callback = (formattedData) ->
+      $('#whois_loader').hide()
+      $('#ce_whois_table').hide()
       $('#whois_data_container').append formattedData
+    error_callback = () ->
+      $('#whois_loader').hide()
 
-    AC.WebCat.Whois.get_whois_data(domain, whois_callback)
+    AC.WebCat.Whois.get_whois_data(domain, whois_callback, error_callback)
 
   get_current_categories = () ->
     error_callback = (errorResponse) ->
@@ -226,6 +230,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
         # remove baseline domain entry
         data.splice(0, 1)
+
+        $('#ce_domain_history_loader').hide()
 
         $('#ce_domain_history_table').DataTable
           data: data
@@ -261,6 +267,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       error: (errorResponse) ->
         console.error(errorResponse)
         std_api_error(errorResponse, "Domain History for this Entry could not be retrieved.", reload: false)
+        $('#ce_domain_history_loader').hide()
       )
 
   get_entry_history = () ->
@@ -274,7 +281,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         parsed_response = $.parseJSON(response)
 
         if parsed_response.error
-          alert(response.error)
+          std_msg_error(response.error, [])
+          console.error(response)
+          $('#ce_entry_history_loader').hide()
         else
           formatted_entry_history = parsed_response.entry_history.complaint_history.map((historical_data) ->
             formatted_history_data = {}
@@ -288,6 +297,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
             return formatted_history_data
           )
+
+          $('#ce_entry_history_loader').hide()
 
           $('#ce_entry_history_table').DataTable
             data: formatted_entry_history
@@ -321,6 +332,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             ]
           $('#ce_entry_history_table')
       error: (response) ->
+        std_msg_error(response.error, [])
+        console.error(response)
+        $('#ce_entry_history_loader').hide()
     )
 
   get_xbrs_history = (url) ->
@@ -334,10 +348,14 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         data = response.data
 
         if data.error?
+          console.error(data.error)
           std_msg_error(data.error, [])
+          $('#ce_xbrs_history_loader').hide()
         else
           for datum in data
             datum['sortable_time'] = moment(datum.time, 'MMMM D, YYYY at HH:mm A')
+
+          $('#ce_xbrs_history_loader').hide()
 
           $('#ce_xbrs_history_table').DataTable({
             data: data
@@ -379,10 +397,13 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           })
       error: (error) ->
         console.error(error)
+        std_msg_error(error, [])
+        $('#ce_xbrs_history_loader').hide()
     )
 
   get_related_history = (domain) ->
     # TODO: implement this when the related history endpoint exists.
+    $('#ce_related_history_loader').hide()
     $('#ce_related_history_table').DataTable({
       data: {}
       ordering: true
@@ -589,6 +610,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
         std_msg_error("Error submitting entry", msg, reload: false)
         remove_entry_from_changes(data.entry_id, 'submit')
+        console.error(msg)
     , this)
 
   # Sending individual reviewed (PENDING) entry info to the backend
@@ -606,7 +628,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         remove_entry_from_changes(data.entry_id, 'submit')
       error: (response) ->
         msg = response.resonseJSON.error
-
+        console.error(msg)
         std_msg_error("Error submitting reviewed entries", msg, reload: false)
     , this)
 
@@ -631,6 +653,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $button.removeAttr('disabled')
 
       error: (response) ->
+        console.error(response)
         std_msg_error(response,"", reload: false)
     )
 
