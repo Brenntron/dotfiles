@@ -293,7 +293,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
             delete historical_data[1]['whodunnit']
 
-            formatted_history_data['details'] = historical_data[1]
+            formatted_history_data['changes'] = historical_data[1]
 
             return formatted_history_data
           )
@@ -302,11 +302,32 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
           $('#ce_entry_history_table').DataTable
             data: formatted_entry_history
+            dom: 'fi<"datatable-top-tools no-margin-datatable-top-tool"l>tipr'
             ordering: true
+            order: [[ 3, 'desc' ]]
             info: false
-            paging: false
+            drawCallback: () ->
+              # for longer descriptions let user toggle full vs truncated
+              $('.truncated-description').on 'click', () ->
+                toggle_truncation($(this))
+            pageLength: 10
             searching: false
             stateSave: false
+            columnDefs: [
+              {
+                targets: [ 0 ]
+                orderData: 3
+                width: '15%'
+              }
+              {
+                targets: [ 1 ],
+                width: '10%'
+              }
+              {
+                targets: [ 2 ],
+                width: '75%'
+              }
+            ]
             columns: [
               {
                 data: 'time'
@@ -317,11 +338,29 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               {
                 data: null
                 render: (data) ->
-                  details = data.details
+                  changes = data.changes
                   detail_segments = []
 
-                  for key, value of details
-                    detail_segments.push("<span class='bold'>#{key}</span>: #{value} <br>")
+                  for key, value of changes
+                    # The second item in the value array is the updated value in the changeset. The first item is the original value.
+                    updated_value = value[1]
+
+                    continue unless updated_value
+
+                    detail_span = if updated_value.length > 500
+                                    truncated_detail = updated_value.substring(0, 500)
+                                    "<span class='description-wrapper'>
+                                      #{truncated_detail}
+                                    </span>
+                                    <span class='truncated-description'
+                                          data-truncated='#{truncated_detail}'
+                                          data-full='#{updated_value}'>
+                                      &hellip;
+                                    </span>"
+                                  else
+                                    "<span class='description-wrapper'>#{updated_value}</span>"
+
+                    detail_segments.push("<span class='bold'>#{key}:</span> #{detail_span} <br>")
 
                   return detail_segments.join('')
               }
@@ -359,9 +398,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
           $('#ce_xbrs_history_table').DataTable({
             data: data
+            dom: 'fi<"datatable-top-tools no-margin-datatable-top-tool"l>tipr'
             ordering: true
+            order: [[ 6, 'desc' ]]
             info: false
-            paging: false
+            pageLength: 10
             searching: false
             stateSave: false
             columnDefs: [

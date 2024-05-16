@@ -22,6 +22,18 @@ window.clear_stored_entries = () ->
   sessionStorage.getItem("webcat_entries_reviewed") || ""
   sessionStorage.setItem("webcat_entries_reviewed", "")
 
+window.toggle_truncation = ($element) ->
+  truncated = $element.data('truncated')
+  full = $element.data('full')
+  $wrapper = $element.prev()
+
+  if $wrapper.text().trim() == truncated
+    $wrapper.text(full)
+    $element.html('&larr;')
+  else
+    $wrapper.text(truncated)
+    $element.html('&hellip;')
+
 $ ->
   clear_stored_entries()
 

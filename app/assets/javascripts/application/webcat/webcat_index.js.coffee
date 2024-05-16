@@ -101,16 +101,7 @@ build_complaints_table = (url) ->
 
         # for longer descriptions let user toggle full vs truncated
         $('.truncated-description').on 'click', () ->
-          short = $(this).attr('data-truncated')
-          full = $(this).attr('data-full')
-          wrapper = $(this).prev()
-
-          if $(wrapper).text() == short
-            $(wrapper).text(full)
-            $(this).html('&larr;')
-          else
-            $(wrapper).text(short)
-            $(this).html('&hellip;')
+          toggle_truncation($(this))
 
 
     createdRow: (row, data) ->

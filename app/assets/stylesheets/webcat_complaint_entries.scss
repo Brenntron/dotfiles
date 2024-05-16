@@ -271,6 +271,20 @@ $selectize-border: #E5E5E5;
       padding-left: 0;
       padding-right: 0;
     }
+
+    .description-wrapper {
+      word-break: break-all;
+      min-width: 150px;
+    }
+
+    .truncated-description {
+      // this is the hex code for the ellipsis character
+      //content: '\002026';
+      display: inline-block;
+      background-color: #d7e6ee;
+      cursor: pointer;
+      margin-left: 2px;
+    }
   }
 
   .ce-resolved-ip-uri-button-wrapper {
@@ -471,6 +485,12 @@ $selectize-border: #E5E5E5;
     &::placeholder {
       color: $type-lighter-color;
       font-style: italic;
+    }
+  }
+
+  .dataTables_wrapper {
+    .datatable-top-tools {
+      float: left;
     }
   }
 
