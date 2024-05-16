@@ -94,29 +94,30 @@ namespace 'AC.WebCat', (exports) ->
           if (current_categories || sds_category || sds_domain_category)
             tooltip_table = '<div class="current-external-cat-info">'
 
-        if current_categories
-          wbrs_table = "<label class='#{if is_index_page then 'tooltip-table-label' else 'data-report-label'}'>
-                            WBRS
-                          </label>
-                          <table class='#{if is_index_page then 'category-tooltip-table' else 'categories-table'}'>
-                            <thead>
-                              <tr>
-                                <th>
-                                  Conf
-                                </th>
-                                <th>
-                                  WBRS Categories
-                                </th>
-                                <th>
-                                  Certainty
-                                </th>
-                                <th colspan='3'>
-                                  Feeds
-                                </th>
-                            </tr>
-                          </thead>
-                          <tbody>"
+          wbrs_table = "<label class='tooltip-table-label'>WBRS</label>"
+        else
+          wbrs_table = ''
 
+        wbrs_table += "<table class='#{if is_index_page then 'category-tooltip-table' else 'categories-table'}'>
+                         <thead>
+                           <tr>
+                             <th>
+                               Conf
+                             </th>
+                             <th>
+                               WBRS Categories
+                             </th>
+                             <th>
+                               Certainty
+                             </th>
+                             <th colspan='3'>
+                               Feeds
+                             </th>
+                           </tr>
+                         </thead>
+                         <tbody>"
+
+        if Object.keys(current_categories).length > 0
           $.each current_categories, (conf, current_category) ->
             return 'continue' unless current_category.is_active
 
@@ -128,7 +129,7 @@ namespace 'AC.WebCat', (exports) ->
               certainties.forEach (certainty, index) ->
                 { certainty: source_certainty, source_description, source_mnemonic } = certainty
 
-                certainty_cells = "<tr>
+                wbrs_table += "<tr>
                                     <td class='alt-col}'>
                                        #{source_certainty}
                                      </td>
@@ -138,6 +139,7 @@ namespace 'AC.WebCat', (exports) ->
                                      <td class='alt-col}'>
                                        #{source_description}
                                      </td>
+                                     <td></td>
                                    </tr>"
             else
               wbrs_table += "<tr>
@@ -150,14 +152,15 @@ namespace 'AC.WebCat', (exports) ->
                                <td>
                                  #{top_certainty}
                                </td>
-                              <td colspan='3'></td>
+                              <td></td>
                              </tr>"
 
             wbrs_table += '</tr></tbody></table>'
-            tooltip_table += wbrs_table if is_index_page
 
             if conf == '1.0' && is_index_page
               primary_cat = '<a class="esc-tooltipped tooltip-underline">' + current_category.mnem + ' - ' + current_category.descr + ' <span class="ex-category-source">WBRS</span></a>'
+        else
+          wbrs_table += '<tr><td style="text-align: center;" colspan="4">No assigned categories.</td></tr>'
 
         if sds_category && is_index_page
           primary_cat = "<a class='esc-tooltipped tooltip-underline'>
@@ -170,28 +173,28 @@ namespace 'AC.WebCat', (exports) ->
                          </a>"
 
         # build the rest of the tooltip if there is stuff from SDS
-        if sds_domain_category || sds_category
-          sds_table = "<label class=#{ if is_index_page then 'tooltip-table-label' else 'data-report-label' }>
-                          SDS
-                        </label>
-                        <table class=#{ if is_index_page then 'category-tooltip-table' else 'categories-table' }>
-                          <thead>
-                            <tr>
-                              <th>SDS URI Category</th>
-                              <th>SDS Domain Category</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>#{sds_category}</td>
-                              <td>#{sds_domain_category}</td>
-                            </tr>
-                          </tbody>
-                        </table>"
+        sds_table = if is_index_page
+          "<label class='tooltip-table-label'>SDS</label>"
+        else
+          ''
+
+        sds_table += "<table class=#{ if is_index_page then 'category-tooltip-table' else 'categories-table' }>
+                        <thead>
+                          <tr>
+                            <th>SDS URI Category</th>
+                            <th>SDS Domain Category</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>#{ sds_category || 'No SDS URI Catgory' }</td>
+                            <td>#{ sds_domain_category || 'No SDS Domain Category' }</td>
+                          </tr>
+                        </tbody>
+                      </table>"
 
         if is_index_page
-          tooltip_table += sds_table
-          tooltip_table += '</div>'
+          tooltip_table += wbrs_table + sds_table + '</div>'
 
           $('#current_cat_' + entry_id).html(primary_cat)
 
