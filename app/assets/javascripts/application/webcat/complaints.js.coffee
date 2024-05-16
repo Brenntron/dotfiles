@@ -354,6 +354,14 @@ window.reopenComplaint = (entry_id) ->
         $(this).prop('disabled', false)
       $('#edit_uri_input_' + entry_id).removeAttr('disabled')
 
+      quick_disabled = 'disabled'
+      $('#quick_edit_dropdown_' + entry_id + ' ul li').each ->
+        unless $(this).hasClass('disabled')
+          quick_disabled = ''
+
+      if quick_disabled == ''
+        $('#quick_edit_uri_' + entry_id).removeAttr('disabled')
+
       # res comment when avail
       cat_input = $('#input_cat_' + entry_id)
       cat_input =   $('#input_cat_' + entry_id)[0].selectize

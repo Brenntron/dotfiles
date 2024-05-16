@@ -85,7 +85,7 @@ module API
                                          submitted_complaint[:status],
                                          submitted_complaint[:comment],
                                          submitted_complaint[:resolution_comment],
-                                         '',
+                                         submitted_complaint[:uri_as_categorized],
                                          current_user,
                                          submitted_complaint[:commit])
 
