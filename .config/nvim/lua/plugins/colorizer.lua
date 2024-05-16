@@ -6,7 +6,12 @@ local M = {
 
 function M.config()
   require("colorizer").setup({
-    "*",
+    "coffee",
+    "css",
+    "lua",
+    "ruby",
+    "vim",
+    "toml",
     html = { names = false},
     javascript = { names = false },
     yaml = { names = false },
