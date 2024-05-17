@@ -225,8 +225,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         'domain': domain
       success: (response) ->
         data = response.data
-        recent_data = data.at(-1)
-        description = recent_data.description
 
         # remove baseline domain entry
         data.splice(0, 1)
@@ -246,6 +244,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             }
             {
               data: 'confidence'
+            }
+            {
+              data: 'description'
             }
             {
               data: 'time_of_action'
