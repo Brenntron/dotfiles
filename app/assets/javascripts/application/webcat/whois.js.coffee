@@ -78,7 +78,6 @@ namespace 'AC.WebCat.Whois', (exports) ->
             'state',
             'province',
             'name servers',
-            'nserver',
             'created at',
             'created',
             'update at',
@@ -101,10 +100,12 @@ namespace 'AC.WebCat.Whois', (exports) ->
         domainStatus = '<h5>Domain Status</h5><table class="nested-dialog-table">'
         for ds in v
           domainStatus += "<tr><td>#{ds}</td></tr>" unless ds.includes('www')
-      else if k == 'nserver'
+      else if k == 'name servers' && v.length > 0
         nservers = '<h5>name servers</h5><table class="nested-dialog-table"'
         for ns in v
           nservers += "<tr><td>#{ns}</td></tr>"
+      else if k == 'nserver'
+        continue
       else
         dataString += "<tr><th scope='row'>#{k}</th><td>#{v}</td></tr>"
 
