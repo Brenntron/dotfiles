@@ -1,3 +1,5 @@
+require 'beaker/verdicts'
+
 class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
   SUPPORTED_PLATFORMS = ['Umbrella', 'Meraki', 'NGFW'].freeze
   def initialize(params, user)
@@ -37,9 +39,9 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
 
   def filter_records(records)
     records = records.where(cluster_type: @platforms) unless @platforms.empty?
-    records = records.where('domain REGEXP ?', @params[:regex]) if @params[:regex].present?
-    records = records.where('!IS_IPV4(domain)') if @params[:cluster_type] == 'domain'
-    records = records.where('IS_IPV4(domain)') if @params[:cluster_type] == 'ip'
+    records = records.where('web_cat_clusters.domain REGEXP ?', @params[:regex]) if @params[:regex].present?
+    records = records.where('!IS_IPV4(web_cat_clusters.domain)') if @params[:cluster_type] == 'domain'
+    records = records.where('IS_IPV4(web_cat_clusters.domain)') if @params[:cluster_type] == 'ip'
     case @params[:f]
     when 'my'
       records = records.where(domain: ClusterAssignment.get_assigned_cluster_domains_for(@user))
