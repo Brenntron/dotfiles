@@ -523,18 +523,13 @@ $selectize-border: #E5E5E5;
     }
   }
 
-  #ce_whois_label, #ce_name_servers_header {
+  .whois-data-container th {
     border-bottom: 1px solid $faint-neutral-color;
-  }
-
-  .ce-whois-table {
-    border-bottom: 1px solid $faint-neutral-color;
-    margin-top: 0;
   }
 
   .ce-allow-review-container {
     align-items: center;
-    background-color: #f2f2f2;
+    background-color: $faint-neutral-color;
     border-radius: 2px;
     column-gap: 5px;
     display: flex;
