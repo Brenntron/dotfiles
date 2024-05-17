@@ -201,7 +201,7 @@
       .complaint-second-reviewer-wrapper
         .complaint-owner-wrapper
           %div
-            %span.user-image#complaint-second_reviewer{ class: ('missing-data' if @complaint_entry.second_reviewer_id.nil? || @complaint_entry.second_reviewer.display_name == 'vrtincom' ) }= @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
+            %span.user-image#complaint-second-reviewer{ class: ('missing-data' if @complaint_entry.second_reviewer_id.nil? || @complaint_entry.second_reviewer.display_name == 'vrtincom' ) }= @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
