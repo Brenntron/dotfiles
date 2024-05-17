@@ -2,14 +2,13 @@
 
   .row
     .col-xs-2.col-with-divider.webcat-complaint-case-wrapper
+      %label.content-label-sm Complaint Entry ID
       .webcat-complaint-case-id-wrapper
         .complaint-entry-id
-          %label.content-label-sm Complaint Entry ID
           #complaint_entry_id.top-info-data
             = @complaint_entry.id.to_s
+        %label.content-label-sm Status
         .complaint-status-col-wrapper
-          %label.content-label-sm
-            Status
           -# bugzilla_popover_state
           - if @complaint_entry.resolution == ComplaintEntry::STATUS_RESOLVED_DUPLICATE
             .duplicate-status-notice
@@ -135,12 +134,12 @@
               %button.status-comment-button.esc-tooltipped{ title: @complaint_entry&.resolution_comment }
 
     .col-xs-2.col-with-divider
+      %label.content-label-sm
+        Users
       .complaint-assignee-wrapper
         .complaint-owner-wrapper
-          %label.content-label-sm
-            Assignee
-          %div.top-info-data
-            %span#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.cvs_username == 'vrtincom' ) }= @complaint_entry.user&.cvs_username || Unassigned
+          %div
+            %span.user-image#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.display_name == 'vrtincom' ) }= @complaint_entry.user&.display_name || Unassigned
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
@@ -148,10 +147,10 @@
                 %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
                                                              title: 'Return ticket to open queue' }
             - else
-              %span.dropdown
-                - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-assign{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
+              - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-assign{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
                                                                                                                 title: 'Assign this ticket to me' }
+                %span.dropdown
                   .dropdown-menu#show-change-assigne-dropdown{ 'aria-labelledby': 'index_change_assign' }
                     .change-assignee-dropdown-wrapper
                       %h3 Change Assignee
@@ -159,7 +158,7 @@
                         .toolbar
                           %div
                             %label.toolbar-section-label Assignee
-                            = select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                            = select_tag :index_target_assignee, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
                           %button.primary{ id: 'button_reassign',
                                            onclick: 'webcat_toolbar_show_change_assignee();',
                                            type: 'button' }
@@ -170,10 +169,8 @@
                                                                                                                                   title: 'Change Assignee' }
       .complaint-reviewer-wrapper
         .complaint-owner-wrapper
-          %label.content-label-sm
-            Reviewer
           %div
-            %span#complaint-reviewer{ class: ('missing-data' if @complaint_entry.reviewer_id.nil? || @complaint_entry.reviewer.cvs_username == 'vrtincom' ) }= @complaint_entry.reviewer&.cvs_username || 'Unassigned'
+            %span.user-image#complaint-reviewer{ class: ('missing-data' if @complaint_entry.reviewer_id.nil? || @complaint_entry.reviewer.display_name == 'vrtincom' ) }= @complaint_entry.reviewer&.display_name || 'No Reviewer'
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
@@ -181,10 +178,10 @@
                 %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
                                                              title: 'Return ticket to open queue' }
             - else
-              %span.dropdown
-                - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-reviewer{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
-                                                                                                                  title: 'Assign this ticket to me' }
+              - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-reviewer{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
+                                                                                                                title: 'Assign this ticket to me' }
+                %span.dropdown
                   .dropdown-menu#show-change-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
                     .change-assignee-dropdown-wrapper
                       %h3 Change Reviewer
@@ -192,35 +189,62 @@
                         .toolbar
                           %div
                             %label.toolbar-section-label reviewer
-                            = select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                            = select_tag :index_target_assignee, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
                           %button.primary{ id: 'button_reassign',
                                            onclick: 'webcat_toolbar_show_change_assignee();',
                                            type: 'button' }
-                            Reviewer
+                            Assign
                   %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#webcat-index-change-reviewer{ 'aria-expanded': 'false',
                                                                                                                                     'aria-haspopup': 'true',
                                                                                                                                     'data-toggle': 'dropdown',
                                                                                                                                     title: 'Change Assignee' }
+      .complaint-second-reviewer-wrapper
+        .complaint-owner-wrapper
+          %div
+            %span.user-image#complaint-second_reviewer{ class: ('missing-data' if @complaint_entry.second_reviewer_id.nil? || @complaint_entry.second_reviewer.display_name == 'vrtincom' ) }= @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
+        - if can? :update, ComplaintEntry
+          .complaint-owner-buttons-wrapper
+            - if @complaint_entry.user_id == current_user.id
+              - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
+                                                             title: 'Return ticket to open queue' }
+            - else
+              - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-second-reviewer{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
+                                                                                                                       title: 'Assign this ticket to me' }
+                %span.dropdown
+                  .dropdown-menu#show-change-second-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
+                    .change-assignee-dropdown-wrapper
+                      %h3 Change Second Reviewer
+                      .inline-tool-content-wrapper
+                        .toolbar
+                          %div
+                            %label.toolbar-section-label Second Reviewer
+                            = select_tag :index_target_assignee, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
+                          %button.primary{ id: 'button_reassign',
+                                           onclick: 'webcat_toolbar_show_change_assignee();',
+                                           type: 'button' }
+                            Assign
+                  %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#webcat-index-change-second-reviewer{ 'aria-expanded': 'false',
+                                                                                                                                           'aria-haspopup': 'true',
+                                                                                                                                           'data-toggle': 'dropdown',
+                                                                                                                                           title: 'Change Assignee' }
     .col-xs-2.col-with-divider
+      %label.content-label-sm Submitted At
       .complaint-submitted-at-wrapper
-        %label.content-label-sm
-          Submitted At
         .submitted-time.top-info-data
           = @complaint_entry.created_at
+      %label.content-label-sm Age
       .complaint-age-wrapper
-        %label.content-label-sm
-          Age
         .complaint-complaint_entry-age.top-info-data{ class: complaint_entry_age_class(@complaint_entry).to_s }
           = complaint_entry_age @complaint_entry
     .col-xs-2.col-with-divider
+      %label.content-label-sm Platform
       .complaint-submitted-at-wrapper
-        %label.content-label-sm
-          Platform
         .submitted-time.top-info-data
           = @complaint_entry.determine_platform || 'None'
+      %label.content-label-sm Source
       .complaint-age-wrapper
-        %label.content-label-sm
-          Source
         .complaint-complaint_entry-age.top-info-data
           - if @source
             - if @source == 'talos-intelligence'
@@ -232,23 +256,19 @@
           - else
             Internal
     .col-xs-2.col-with-divider
+      %label.content-label-sm Submitter Type
       .submitter-type-wrapper
-        %label.content-label-sm
-          Submitter Type
         .top-info-data= @complaint.submitter_type || 'NON-CUSTOMER'
+      %label.content-label-sm Submitter Organization
       .submitter-org-wrapper
-        %label.content-label-sm
-          Submitter Organization
         .top-info-data= @org_name
 
     .col-xs-2
+      %label.content-label-sm Contact Name
       .contact-name-wrapper
-        %label.content-label-sm
-          Contact Name
         .top-info-data.complaint-edit-field#complaint-customer-name= @complaint.customer&.name || 'None'
+      %label.content-label-sm Contact Email
       .contact-email-wrapper
-        %label.content-label-sm
-          Contact Email
         .top-info-data.complaint-edit-field#complaint-customer-email= @complaint.customer&.email || 'None'
 
 %ul.nav.nav-tabs#ce_tabs{ role: 'tablist' }
