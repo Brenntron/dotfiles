@@ -129,7 +129,9 @@ module API
             post 'proccess' do
               clusters = [params[:cluster]]
               # js converts array to hash on sending for some reason => .values
-              clusters += params.dig(:cluster, :duplicates).values if params.dig(:cluster, :duplicates).present?
+              clusters +=  JSON.parse(params.dig(:cluster, :duplicates)) if params.dig(:cluster, :duplicates).present?
+              clusters = clusters.map(&:with_indifferent_access)
+              clusters = clusters.map(&:with_indifferent_access)
               ::Clusters::Processor.new(clusters, current_user).process!
               return { status: 'success' }.to_json
             rescue Exception => e
@@ -144,6 +146,7 @@ module API
             end
             post 'process_multiple_reviewed' do
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              clusters = clusters.map(&:with_indifferent_access)
               ::Clusters::Processor.new(clusters, current_user).process!
               return { status: 'success' }.to_json
               rescue Exception => e
@@ -159,7 +162,8 @@ module API
             post 'decline' do
               clusters = [params[:cluster]]
               # js converts array to hash on sending for some reason => .values
-              clusters += params.dig(:cluster, :duplicates).values if params.dig(:cluster, :duplicates).present?
+              clusters +=  JSON.parse(params.dig(:cluster, :duplicates)) if params.dig(:cluster, :duplicates).present?
+              clusters = clusters.map(&:with_indifferent_access)
               ::Clusters::Processor.new(clusters, current_user).decline
               return { status: 'success' }.to_json
             rescue Exception => e
@@ -175,6 +179,7 @@ module API
             end
             post 'decline_multiple_reviewed' do
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              clusters = clusters.map(&:with_indifferent_access)
               ::Clusters::Processor.new(clusters, current_user).decline
               return {:status => "success"}.to_json
             rescue Exception => e
