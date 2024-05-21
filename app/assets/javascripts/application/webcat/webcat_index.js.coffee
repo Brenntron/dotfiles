@@ -3,7 +3,6 @@
 $ ->
   # call below and related functions only if we're on webcat index
   if $('#complaints-index').length
-
     # Create index table
     url = $('#complaints-index').data('source')
     $.when(window.pull_user_preference_filter()).done ->
@@ -11,7 +10,6 @@ $ ->
 
 #### New complaints index table setup
 window.build_complaints_table = (url) ->
-
   #get count of entries per page from localstorage, set to 25 if none found
   entries_per_page = localStorage.getItem 'webcat_entries_per_page'
   if entries_per_page == null then entries_per_page = 25
@@ -689,7 +687,7 @@ build_data = () ->
         else
           # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
           search_name = "MY TICKETS"
-        refresh_localStorage()
+        refresh_webcat_localStorage()
         data = {
           search_type: webcat_search_type
           search_name: search_name
@@ -708,7 +706,7 @@ build_data = () ->
     fav = $('.favorite-search-icon-active')
     if fav.length > 0
       search_name = $('#saved-searches-wrapper .active-link').text().trim()
-      refresh_localStorage()
+      refresh_webcat_localStorage()
       data = {
         search_type: 'named'
         search_name: search_name
@@ -724,7 +722,7 @@ build_data = () ->
       address = $(link).attr('href')
       filter = address.split('=').pop();
 
-      refresh_localStorage()
+      refresh_webcat_localStorage()
       data = {
         search_type: 'standard'
         search_name: filter
@@ -870,6 +868,7 @@ get_visible_reset_icon = ->
 get_reset_icon = (search_name) ->
   if current_page_is_favourite(search_name)
     reset_icon_class = 'hidden style="display: none"'
+    $('#filter-cases-list')
   else
     reset_icon_class = ''
   reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'

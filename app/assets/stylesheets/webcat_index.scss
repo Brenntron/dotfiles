@@ -502,6 +502,8 @@ table.dataTable tbody tr.submitting-entry {
 
 .sort-button {
   background-image: url(image_path('icon_sort_grey.svg'));
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .open .sort-button {
