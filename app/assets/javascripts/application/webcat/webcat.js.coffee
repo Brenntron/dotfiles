@@ -77,6 +77,7 @@ $ ->
       # (prevent errant clicks while new filter is loading)
       $('#complaints-index tbody').addClass('hide')
       $('#complaints-index').DataTable().destroy()
+      $('#filter-complaints').dropdown('toggle')
       window.build_complaints_table()
 
     else
@@ -162,6 +163,7 @@ $ ->
   window.webcat_refresh = ()->
     refresh_webcat_localStorage()
     refresh_url()
+    # add 'selected' to default filter
 
 
   refresh_url = (href) ->
@@ -208,6 +210,7 @@ $ ->
     )
 
 
+  # I don't see this being used anywhere
   window.use_user_preference_filter = () ->
     return if window.location.pathname != '/escalations/webcat/complaints'
 
