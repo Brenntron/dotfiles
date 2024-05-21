@@ -1071,6 +1071,7 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    stateSave: true
     pagingType: 'full_numbers'
     order: [ [
       6
