@@ -132,6 +132,7 @@ window.sort_webcat_index = () ->
   # disable all sort buttons temporarily while the data loads
   $('#webcat-index-table-sort-button').attr('disabled', true)
   $('#sort-btn-group button').attr('disabled', true)
+  localStorage.setItem('webcat_sort_order', [col, dir])
   $('#complaints-index').DataTable().order(col, dir).draw();
   $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()
@@ -168,6 +169,8 @@ window.toggle_direct_sort = (col, field, button) ->
   # disable all sort buttons temporarily while the data loads
   $('#webcat-index-table-sort-button').attr('disabled', true)
   $('#sort-btn-group button').attr('disabled', true)
+  # save to localstorage in case of page refresh
+  localStorage.setItem('webcat_sort_order', [col, desired_order])
   $('#complaints-index').DataTable().order(col, desired_order).draw();
   $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()
@@ -188,7 +191,7 @@ window.toggle_select_order = (button) ->
 window.set_active_sort = () ->
   # clear any existing active sort settings
   window.unset_active_sort()
-
+  # active sort settings on button are set *after* the dt is loaded
   curr_sort = $('#complaints-index').DataTable().order()
   col = curr_sort[0].toString()
   direction = curr_sort[1]

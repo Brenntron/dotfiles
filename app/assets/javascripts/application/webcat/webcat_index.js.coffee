@@ -151,8 +151,8 @@ window.build_complaints_table = (url) ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
-    # default ordering - keep on hidden age column
-    order: [ 10, 'desc' ]
+    # default ordering - see below function if columns of dt change. Should default to user's last sort OR age integer if none exists
+    order: get_last_sort_order()
     columnDefs: [
       {
         targets: [10,11,12,13,14,15,16,17]
@@ -901,3 +901,13 @@ set_icon_for_favorite_filter = (filter_name) ->
   else if saved_search
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
     saved_search.addClass 'active-link'
+
+
+window.get_last_sort_order = () ->
+  webcat_sort_order = localStorage.getItem 'webcat_sort_order'
+  if webcat_sort_order?
+    sort_arr = webcat_sort_order.split(',')
+    webcat_sort_order = [+sort_arr[0], sort_arr[1]]
+  else
+    webcat_sort_order = [10, 'desc']
+  return webcat_sort_order
