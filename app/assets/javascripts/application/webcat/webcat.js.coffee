@@ -286,8 +286,8 @@ $ ->
         return options
 
     assignee_input = $('#assignee-input').selectize {
-      persist: true
-      create: false
+      persist: true,
+      create: false,
       valueField: 'name',
       labelField: 'display_name',
       searchField: ['name', 'display_name'],
@@ -318,7 +318,7 @@ $ ->
     }
 
     category_input = $('#category-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       valueField: 'category_id',
       labelField: 'category_name',
@@ -330,7 +330,7 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
     $('#company-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       valueField: 'company_name',
       labelField: 'company_name',
@@ -467,7 +467,8 @@ $ ->
 
     $('#submitter-type-input').selectize {
       delimiter: ',',
-      persist: false,
+      persist: true,
+      create: false,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -904,27 +905,6 @@ window.toggle_selectize_layer = (input, focus) ->
   else
     $(select_parent).css('z-index', '2')
 
-
-# Let users copy the customer description
-window.copy_description = (item) ->
-  description = $(item).text()
-  dummy = document.createElement('input')
-  document.body.appendChild dummy
-  dummy.setAttribute 'value', description
-  dummy.select()
-  document.execCommand 'copy'
-  document.body.removeChild dummy
-
-  html = "<div class='copied-container'>" +
-            "<span class='copied-check'></span>" +
-            "<p id='copiedAlert'>Copied to clipboard</p>" +
-          "</div>"
-
-  $(item).after( html )
-  $('.copied-container').delay(1000).fadeOut(1000);
-  setTimeout (->
-    $(".copied-container").remove()
-  ), 2000
 
 
 ## SAVED (NAMED) SEARCH FUNCTIONS

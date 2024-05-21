@@ -108,6 +108,20 @@ window.build_complaints_table = (url) ->
           localStorage.setItem 'webcat_entries_per_page', len
         )
 
+        # for longer descriptions let user toggle full vs truncated
+        $('.truncated-description').on 'click', () ->
+          short = $(this).attr('data-truncated')
+          full = $(this).attr('data-full')
+          wrapper = $(this).prev()
+
+          if $(wrapper).text() == short
+            $(wrapper).text(full)
+            $(this).html('&larr;')
+          else
+            $(wrapper).text(short)
+            $(this).html('&hellip;')
+
+
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
       $(row).attr('data-categories', data.category)
@@ -123,7 +137,6 @@ window.build_complaints_table = (url) ->
         ### check variables below
             text_check makes sure that the table doesn't have the named search with the same name being saved now
             search_name_check makes sure that the search is being saved as a named search
-            Not super complicated, but that if statement was looking gross and confusing
         ###
         text_check = !window.find_saved_search_by_name(webcat_search_name)
         search_name_check = webcat_search_name != ''
@@ -292,7 +305,12 @@ window.build_complaints_table = (url) ->
         className: 'description-col'
         render: (data) ->
           if data?
-            description = '<span onclick="copy_description(this)">' + data + '</span>'
+            if data.length > 500
+              truncated_desc = data.substring(0, 500)
+              description = '<span class="description-wrapper">' + truncated_desc + '</span><span class="truncated-description" data-truncated="' + truncated_desc + '" data-full="' + data + '">&hellip;</span>'
+            else
+              description = '<span class="description-wrapper">' + data + '</span>'
+
           return description
       }
       {
@@ -315,11 +333,7 @@ window.build_complaints_table = (url) ->
         data: 'uri'
         className: 'uri-col'
         render: (data, type, full, meta) ->
-          if full.status == 'PENDING'
-            disabled = "disabled=true"
-          else
-            disabled = ''
-
+          # wbrs score section
           rep = wbrs_display(full.wbrs_score)
           wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
           if rep == undefined then rep = 'unknown'
@@ -329,17 +343,14 @@ window.build_complaints_table = (url) ->
           entry = data || full.ip_address
           domain = full.domain || full.ip_address
 
-          # disabling domain status since it is the default
-          domain_status = 'disabled'
-
-          if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.subdomain == '' && full.path == '')
-            edit_button_status = 'disabled="disabled"'
-            if (full.status == 'COMPLETED') || (full.status == 'PENDING')
-              input_status = 'disabled="disabled"'
-            else
-              input_status = ''
+          # quick edit button status & individual selections statuses
+          if full.uri_as_categorized? && full.uri_as_categorized != domain
+            domain_status = ''
+            domain_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + domain + '\', \'domain\');"'
           else
-            edit_button_status = ''
+            domain_status = 'disabled'
+            domain_function = ''
+
           if full.subdomain == ''
             sub_status = 'disabled'
             sub_function = ''
@@ -348,6 +359,7 @@ window.build_complaints_table = (url) ->
             sub_status = ''
             sub_val = full.subdomain + '.' + domain
             sub_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.subdomain + '.' + domain + '\', \'subdomain\');"'
+
           if full.path == ''
             path_status = 'disabled'
             path_function = ''
@@ -357,12 +369,27 @@ window.build_complaints_table = (url) ->
             path_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.uri + '\', \'uri\');"'
             path_val = full.uri
 
-          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
-            input_uri = full.uri_as_categorized
+          if (domain_status == 'disabled' && sub_status == 'disabled' && path_status == 'disabled') || (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            edit_button_status = 'disabled'
+          else
+            edit_button_status = ''
+
+          # value of the actual text input
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.status == 'REOPENED')
+            if full.uri_as_categorized? && full.uri_as_categorized != ''
+              input_uri = full.uri_as_categorized
+            else
+              input_uri = domain
           else if domain? && domain != ''
             input_uri = domain
           else
             input_uri = entry
+
+          # status of the input textbox
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            input_status = 'disabled'
+          else
+            input_status = ''
 
           domain_col =
             '<table class="nested-col-table">' +
@@ -377,7 +404,7 @@ window.build_complaints_table = (url) ->
               '<button class="edit-button" id="quick_edit_uri_' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"' + edit_button_status + '></button>' +
               '<div id="quick_edit_dropdown_' + full.entry_id + '" class="dropdown-menu quick-edit-uri-dropdown" aria-labelledby="quick_edit_uri_' + full.entry_id + '">' +
               '<ul>' +
-              '<li class="quick-domain ' + domain_status + '" data-val="' + domain + '">domain</li>' +
+              '<li class="quick-domain ' + domain_status + '" data-val="' + domain + '" ' + domain_function + '>domain</li>' +
               '<li class="quick-subdomain ' + sub_status + '" data-val="' + sub_val + '" ' + sub_function + '>subdomain</li>' +
               '<li class="quick-uri ' + path_status + '" data-val="' + path_val + '" ' + path_function + '>original uri</li>' +
               '</ul>' +

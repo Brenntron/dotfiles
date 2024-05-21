@@ -19,7 +19,7 @@ $ ->
       success: (response) ->
         $('#sdr-platform-list').empty()
         for platform in response.data
-          $('#sdr-platform-list').append '<option value="' + platform + '"></option>'
+          $('#sdr-platform-list').append '<option value="' + platform.public_name + '"></option>'
     )
 
   $('#cancel_sdr_dispute').on 'click', ->
