@@ -244,9 +244,7 @@ $ ->
 
 
 
-  if $('#complaints-index').length
-
-
+  if window.location.href.includes('escalations/webcat') && !window.location.href.includes('clusters')
     ## WEBCAT ADVANCED SEARCH FUNCTIONS
 
     ## Note - this function is not currently used,
