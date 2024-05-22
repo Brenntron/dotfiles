@@ -979,10 +979,9 @@ class ComplaintEntry < ApplicationRecord
       where(status: 'PENDING')
     when "PENDING OVERDUE"
       where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
-    when "ALL"
-      all
     else
-      all
+      # defaulting to users open tix if nothing is set
+      open.where(user_id: user.id)
     end
   end
 
