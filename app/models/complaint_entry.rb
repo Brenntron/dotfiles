@@ -939,7 +939,7 @@ class ComplaintEntry < ApplicationRecord
       open.where(user_id: user.id)
     when "MY PENDING TICKETS"
       # need this to be if user is assigned as reviewer or second reviewer
-      where(status: 'PENDING').where(reviewer_id: user.id)
+      where(status: 'PENDING').where(reviewer_id: user.id).or(where(status: 'PENDING').where(second_reviewer_id: user.id))
     when "MY CLOSED COMPLAINTS"
       closed.where(user_id: user.id)
     when "MANAGER QUEUE"
