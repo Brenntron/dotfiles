@@ -202,7 +202,7 @@ module API
                   if !prefix_records.empty?
                     prefix_records.each do |prefix_record|
                       if prefix_record.domain == parsed_url[:domain] && ((prefix_record.subdomain == parsed_url[:subdomain]) || (prefix_record.subdomain.blank? && parsed_url[:subdomain] = 'www')) && prefix_record.path == parsed_url[:path]
-                        prefix_ids[position + 1] = prefix_record.prefix_id
+                        prefix_ids[position + 1] = prefix_record.prefix_id if prefix_record.is_active?
                       end
                     end
                   end
@@ -251,7 +251,6 @@ module API
                     prefix_ids[key] = Wbrs::Prefix.where(:urls => [value]).first.prefix_id
                     top_url = Wbrs::TopUrl.check_urls([value]).first.is_important
                     description = "Dropping all current categories for #{value}"
-
                     if top_url
                       description += " Moving to peer review as attempt of category drop is on an important url"
                       Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
