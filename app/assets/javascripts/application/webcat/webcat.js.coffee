@@ -265,8 +265,8 @@ $ ->
         return options
 
     assignee_input = $('#assignee-input').selectize {
-      persist: true
-      create: false
+      persist: true,
+      create: false,
       valueField: 'name',
       labelField: 'display_name',
       searchField: ['name', 'display_name'],
@@ -297,7 +297,7 @@ $ ->
     }
 
     category_input = $('#category-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       valueField: 'category_id',
       labelField: 'category_name',
@@ -309,7 +309,7 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
     $('#company-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       valueField: 'company_name',
       labelField: 'company_name',
@@ -446,7 +446,8 @@ $ ->
 
     $('#submitter-type-input').selectize {
       delimiter: ',',
-      persist: false,
+      persist: true,
+      create: false,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
