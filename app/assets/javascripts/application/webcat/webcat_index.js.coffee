@@ -748,6 +748,11 @@ build_header = (data) ->
       webcat_search_conditions = {}
 
     if search_type == 'standard'
+
+      #'My Open Tickets' filter is now default, so load that instead of any 'all' filters that load whole table
+      if search_name == 'all'
+        search_name = "MY OPEN COMPLAINTS"
+
       search_name = search_name.toLowerCase().replace('complaints', 'tickets')
 
       if !search_name.endsWith('tickets')
@@ -790,10 +795,10 @@ build_header = (data) ->
           reset_icon +
           '</div>'
     else
-      new_header = 'All Tickets'
+      new_header = ''
     $('#webcat-index-title')[0].innerHTML = new_header
   else
-    $('#webcat-index-title')[0].innerHTML = 'All Tickets'
+    $('#webcat-index-title')[0].innerHTML = ''
 
 
 

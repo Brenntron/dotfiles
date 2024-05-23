@@ -230,7 +230,12 @@ $ ->
 
     #catch for when no favorites are set
     else if $('.favorite-search-icon-active').length == 0
-      return false
+
+      #'My Open Tickets' filter is now default - if no favorites set, do not include clear filter button
+      if search_name == 'my open tickets'
+        return true
+      else
+        return false
 
     #check if saved search favorite is set but there's no local storage saved
     else
