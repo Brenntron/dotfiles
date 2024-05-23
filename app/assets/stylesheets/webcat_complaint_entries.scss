@@ -346,6 +346,7 @@ $selectize-border: #E5E5E5;
   }
 
   #ce_tags_wrapper {
+    align-items: center;
     display: flex;
     gap: 50px;
 
@@ -381,6 +382,10 @@ $selectize-border: #E5E5E5;
       height: 20px;
       padding: 4px;
       width: 20px;
+    }
+
+    .save-tags {
+      margin-left: auto;
     }
   }
 

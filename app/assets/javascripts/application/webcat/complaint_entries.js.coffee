@@ -49,17 +49,17 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             window.prevent_close()
     }
 
-    $('#edit_tags').on 'click', () ->
-      $ce_tags = $('#ce_tags')
-
-      if $ce_tags.is(':visible')
-        $ce_tags.hide()
-        $('#ce_tags_select')[0].selectize.enable()
-        $('.ce-tags-select').removeClass('hidden')
-      else
-        $('.ce-tags-select').addClass('hidden')
-        $('#ce_tags_select')[0].selectize.disable()
-        $ce_tags.show()
+    # $('#edit_tags').on 'click', () ->
+    #   $ce_tags = $('#ce_tags')
+    #
+    #   if $ce_tags.is(':visible')
+    #     $ce_tags.hide()
+    #     $('#ce_tags_select')[0].selectize.enable()
+    #     $('.ce-tags-select').removeClass('hidden')
+    #   else
+    #     $('.ce-tags-select').addClass('hidden')
+    #     $('#ce_tags_select')[0].selectize.disable()
+    #     $ce_tags.show()
 
   window.set_complaint_entry_data = (category_data, ce_entry_status) ->
     ce_current_categories = if category_data? then category_data.split(', ') else []

@@ -93,8 +93,10 @@
       %h4.ticket-report-header Tags
       #ce_tags_wrapper
         = render_tags(@tags)
-        %input.ce-tags-select.hidden#ce_tags_select{ placeholder: 'Enter Tags' }
-        %button.tags-button#edit_tags
+        -# %input.ce-tags-select.hidden#ce_tags_select{ placeholder: 'Enter Tags' }
+        -# %button.tags-button#edit_tags
+        -# %button.primary.save-tags{ onClick: 'webcat_show_page_edit_tags()' }
+        -#   Save
 
   .col-xs-4.ce-research-column
     %h4.ticket-report-header
