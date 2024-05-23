@@ -836,8 +836,10 @@ get_visible_reset_icon = ->
 
 #for filters and saved searches we need to check if currently on the favorite page since it's the index
 get_reset_icon = (search_name) ->
-  if current_page_is_favourite(search_name)
+  if current_page_is_favorite(search_name)
     reset_icon_class = 'hidden style="display: none"'
+    #bug fix - set favorited link as selected in case filters were just cleared
+    $('.favorite-search-icon-active').parent('li').addClass 'selected'
   else
     reset_icon_class = ''
   reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'

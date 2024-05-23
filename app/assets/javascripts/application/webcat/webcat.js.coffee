@@ -210,7 +210,7 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     { icon: fav_icon, link: link, name: name }
 
-  window.current_page_is_favourite = (search_name) ->
+  window.current_page_is_favorite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
       filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
