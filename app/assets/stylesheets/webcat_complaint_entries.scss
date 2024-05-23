@@ -32,6 +32,31 @@ $selectize-border: #E5E5E5;
     }
   }
 
+  .webcat-complaint-case-wrapper {
+    display: flex;
+  }
+
+  .webcat-complaint-important-reviewed-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin: 20px 10px 0 0;
+
+    .is-important, .was-reviewed {
+      background-repeat: no-repeat;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+    }
+
+    .is-important {
+      background-image: url(image_path('icon_important.svg'));
+    }
+
+    .was-reviewed {
+      background-image: url(image_path('icon_reviewed_check.svg'));
+    }
+  }
+
   .complaint-assignee-wrapper, .complaint-reviewer-wrapper, .complaint-second-reviewer-wrapper {
     align-items: center;
     display: flex;

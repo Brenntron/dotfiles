@@ -1,9 +1,13 @@
 .content-wrapper.complaint-entry-show-content-wrapper.top-case-info
-
   .row
     .col-xs-2.col-with-divider.webcat-complaint-case-wrapper
-      %label.content-label-sm Complaint Entry ID
+      .webcat-complaint-important-reviewed-wrapper
+        - if @complaint_entry.is_important
+          %span.esc-tooltipped.is-important.highlight-second-review{ tooltip: true, title: 'Imporant' }
+        - if @complaint_entry.was_dismissed
+          %span.esc-tooltipped.was-reviewed.highlight-was-dismissed{ tooltip: true, title: 'Reviewed' }
       .webcat-complaint-case-id-wrapper
+        %label.content-label-sm Complaint Entry ID
         .complaint-entry-id
           #complaint_entry_id.top-info-data
             = @complaint_entry.id.to_s
@@ -139,7 +143,7 @@
       .complaint-assignee-wrapper
         .complaint-owner-wrapper
           %div
-            %span.user-image#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.display_name == 'vrtincom' ) }= @complaint_entry.user&.display_name || Unassigned
+            %span.user-image#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.display_name == 'vrtincom' ) }= @complaint_entry.user&.display_name || 'Unassigned'
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
