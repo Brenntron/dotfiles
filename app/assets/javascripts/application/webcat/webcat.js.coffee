@@ -201,6 +201,9 @@ $ ->
     if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
 
 
+  is_default_saved_search = (chosen_icon) ->
+    chosen_icon.closest('#saved-search > #saved-search-tbody').length > 0
+
   is_default_filter = (chosen_icon) ->
     chosen_icon.closest('#filter-dropdown > #filter-cases-list').length > 0
 
@@ -221,6 +224,18 @@ $ ->
         #If no url path check if active link matches current filter name
         else
           link_text = $("#filter-dropdown > #filter-cases-list a.active-link").text().trim().toLowerCase()
+          if link_text == search_name
+            return true
+
+    else if is_default_saved_search(icon)
+      saved_search_dropdown = $("#saved-search > span.favorite-search-icon-active")
+      if saved_search_dropdown
+        #Check if saved search link matches current url path
+        if name == decodeURIComponent(window.location.search)
+          return true
+        #If no url path check if active link matches current filter name
+        else
+          link_text = $("#saved-search > #saved-search-tbody a.active-link").text().trim()
           if link_text == search_name
             return true
 
