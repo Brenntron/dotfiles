@@ -21,10 +21,12 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
                   @complaint.customer_org
                 end
     @source = @complaint.ticket_source
-    @submitted_ip_uri = if @complaint_entry.uri.nil?
-                          @complaint_entry.ip_address
+    @submitted_ip_uri = if ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) && !@complaint_entry.uri_as_categorized.empty?
+                          @complaint_entry.uri_as_categorized
+                        elsif ['COMPLETED', 'PENDING', 'REOPENED'].includes(@complaint_entry.status) || !@complaint_entry.domain.empty?
+                          @complaint_entry.domain || @complaint_entry.ip_address
                         else
-                          @complaint_entry.uri
+                          @complaint_entry.uri || @complaint_entry.ip_address
                         end
     @tags = @complaint.complaint_tags.map(&:name)
     @wbrs_score = @complaint_entry.wbrs_score.nil? ? 0 : @complaint_entry.wbrs_score.round(1)
