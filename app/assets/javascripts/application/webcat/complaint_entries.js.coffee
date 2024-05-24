@@ -200,6 +200,67 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     wrapper = radio.parent()
     wrapper.addClass('selected')
 
+  window.take_single_webcat_complaint = (type) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': [entry_id], 'assignment_type': type
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          if jQuery.type(json.error) == 'array'
+            std_msg_error('Error Taking Entries', [json.error.join(' ')])
+          else
+            std_msg_error('Error Taking Entries', [json.error])
+        else
+          # TODO add flash success
+          $(selected_rows).each ->
+            row = this
+            if assignment_type == 'assignee'
+              $(row).find('.assignee-row td').text(json.name)
+              status = $(row).find('.state-row td')
+              if ($(status).text() == 'NEW') || ($(status).text() == 'REOPENED')
+                $(status).text('ASSIGNED')
+            else if assignment_type == 'reviewer'
+              $(row).find('.reviewer-row td').text(json.name)
+            else if assignment_type == 'second_reviewer'
+              $(row).find('.second-reviewer-row td').text(json.name)
+
+      error: (response) ->
+        std_msg_error('Error Taking Entries', response.responseText)
+    , this)
+
+  window.return_single_webcat_complaint = (type) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': [entry_id], 'assignment_type': assignment_type
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          if jQuery.type(json.error) != 'array'
+            std_msg_error('Error Returning Entries', [json.error])
+          else
+            std_msg_error('Error Returning Entries', [json.error.join(' ')])
+        else
+          $(selected_rows).each ->
+            row = this
+            if assignment_type == 'assignee'
+              $(row).find('.assignee-row td').text("Vrt Incoming")
+              status = $(row).find('.state-row td')
+              if $(status).text() == 'ASSIGNED'
+                $(status).text('NEW')
+            else if assignment_type == 'reviewer'
+              $(row).find('.reviewer-row td').text("")
+            else if assignment_type == 'second_reviewer'
+              $(row).find('.second-reviewer-row td').text("")
+
+      error: (response) ->
+        std_msg_error('Error Returning Entries', [response.responseText])
+    , this)
+
   render_whois_table = (domain) ->
     whois_callback = (formattedData) ->
       $('#whois_loader').hide()

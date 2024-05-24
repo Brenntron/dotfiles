@@ -143,16 +143,17 @@
       .complaint-assignee-wrapper
         .complaint-owner-wrapper
           %div
-            %span.user-image#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.display_name == 'vrtincom' ) }= @complaint_entry.user&.display_name || 'Unassigned'
+            %span.user-image#complaint-assignee{ class: ('missing-data' if no_user?(@complaint_entry.user) ) }= no_user?(@complaint_entry.user) ? 'Unassigned' : @complaint_entry.user.display_name
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
+                %button.return-ticket-button.esc-tooltipped{ onclick: 'return_single_webcat_complaint("assignee");',
                                                              title: 'Return ticket to open queue' }
             - else
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-assign{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
+                - if no_user?(@complaint_entry.user)
+                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-assign{ onclick: "take_single_webcat_complaint('assignee');",
                                                                                                                 title: 'Assign this ticket to me' }
                 %span.dropdown
                   .dropdown-menu#show-change-assigne-dropdown{ 'aria-labelledby': 'index_change_assign' }
@@ -174,17 +175,18 @@
       .complaint-reviewer-wrapper
         .complaint-owner-wrapper
           %div
-            %span.user-image#complaint-reviewer{ class: ('missing-data' if @complaint_entry.reviewer_id.nil? || @complaint_entry.reviewer.display_name == 'vrtincom' ) }= @complaint_entry.reviewer&.display_name || 'No Reviewer'
+            %span.user-image#complaint-reviewer{ class: ('missing-data' if no_user?(@complaint_entry.reviewer))}= @complaint_entry.reviewer&.display_name || 'No Reviewer'
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
-            - if @complaint_entry.user_id == current_user.id
+            - if @complaint_entry.reviewer_id == current_user.id
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
+                %button.return-ticket-button.esc-tooltipped{ onclick: 'return_single_webcat_complaint("reviewer");',
                                                              title: 'Return ticket to open queue' }
             - else
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-reviewer{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
-                                                                                                                title: 'Assign this ticket to me' }
+                - if no_user?(@complaint_entry.reviewer)
+                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-reviewer{ onclick: "take_single_webcat_complaint('reviewer');",
+                                                                                                                  title: 'Assign this ticket to me' }
                 %span.dropdown
                   .dropdown-menu#show-change-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
                     .change-assignee-dropdown-wrapper
@@ -205,17 +207,18 @@
       .complaint-second-reviewer-wrapper
         .complaint-owner-wrapper
           %div
-            %span.user-image#complaint-second-reviewer{ class: ('missing-data' if @complaint_entry.second_reviewer_id.nil? || @complaint_entry.second_reviewer.display_name == 'vrtincom' ) }= @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
+            %span.user-image#complaint-second-reviewer{ class: ('missing-data' if no_user?(@complaint_entry.second_reviewer)) }= @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
-            - if @complaint_entry.user_id == current_user.id
+            - if @complaint_entry.second_reviewer_id == current_user.id
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
+                %button.return-ticket-button.esc-tooltipped{ onclick: 'return_single_webcat_complaint("second_reviewer");',
                                                              title: 'Return ticket to open queue' }
             - else
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
-                %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-second-reviewer{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
-                                                                                                                       title: 'Assign this ticket to me' }
+                - if no_user?(@complaint_entry.second_reviewer)
+                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-second-reviewer{ onclick: "take_single_webcat_complaint('second_reviewer');",
+                                                                                                                         title: 'Assign this ticket to me' }
                 %span.dropdown
                   .dropdown-menu#show-change-second-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
                     .change-assignee-dropdown-wrapper
