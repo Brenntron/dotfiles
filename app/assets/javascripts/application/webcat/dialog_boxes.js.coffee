@@ -220,6 +220,8 @@ window.whois_dialog = (ipDomain) ->
     $('#icann_whois > .webcat-loader-wrapper').hide()
 
   error_callback = (response) ->
+    $('#icann_whois > .webcat-loader-wrapper').hide()
+
     if response?
       { responseJSON } = response
 
@@ -231,8 +233,6 @@ window.whois_dialog = (ipDomain) ->
       return $.each(response.responseJSON, (key, value) ->
         console.error value
       )
-
-    $('#icann_whois > .webcat-loader-wrapper').hide()
 
   AC.WebCat.Whois.get_whois_data(ipDomain, whois_callback, error_callback)
 
