@@ -219,7 +219,19 @@ window.whois_dialog = (ipDomain) ->
     $("#icann_whois").append("<div id='icannContent'>#{formattedData}</div>")
     $('#icann_whois > .webcat-loader-wrapper').hide()
 
-  error_callback = () ->
+  error_callback = (response) ->
+    if response?
+      { responseJSON } = response
+
+      if !responseJSON
+        std_msg_error("Error retrieving WHOIS query.","")
+      else
+        std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
+
+      return $.each(response.responseJSON, (key, value) ->
+        console.error value
+      )
+
     $('#icann_whois > .webcat-loader-wrapper').hide()
 
   AC.WebCat.Whois.get_whois_data(ipDomain, whois_callback, error_callback)

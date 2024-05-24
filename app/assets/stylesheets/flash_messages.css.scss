@@ -1,4 +1,8 @@
 //*************** Flash Message Styles ****************//
+/* Flash/Inline Message Colors */
+$flash-success-color: #ecf9e7;
+$flash-error-color: #fdf0e2;
+$flash-info-color: #e9f5fd;
 
 // alert/flash messaging styles, both "alert" and "flash" should look consistent, handle both here
 .alert-dismissable, .flash {
@@ -40,11 +44,15 @@
   }
 
   &.alert-success, &.alert-info, &.flash-notice {
+    background-color: $flash-success-color;
     background-image: url(image_path('icon_success.svg'));
+    color: darken($flash-success-color, 60%);  // color harmony for font colors on bg's
   }
 
   &.alert-danger, &.flash-error, &.flash-info {
+    background-color: $flash-error-color;
     background-image: url(image_path('icon_error.svg'));
+    color: darken($flash-error-color, 60%);
   }
 
   &.alert-danger {

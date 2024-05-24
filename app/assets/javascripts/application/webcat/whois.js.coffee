@@ -9,18 +9,7 @@ namespace 'AC.WebCat.Whois', (exports) ->
         formattedData = formatIcannData(response.data)
         success_callback(formattedData)
       error: (response) ->
-        if response?
-          { responseJSON } = response
-
-          if !responseJSON
-            std_msg_error("Error retrieving WHOIS query.","")
-          else
-            std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
-
-          return $.each(response.responseJSON, (key, value) ->
-            console.error value
-          )
-        error_callback()
+        error_callback(response)
     )
 
   # The cluster whois dialog doesn't require all the iformation returned by TESS.

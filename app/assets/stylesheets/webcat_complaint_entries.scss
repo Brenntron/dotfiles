@@ -186,7 +186,7 @@ $selectize-border: #E5E5E5;
 }
 
 .ce-research-column, .ce-history-column {
-  & > div {
+  & > div:not(.alert) {
     padding: 0 0 10px;
   }
 
@@ -556,6 +556,15 @@ $selectize-border: #E5E5E5;
 
   .whois-data-container th {
     border-bottom: 1px solid $faint-neutral-color;
+
+    .missing-data {
+      padding-top: 10px;
+    }
+  }
+
+  .alert.alert-dismissable.alert-streamlined {
+    left: 75px;
+    top: 0;
   }
 
   .ce-allow-review-container {

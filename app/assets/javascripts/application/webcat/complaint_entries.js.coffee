@@ -184,6 +184,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           }
         )
 
+  window.set_lookup = (lookup) ->
+    get_domain_history(lookup)
+    get_related_history(lookup)
+    render_whois_table(lookup)
+    get_xbrs_history(lookup)
+
   window.webcat_complaint_drop_down = () ->
     # deselect all statuses
     $('.status-radio-wrapper').removeClass 'selected'
@@ -266,8 +272,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       $('#whois_loader').hide()
       $('#ce_whois_table').hide()
       $('#whois_data_container').append formattedData
-    error_callback = () ->
+    error_callback = (response) ->
       $('#whois_loader').hide()
+      $('#whois_data_container').append("<p class='missing-data'>No data available</p>")
+      show_message('error', "Error retrieving WHOIS query. #{response.responseJSON.message}", false, '#whois_header')
 
     AC.WebCat.Whois.get_whois_data(domain, whois_callback, error_callback)
 
@@ -761,18 +769,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     )
 
   $ ->
-    domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
     entry_id = Number($('#complaint_entry_id')[0].innerText)
     headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
     resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
 
     get_current_categories()
     get_entry_history()
-
-    get_domain_history(domain_title)
-    get_related_history(domain_title)
-    render_whois_table(domain_title)
-    get_xbrs_history(domain_title)
 
     get_resolution_templates(resolution, 'individual', [entry_id])
 
@@ -803,5 +805,3 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       store_entry_changes(entry_id, 'submit')
 
     $(document).on 'change', '.resolution_radio_button, .ce-input', ->
-      $('.ce-submit-button').prop('disabled', false)
-      store_entry_changes(entry_id, 'submit')

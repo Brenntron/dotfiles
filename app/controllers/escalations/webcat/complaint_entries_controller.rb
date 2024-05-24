@@ -14,21 +14,21 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   def show
     @complaint_entry = ComplaintEntry.find(params[:id])
     @complaint = @complaint_entry.complaint
+    @lookup = @complaint_entry.domain.present? ? @complaint_entry.domain : @complaint_entry.ip_address
     @org_name = if @complaint.customer.nil?
                   'Guest'
                 else
                   @complaint.customer_org
                 end
-    @tags = @complaint.complaint_tags.map(&:name)
     @source = @complaint.ticket_source
     @submitted_ip_uri = if @complaint_entry.uri.nil?
                           @complaint_entry.ip_address
                         else
                           @complaint_entry.uri
                         end
+    @tags = @complaint.complaint_tags.map(&:name)
     @wbrs_score = @complaint_entry.wbrs_score.nil? ? 0 : @complaint_entry.wbrs_score.round(1)
     @webcat_users = User.joins(:roles).where('roles.role like "%webcat%"').distinct.order(:display_name)
-    @whois_lookup = @complaint_entry.domain.present? ? @complaint_entry.domain : @complaint_entry.ip_address
   end
 
   def update; end

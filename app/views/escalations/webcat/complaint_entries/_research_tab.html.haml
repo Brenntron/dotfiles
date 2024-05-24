@@ -85,7 +85,7 @@
     .external-categories-section
       %h4.ticket-report-header Current Categories
     .loader-div#current_categories_loader
-      %span.loader-msg Loading Whois data...
+      %span.loader-msg Loading Current Categories...
       .loader-gears
         = inline_svg 'icon_gears_loader.svg'
 
@@ -193,19 +193,9 @@
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             submit
   .col-xs-4.ce-research-column
-    %h4.ticket-report-header
+    %h4.ticket-report-header#whois_header
       Whois
     .whois-data-container#whois_data_container
-    %table.data-report-table#ce_whois_table
-      %tbody
-        %tr
-          %td.data-report-table-column-header
-            - if @complaint_entry.domain.present?
-              Domain Name
-            - else
-              IP Address
-          %td#domain_title
-            = @whois_lookup
     .loader-div#whois_loader
       %span.loader-msg Loading Whois data...
       .loader-gears
@@ -214,4 +204,5 @@
   $(document).ready(function() {
     window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');
     window.set_tags("#{@tags.join(', ')}");
+    window.set_lookup("#{@lookup}")
   });
