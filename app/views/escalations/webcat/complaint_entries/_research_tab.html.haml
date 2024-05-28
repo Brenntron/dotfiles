@@ -128,29 +128,44 @@
     .ce-resolution-wrapper
       %label.content-label-sm
         Resolution
-      .ce-radio-group-wrapper
-        .ce-radio-group
-          %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                          name: 'resolution',
-                                          type: 'radio',
-                                          value: 'unchanged' }
-          %label.radio-label{ for: 'unchanged' }
-            Unchanged
-        .ce-radio-group
-          %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                          name: 'resolution',
-                                          checked: true,
-                                          type: 'radio',
-                                          value: 'fixed' }
-          %label.radio-label{ for: 'fixed' }
-            Fixed
-        .ce-radio-group
-          %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                          name: 'resolution',
-                                          type: 'radio',
-                                          value: 'invalid' }
-          %label.radio-label{ for: 'invalid' }
-            Invalid
+      - if @complaint_entry.status == 'PENDING'
+        .ce-radio-group-wrapper
+          .ce-radio-group
+            %input.review-radio-button{ name: 'resolution',
+                                        type: 'radio',
+                                        value: 'commit' }
+            %label.radio-label{ for: 'commit' }
+              Commit
+          .ce-radio-group
+            %input.review-radio-button{ name: 'resolution',
+                                        type: 'radio',
+                                        value: 'decline' }
+            %label.radio-label{ for: 'decline' }
+              Decline
+      - else
+        .ce-radio-group-wrapper
+          .ce-radio-group
+            %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                            name: 'resolution',
+                                            type: 'radio',
+                                            value: 'unchanged' }
+            %label.radio-label{ for: 'unchanged' }
+              Unchanged
+          .ce-radio-group
+            %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                            name: 'resolution',
+                                            checked: true,
+                                            type: 'radio',
+                                            value: 'fixed' }
+            %label.radio-label{ for: 'fixed' }
+              Fixed
+          .ce-radio-group
+            %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                            name: 'resolution',
+                                            type: 'radio',
+                                            value: 'invalid' }
+            %label.radio-label{ for: 'invalid' }
+              Invalid
     .ce-customer-comment-wrapper
       %label.content-label-sm
         Email Response to Customer
@@ -171,10 +186,7 @@
       .row.text-center
         .col-xs-6
           .ce-allow-review-container
-            - if current_user.enabled_self_review
-              %input{ type: 'checkbox', id: 'self_review', checked: true }
-            - else
-              %input{ type: 'checkbox', id: 'self_review', checked: false }
+            %input{ type: 'checkbox', id: 'self_review', checked: (true if current_user.enabled_self_review) }
             %label{ for: 'self_review' }
               Allow Self Review
         .col-xs-6

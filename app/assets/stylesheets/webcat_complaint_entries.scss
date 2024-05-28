@@ -467,7 +467,7 @@ $selectize-border: #E5E5E5;
     display: flex;
     gap: 4px;
 
-    .resolution-radio-button {
+    .resolution-radio-button, .review-radio-button {
       appearance: none;
       --webkit-appearance: none;
       background-color: $content-bg-color;

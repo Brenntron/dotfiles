@@ -21,7 +21,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
                   @complaint.customer_org
                 end
     @source = @complaint.ticket_source
-    @submitted_ip_uri = if ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) && !@complaint_entry.uri_as_categorized.empty?
+    @submitted_ip_uri = if ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) && !@complaint_entry.uri_as_categorized&.empty?
                           @complaint_entry.uri_as_categorized
                         elsif ['COMPLETED', 'PENDING', 'REOPENED'].includes(@complaint_entry.status) || !@complaint_entry.domain.empty?
                           @complaint_entry.domain || @complaint_entry.ip_address

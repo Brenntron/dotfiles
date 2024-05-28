@@ -642,7 +642,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         complaint_entry_id: entry_id
       success: (response) ->
         data = $.parseJSON(response).data
-        { curr_status: status } = data.complaint
+        { status: curr_status } = data.complaint
         { uri } = data.complaint_entry
         cat_ids = null
         # slight differences in data sent
@@ -656,9 +656,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         if status == 'PENDING'
           status = ''
           commit = $('input[name=resolution]:checked').val()
-          # we are disabling the button if ignore is checked, but just in case
-          if commit == 'ignore'
-            return
         else
           status = $('input[name=resolution]:checked').val()
 
@@ -715,7 +712,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         if data.error?
           show_message('error', "Submittions failed: #{data.error}", false, '#alert_message')
         else
-          show_message('success', 'Submitted. Refresh to see new results.', false, '#alert_message')
+          show_message('success', 'Submitted. Refreshing to see new results.', false, '#alert_message')
+          setTimeout ->
+            location.reload()
+          , 5000
+
       error: (response) ->
         msg = response.resonseJSON.error
 
@@ -735,8 +736,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         data: [entry_data]
       }
       success: (response) ->
-        show_message('success', 'Submitted. Refresh to see new results.', false, '#alert_message')
+        show_message('success', 'Submitted. Refreshing to see new results.', false, '#alert_message')
         remove_entry_from_changes(data.entry_id, 'submit')
+        setTimeout ->
+          location.reload()
+        , 5000
       error: (response) ->
         msg = response.resonseJSON.error
         console.error(msg)
@@ -759,7 +763,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('.ce-input').prop('disabled', false)
 
         store_entry_changes(entry_id, 'submit')
-        $button.attr('onclick', "submit_changes(#{entry_id});")
+        $button.attr('onclick', "submit_show_page_changes(#{entry_id});")
         $button.text('submit')
         $button.removeAttr('disabled')
 
@@ -804,4 +808,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
       store_entry_changes(entry_id, 'submit')
 
-    $(document).on 'change', '.resolution_radio_button, .ce-input', ->
+    $(document).on 'change', '.resolution-radio-button, .ce-input', ->
+      store_entry_changes(entry_id, 'submit')
+      $('.ce-submit-button').prop('disabled', false)
+
+    $(document).on 'change', '.review-radio-button', ->
+      store_entry_changes(entry_id, 'review')
+      $('.ce-submit-button').prop('disabled', false)
