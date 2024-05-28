@@ -275,7 +275,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     error_callback = (response) ->
       $('#whois_loader').hide()
       $('#whois_data_container').append("<p class='missing-data'>No data available</p>")
-      show_message('error', "Error retrieving WHOIS query. #{response.responseJSON.message}", false, '#whois_header')
+      show_message('error', "Error retrieving WHOIS query. #{response.responseJSON.message}", false, '#whois_loader')
 
     AC.WebCat.Whois.get_whois_data(domain, whois_callback, error_callback)
 

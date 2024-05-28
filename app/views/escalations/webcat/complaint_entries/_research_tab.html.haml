@@ -202,7 +202,7 @@
         = inline_svg 'icon_gears_loader.svg'
 :javascript
   $(document).ready(function() {
-    window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');
+    window.set_complaint_entry_data("#{@complaint_entry.url_primary_category}", '#{@complaint_entry.status}');
     window.set_tags("#{@tags.join(', ')}");
     window.set_lookup("#{@lookup}")
   });
