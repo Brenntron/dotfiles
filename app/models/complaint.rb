@@ -10,6 +10,7 @@ class Complaint < ApplicationRecord
 
   FILTER_VIEW_OPTIONS = [
     { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
+    { label: 'My Pending Tickets', param: 'MY PENDING TICKETS', icon: 'icon-my-pending-bugs'},
     { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
     { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
     { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
@@ -21,7 +22,6 @@ class Complaint < ApplicationRecord
     { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
     { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
-    { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
