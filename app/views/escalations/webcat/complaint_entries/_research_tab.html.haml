@@ -169,17 +169,17 @@
     .ce-customer-comment-wrapper
       %label.content-label-sm
         Email Response to Customer
-      %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+      %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
                                                                                 id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
         %option{ value: 'fixed', selected: true } Fixed - Default Response
-      %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+      %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
                                                        id: "entry-email-response-to-customers_#{@complaint_entry.id}",
                                                        name: 'ce_customer_comment_textarea',
                                                        maxlength: '64000' }
     .ce-internal-comment-wrapper
       %label.content-label-sm
         Internal Comment
-      %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+      %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
                                                        name: 'ce_internal_comment_textarea',
                                                        placeholder: 'Internal note for choosing categories' }
     - if @complaint_entry.is_important
