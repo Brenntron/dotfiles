@@ -10,6 +10,7 @@ class Complaint < ApplicationRecord
 
   FILTER_VIEW_OPTIONS = [
     { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
+    { label: 'My Pending Tickets', param: 'MY PENDING TICKETS', icon: 'icon-my-pending-bugs'},
     { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
     { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
     { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
@@ -21,7 +22,6 @@ class Complaint < ApplicationRecord
     { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
     { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
-    { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
@@ -52,6 +52,8 @@ class Complaint < ApplicationRecord
   INT_CHANNEL = 'internal'
   WBNP_CHANNEL = 'wbnp'
   JIRA_CHANNEL = 'jira'
+  RMS_CHANNEL = 'RMS'
+  RMS_ALERT_CHANNEL = 'RMS Alert'
 
   SOURCE_RULEUI = "RuleUI"
 
@@ -71,7 +73,7 @@ For future web and email reputation requests, please open a web and email reputa
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
 
-  scope :from_ti,   -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_ti,   -> { includes(:complaint_entries).where(channel: [TI_CHANNEL, RMS_CHANNEL, RMS_ALERT_CHANNEL]) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
   scope :from_jira, -> { includes(:complaint_entries).where(channel: JIRA_CHANNEL) }
