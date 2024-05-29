@@ -7645,16 +7645,16 @@ table.dispute-entry-table tbody tr.selected {
   &:hover {
     background-color: $primary-section-color !important;
   }
+  &:disabled {
+    background-color: #b3b3b3 !important;
+  }
 }
 
 .dispute-owner-buttons-wrapper .ticket-owner-unassigned-button {
   &:hover {
     background-color: $primary-section-color !important;
   }
-}
-
-.dispute-owner-buttons-wrapper .ticket-owner-unassigned-button:disabled {
-  &:hover {
+  &:disabled {
     background-color: #b3b3b3 !important;
   }
 }
