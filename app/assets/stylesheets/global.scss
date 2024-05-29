@@ -7647,6 +7647,18 @@ table.dispute-entry-table tbody tr.selected {
   }
 }
 
+.dispute-owner-buttons-wrapper .ticket-owner-unassigned-button {
+  &:hover {
+    background-color: $primary-section-color !important;
+  }
+}
+
+.dispute-owner-buttons-wrapper .ticket-owner-unassigned-button:disabled {
+  &:hover {
+    background-color: #b3b3b3 !important;
+  }
+}
+
 .dispute-owner-buttons-wrapper .dropdown-menu {
   border-radius: 0 4px 4px 4px;
   border: none;
