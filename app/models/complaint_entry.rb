@@ -422,11 +422,13 @@ class ComplaintEntry < ApplicationRecord
         return post_categorize(current_user)
       end
 
+      #commenting this out for now even though this represents how change_category was written before R-ACE project. looks like things might have
+      # been broken and wasn't caught, but this is causing behavior that SDO wasn't expecting.
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if current_user.enabled_self_review
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
-        return post_categorize(current_user)
-      end
+      #if current_user.enabled_self_review
+      #  categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
+      #  return post_categorize(current_user)
+      #end
 
       #################
 
@@ -464,19 +466,19 @@ class ComplaintEntry < ApplicationRecord
 
       ## call guardrails
 
-      #begin
+      begin
         category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
         verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
 
         verdict_pass = verdict_results[:verdict_pass]
         verdict_reasons = verdict_results[:verdict_reasons]
-        #binding.pry
-      #rescue Exception => e
-      #  Rails.logger.error(e.message)
-      #  verdict_pass = false
-      #  verdict_reasons << "there was an api call failure, erring to manager review"
-      #end
+
+      rescue Exception => e
+        Rails.logger.error(e.message)
+        verdict_pass = false
+        verdict_reasons << "there was an api call failure, erring to manager review"
+      end
 
       ## if verdict does not pass and is not a webcat manager then kickback to manager with why it failed
       if verdict_pass == false
