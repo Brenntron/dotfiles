@@ -69,6 +69,7 @@ build_complaints_table = (url) ->
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
         create_ind_res_dialogs()
+        load_self_review_setting(rows)
 
         $('#complaints-index tbody tr.cat-index-main-row .nested-col-table tr td').click ->
           # allows individual selection of rows while clicking in nested data, is a little buggy with the multiselect
@@ -290,9 +291,9 @@ build_complaints_table = (url) ->
           users_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
-              '<tr class="assignee-row"><td>' + user + '</td></tr>' +
-              '<tr class="reviewer-row"><td>' + reviewer + '</td></tr>' +
-              '<tr class="second-reviewer-row"><td>' + second_reviewer + '</td></tr>' +
+              '<tr class="assignee-row" data-user-id="' + full.assigned_to_id + '"><td>' + user + '</td></tr>' +
+              '<tr class="reviewer-row" data-user-id="' + full.reviewer_id + '"><td>' + reviewer + '</td></tr>' +
+              '<tr class="second-reviewer-row" data-user-id="' + full.second_reviewer_id + '"><td>' + second_reviewer + '</td></tr>' +
               '</tbody>' +
               '</table>'
 
@@ -883,3 +884,27 @@ set_icon_for_favorite_filter = (filter_name) ->
   else if saved_search
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
     saved_search.addClass 'active-link'
+
+
+load_self_review_setting = (rows) ->
+  if $('#self_review')?
+    current_user_id = $('#self_review').attr('data-current-user')
+    if $('#self_review:checked')?
+      $(rows).each ->
+        row = this
+        assigned_id = $(row).find('assignee-row')[0].attr('data-user-id')
+        if assigned_id == current_user_id
+          $(row).show()
+      # show tickets where I am assginee
+      # allow me to assign myself as reviewer
+    else
+      $(rows).each ->
+        debugger
+        row = this
+        assigned_id = $(row).find('assignee-row')[0].attr('data-user-id')
+        if assigned_id == current_user_id
+          $(row).hide()
+      # hide tickets where I am assignee
+      # do not let me assign myself
+  else
+    return

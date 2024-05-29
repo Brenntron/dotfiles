@@ -203,8 +203,9 @@
       %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped-webcat-toolbar{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text WBNP Data
+
   .webcat-toolbar-push
-    - if params[:f] == "REVIEW"
+    - if params[:f] == "REVIEW" || params[:f] == "MY PENDING TICKETS"
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text-wider Confirm Review
     - else
@@ -213,11 +214,13 @@
           Bulk Resolution Tool
       %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
         %span.toolbar-button-text-wider Bulk Submit
-  .webcat-toolbar-tall-wrapper
-    - if current_user.enabled_self_review
-      %input{type: 'checkbox', id:'self_review', checked: true}
-    - else 
-      %input{type: 'checkbox', id:'self_review', checked: false}
-    %label{for: 'self_review'}
-      %span.toolbar-button-text-wider.no-float-no-pad Allow
-      %span.no-float-no-pad Self Review
+
+  - if params[:f] == "REVIEW" || params[:f] == "MY PENDING TICKETS"
+    .webcat-toolbar-tall-wrapper
+      - if current_user.enabled_self_review
+        %input{type: 'checkbox', id:'self_review', checked: true, 'data-current-user': @current_user_id}
+      - else
+        %input{type: 'checkbox', id:'self_review', checked: false, 'data-current-user': @current_user_id}
+      %label{for: 'self_review'}
+        %span.toolbar-button-text-wider.no-float-no-pad Allow
+        %span.no-float-no-pad Self Review
