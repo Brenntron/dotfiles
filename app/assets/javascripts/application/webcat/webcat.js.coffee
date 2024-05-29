@@ -234,7 +234,7 @@ $ ->
 
     #check if saved search favorite is set but there's no local storage saved
     else
-      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      saved_search_dropdown = $("#saved-searches-wrapper span.favorite-search-icon-active")
       if saved_search_dropdown.length > 0
         saved_name = $('#saved-searches-wrapper .active-link').text().trim()
         if search_name == saved_name
