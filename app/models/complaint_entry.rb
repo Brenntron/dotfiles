@@ -939,6 +939,8 @@ class ComplaintEntry < ApplicationRecord
       where(user_id: user.id)
     when "MY OPEN COMPLAINTS"
       open.where(user_id: user.id)
+    when "MY PENDING TICKETS"
+      where(status: 'PENDING').where(reviewer_id: user.id).or(where(status: 'PENDING').where(second_reviewer_id: user.id))
     when "MY CLOSED COMPLAINTS"
       closed.where(user_id: user.id)
     when "MANAGER QUEUE"
@@ -979,10 +981,9 @@ class ComplaintEntry < ApplicationRecord
       where(status: 'PENDING')
     when "PENDING OVERDUE"
       where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
-    when "ALL"
-      all
     else
-      all
+      # defaulting to users open tix if nothing is set
+      open.where(user_id: user.id)
     end
   end
 

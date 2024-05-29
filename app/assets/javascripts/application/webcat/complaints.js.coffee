@@ -39,6 +39,8 @@ window.remove_entry_from_changes = (entry_id, type) ->
         new_changes.push(entry)
 
     new_changes.join(',')
+    if new_changes.length == 0 #remove changes popup if no changes in table
+      window.prevent_close()
     sessionStorage.setItem(changed, new_changes)
 
 

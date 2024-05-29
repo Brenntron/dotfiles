@@ -328,14 +328,14 @@ window.return_selected = ()->
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text("Vrt Incoming")
+              $(row).find('.assignee-row td').html('<span class="missing-data">No assignee</span>')
               status = $(row).find('.state-row td')
               if $(status).text() == 'ASSIGNED'
                 $(status).text('NEW')
             else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text("")
+              $(row).find('.reviewer-row td').html('<span class="missing-data">No reviewer</span>')
             else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text("")
+              $(row).find('.second-reviewer-row td').html('<span class="missing-data">No 2nd reviewer</span>')
 
       error: (response) ->
         std_msg_error('Error Returning Entries', [response.responseText])
@@ -423,14 +423,14 @@ window.webcat_remove_assignee = () ->
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text("Vrt Incoming")
+              $(row).find('.assignee-row td').html('<span class="missing-data">No assignee</span>')
               status = $(row).find('.state-row td')
               if $(status).text() == 'ASSIGNED'
                 $(status).text('NEW')
             else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text("")
+              $(row).find('.reviewer-row td').html('<span class="missing-data">No reviewer</span>')
             else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text("")
+              $(row).find('.second-reviewer-row td').html('<span class="missing-data">No 2nd reviewer</span>')
 
       error: (response) ->
         std_msg_error('Error Removing Assignees', [response.responseText])
