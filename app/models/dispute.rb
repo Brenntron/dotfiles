@@ -1129,8 +1129,18 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.suggested_threat_category = entry[:sbrs]["suggested_threat_category"] unless entry[:sbrs]["suggested_threat_category"].blank?
 
+          ipd_stuff = CloudIntel::Reputation.reputation_ips([self.hostlookup]).first rescue nil
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
+          if new_dispute_entry.sbrs_score.nil?
+            new_dispute_entry.sbrs_score = ipd_stuff.last[:reputation].score rescue nil
+          end
+
+          urs_stuff = Beaker::Urs.query_reputation_for_ip(DisputeEntry.domain_of(new_dispute_entry.hostlookup)).result.first.result.first rescue nil
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
+          if new_dispute_entry.wbrs_score.nil?
+            new_dispute_entry.wbrs_score = (urs_stuff.reputation_score_x10 / 10.0).to_f rescue nil
+          end
+
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
@@ -1146,15 +1156,15 @@ For future Web categorization requests, please open a Web categorization ticket 
           if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
             wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           else
-            Rails.logger.error('No data for WBRS Rule Hits')
-            wbrs_hits = []
+            #Rails.logger.error('No data for WBRS Rule Hits')
+            wbrs_hits = Sbrs::ManualSbrs.get_rule_names_from_urs(urs_stuff.rep_rule_id) rescue []
           end
 
           if entry && entry[:sbrs] && entry[:sbrs]["SBRS_Rule_Hits"]
             sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           else
-            Rails.logger.error('No data for SBRS Rule Hits')
-            sbrs_hits = []
+            #Rails.logger.error('No data for SBRS Rule Hits')
+            sbrs_hits = CloudIntel::Reputation.mnemonics_ip(new_dispute_entry.hostlookup) rescue []
           end
 
           #total_hits = (wbrs_hits + sbrs_hits).uniq
@@ -1207,7 +1217,13 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
           new_dispute_entry.case_opened_at = opened_at
+
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
+
+          urs_stuff = Beaker::Urs.query_reputation(new_dispute_entry.hostlookup).result.first.result.first rescue nil
+          if new_dispute_entry.wbrs_score.nil?
+            new_dispute_entry.wbrs_score = (urs_stuff.reputation_score_x10 / 10.0).to_f rescue nil
+          end
 
           if new_dispute_entry.suggested_threat_category.blank?
             new_dispute_entry.status = DisputeEntry::PROCESSING
@@ -1236,15 +1252,18 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.save
           rule_hits_snapshot = []
           if entry["WBRS_Rule_Hits"].present?
-            all_hits = entry["WBRS_Rule_Hits"].split(",")
-            all_hits.each do |rule_hit|
-              new_rule_hit = DisputeRuleHit.new
-              new_rule_hit.dispute_entry_id = new_dispute_entry.id
-              new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "WBRS"
-              new_rule_hit.save!
-              rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
-            end
+            wbrs_hits = entry["WBRS_Rule_Hits"].split(",")
+          else
+            wbrs_hits = Sbrs::ManualSbrs.get_rule_names_from_urs(urs_stuff.rep_rule_id) rescue []
+          end
+
+          wbrs_hits.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.dispute_entry_id = new_dispute_entry.id
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "WBRS"
+            new_rule_hit.save!
+            rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
           end
           packet = {}
           packet[:wbrs_score] = new_dispute_entry.wbrs_score
