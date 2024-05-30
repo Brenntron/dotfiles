@@ -9,13 +9,6 @@ $type-faint-accent: #D7DADB; /* Lighter Grey */
 $selectize-border: #E5E5E5;
 
 .complaint-entry-show-content-wrapper {
-  .row > div {
-    height: 105.5px;
-  }
-
-  &.top-case-info {
-    padding-bottom: 15px;
-  }
 
   @-moz-document url-prefix() {
     .complaint-owner-buttons-wrapper button#index_change_assign {
@@ -39,13 +32,14 @@ $selectize-border: #E5E5E5;
   .webcat-complaint-important-reviewed-wrapper {
     display: flex;
     flex-direction: column;
-    margin: 20px 10px 0 0;
+    margin: 2px 10px 0 0;
 
     .is-important, .was-reviewed {
       background-repeat: no-repeat;
       display: inline-block;
       width: 20px;
       height: 20px;
+      margin-bottom: 3px;
     }
 
     .is-important {
@@ -58,11 +52,9 @@ $selectize-border: #E5E5E5;
   }
 
   .complaint-assignee-wrapper, .complaint-reviewer-wrapper, .complaint-second-reviewer-wrapper {
-    align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
-
+    margin-bottom: 2px;
     &:last-of-type {
       margin-bottom: 0;
     }
@@ -74,6 +66,8 @@ $selectize-border: #E5E5E5;
 
     #complaint-assignee {
       background-image: url(image_path('icon_user_grey.svg'));
+      background-size: 15px;
+      background-position: center left 2px;
     }
     #complaint-reviewer {
       background-image: url(image_path('icon_check_grey.svg'));
@@ -81,10 +75,6 @@ $selectize-border: #E5E5E5;
     #complaint-second-reviewer {
       background-image: url(image_path('icon_doublecheck_grey.svg'));
     }
-  }
-
-  .submitter-org-wrapper, .contact-email-wrapper {
-    margin: 0;
   }
 
   .complaint-owner-wrapper {
@@ -96,6 +86,7 @@ $selectize-border: #E5E5E5;
     align-self: flex-end;
     display: flex;
     min-width: 50px;
+    justify-content: flex-end;
 
     h3 {
       padding: 2px 10px !important;
@@ -137,6 +128,7 @@ $selectize-border: #E5E5E5;
 
     .ticket-owner-button {
       background-image: url(image_path('icon_user_white.svg'));
+      background-size: 15px;
 
       &:hover {
         background-color: $primary-section-color !important;
