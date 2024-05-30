@@ -151,7 +151,10 @@ $selectize-border: #E5E5E5;
 }
 
 .ce-research-tab {
-  .ticket-report-header {
+  h2 {
+    font-size: 15px;
+    font-weight: 700;
+    padding: 3px 3px 10px;
     margin-top: 20px;
   }
   .toolbar {
@@ -169,11 +172,11 @@ $selectize-border: #E5E5E5;
     padding-bottom: 30px !important;
     margin-bottom: 30px !important;
   }
-  .content-label-sm {
-    margin-bottom: 0;
-  }
   .customer-submitted-data-wrapper {
     margin-bottom: 10px;
+    .content-label-sm {
+      margin-top: 10px;
+    }
   }
 }
 
@@ -209,6 +212,11 @@ $selectize-border: #E5E5E5;
   }
 
   #ce_research_toolbar {
+    margin-top: -8px;
+
+    .toolbar-button-text {
+      float: none;
+    }
     .toolbar .dropdown-menu {
       margin: 0 !important;
 
@@ -265,24 +273,20 @@ $selectize-border: #E5E5E5;
 
   .ce-submitted-wbrs-wrapper {
     display: flex;
-    justify-content: space-between;
 
     .ce-submitted-ip-uri {
-      font-weight: 500;
+      font-weight: 600;
     }
   }
 
   #ce_wbrs_score_wrapper {
-    float: right;
+    width: 50px;
 
     .webcat-research-svg {
-      bottom: 1px;
+      bottom: 5px;
+      margin-right: 0;
       display: initial;
       position: relative;
-    }
-
-    #ce_wbrs_score {
-      line-height: normal;
     }
   }
 

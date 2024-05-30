@@ -3,21 +3,20 @@
   #alert_message
   .col-xs-4.ce-research-column
     .customer-submitted-section.bottom-divider
-      %h4.ticket-report-header
-        Customer Submitted Info
+      %h2 Customer Submitted Info
       #ce_research_toolbar
         .toolbar
-          .view-btn-group
-            %label.toolbar-section-label
-              View
-            .btn-group.toolbar-btn-group
-              %button.btn.toolbar-button.toolbar-button-spacer.esc-tooltipped-webcat-toolbar.tooltipstered.open-all{ title: 'Open in a new tab.', type: 'button', onclick: 'open_ip_uri()' }
-                %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.google-btn{ title: 'Google It!', type: 'button', onclick: "google_it()" }
-          .edit-btn-group
-            %label.toolbar-section-label
-              Edit
-            .dropdown.btn-group.toolbar-btn-group
+          %div
+            %label.toolbar-section-label View
+            %button.btn.toolbar-button.toolbar-button-spacer.esc-tooltipped-webcat-toolbar.open-all{ title: 'Open in a new tab.', type: 'button', onclick: 'open_ip_uri()' }
+              %span.toolbar-button-text Open in new tab
+            %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.icon-google{ title: 'Google It!', type: 'button', onclick: "google_it()" }
+              %span.toolbar-button-text Search in Google
+          %div
+            %label.toolbar-section-label Edit
+            %span.dropdown
               %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-haspopup': 'true', 'aria-expanded': 'false', 'data-toggle': 'dropdown', onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})", title: 'Convert ticket to web reputation ticket', type: 'button' }
+                %span.toolbar-button-text Convert to Webrep
               .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{ 'aria-labelledby': 'convert-ticket-button' }
                 .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
                 .inline-tool-content-wrapper
@@ -60,37 +59,31 @@
                   .button-row-center
                     %button.primary.dropdown-submit-button#convert-to-webrep{ type: 'button', disabled: 'disabled' }
                       Convert Ticket
-      .ce-submitted-wbrs-wrapper
-        #ce_submitted_ip_uri_wrapper
-          %label.content-label-sm
-            Submitted IP/URI
-          %p.ce-submitted-ip-uri
-            = @submitted_ip_uri
+
+      .ce-submitted-wbrs-wrapper.customer-submitted-data-wrapper
         #ce_wbrs_score_wrapper
-          %label.content-label-sm
-            WBRS Score
           %div
             %span{ class: ['webcat-research-svg', wbrs_score_icon(@complaint_entry.wbrs_score)] }
             %p#ce_wbrs_score= @wbrs_score
-      .ce-suggested-categories_wrapper.customer-submitted-data-wrapper
-        %label.content-label-sm
-          Suggested Categories
-        = suggested_categories(@complaint_entry.suggested_disposition)
-      .ce-description-wrapper.customer-submitted-data-wrapper
-        %label.content-label-sm
-          Description
-        %p#ce_description
-          = @complaint.description
+
+        #ce_submitted_ip_uri_wrapper
+          %p.ce-submitted-ip-uri= @submitted_ip_uri
+
+          %label.content-label-sm Suggested Categories
+          %p= suggested_categories(@complaint_entry.suggested_disposition)
+
+          %label.content-label-sm Description
+          %p#ce_description= @complaint.description
 
     .external-categories-section
-      %h4.ticket-report-header Current Categories
+      %h2 Current Categories
     .loader-div#current_categories_loader
       %span.loader-msg Loading Current Categories...
       .loader-gears
         = inline_svg 'icon_gears_loader.svg'
 
     .tags-section
-      %h4.ticket-report-header Tags
+      %h2 Tags
       #ce_tags_wrapper
         = render_tags(@tags)
         -# %input.ce-tags-select.hidden#ce_tags_select{ placeholder: 'Enter Tags' }
@@ -99,8 +92,7 @@
         -#   Save
 
   .col-xs-4.ce-research-column
-    %h4.ticket-report-header
-      categorization resolution
+    %h2 Categorization Resolution
     .ce-resolved-ip-uri-wrapper
       %label.content-label-sm
         Resolved IP/URI
@@ -194,26 +186,27 @@
         .col-xs-6
           - if @complaint_entry.status == 'COMPLETED'
             %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
-              reopen
+              Reopen
           - else
             %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-              submit
+              Submit
     - else
       .text-center
         - if @complaint_entry.status == 'COMPLETED'
           %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
-            reopen
+            Reopen
         - else
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-            submit
+            Submit
+
   .col-xs-4.ce-research-column
-    %h4.ticket-report-header#whois_header
-      Whois
+    %h2 Whois
     .whois-data-container#whois_data_container
     .loader-div#whois_loader
       %span.loader-msg Loading Whois data...
       .loader-gears
         = inline_svg 'icon_gears_loader.svg'
+
 :javascript
   $(document).ready(function() {
     window.set_complaint_entry_data("#{@complaint_entry.url_primary_category}", '#{@complaint_entry.status}');
