@@ -221,6 +221,6 @@
         %input{type: 'checkbox', id:'self_review', checked: true, 'data-current-user': @current_user_id}
       - else
         %input{type: 'checkbox', id:'self_review', checked: false, 'data-current-user': @current_user_id}
-      %label#self_review_label{for: 'self_review', title: 'Checking this will allow you to view entries you submitted and assign yourself as a reviewer.'}
+      %label#self_review_label.esc-tooltipped{for: 'self_review', title: 'Checking this will allow you to view entries you submitted and assign yourself as a reviewer.'}
         %span.toolbar-button-text-wider.no-float-no-pad Allow
         %span.no-float-no-pad Self Review
