@@ -490,7 +490,7 @@ build_complaints_table = (url) ->
               '<select class="response-template-select" id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Response to Customer</label>' +
-              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
+              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text">' + res_comment + '</textarea>' +
               '<label class="content-label-sm full-row-label">*Edits to the above textarea will be saved upon submitting the entry. Selecting a different template or resolution will replace any text added above.</label>' +
               '</div></div></div>' +
             '</div>'
