@@ -19,6 +19,7 @@ $ ->
       data: {data, name: "SelfReview"}
       dataType: "json"
       success: (response) ->
+        toggle_self_review(self_review)
     )
 
 window.get_display_prefs = () ->
@@ -543,3 +544,15 @@ webcat_new_internal_tickets_column_filter = {
   "view-sugg-col-cb": "false",
   "view-tools-col-cb": "false"
 }
+
+window.toggle_self_review = (self_review) ->
+  current_user_id = $('#self_review').attr('data-current-user')
+  rows = $('#complaints-index').DataTable().rows().data()
+  $(rows).each ->
+    entry = this
+    row = $('#' + entry.DT_RowId)[0]
+    if entry.assigned_to_id == current_user_id
+      if self_review == true
+        $(row).show()
+      else
+        $(row).hide()

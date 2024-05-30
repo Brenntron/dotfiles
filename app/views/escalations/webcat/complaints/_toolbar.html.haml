@@ -215,12 +215,12 @@
       %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
         %span.toolbar-button-text-wider Bulk Submit
 
-  - if params[:f] == "REVIEW" || params[:f] == "MY PENDING TICKETS"
+  - if params[:f] == "REVIEW"
     .webcat-toolbar-tall-wrapper
       - if current_user.enabled_self_review
         %input{type: 'checkbox', id:'self_review', checked: true, 'data-current-user': @current_user_id}
       - else
         %input{type: 'checkbox', id:'self_review', checked: false, 'data-current-user': @current_user_id}
-      %label{for: 'self_review'}
+      %label#self_review_label{for: 'self_review', title: 'Checking this will allow you to view entries you submitted and assign yourself as a reviewer.'}
         %span.toolbar-button-text-wider.no-float-no-pad Allow
         %span.no-float-no-pad Self Review

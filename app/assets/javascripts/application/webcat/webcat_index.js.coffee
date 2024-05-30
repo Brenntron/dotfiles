@@ -69,7 +69,7 @@ build_complaints_table = (url) ->
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
         create_ind_res_dialogs()
-        load_self_review_setting(rows)
+        load_self_review_setting()
 
         $('#complaints-index tbody tr.cat-index-main-row .nested-col-table tr td').click ->
           # allows individual selection of rows while clicking in nested data, is a little buggy with the multiselect
@@ -886,25 +886,12 @@ set_icon_for_favorite_filter = (filter_name) ->
     saved_search.addClass 'active-link'
 
 
-load_self_review_setting = (rows) ->
+load_self_review_setting = () ->
   if $('#self_review')?
-    current_user_id = $('#self_review').attr('data-current-user')
-    if $('#self_review:checked')?
-      $(rows).each ->
-        row = this
-        assigned_id = $(row).find('assignee-row')[0].attr('data-user-id')
-        if assigned_id == current_user_id
-          $(row).show()
-      # show tickets where I am assginee
-      # allow me to assign myself as reviewer
+    if $('#self_review:checked').length > 0
+      self_review = true
     else
-      $(rows).each ->
-        debugger
-        row = this
-        assigned_id = $(row).find('assignee-row')[0].attr('data-user-id')
-        if assigned_id == current_user_id
-          $(row).hide()
-      # hide tickets where I am assignee
-      # do not let me assign myself
+      self_review = false
+    window.toggle_self_review(self_review)
   else
     return
