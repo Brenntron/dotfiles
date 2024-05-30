@@ -350,7 +350,7 @@
 
 .toolbar#webcat-index-toolbar {
   background: #fff;
-  bottom: 18px;
+  bottom: 2px;
   box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
   flex-direction: row;
   float: left;
@@ -367,7 +367,11 @@
   }
 
   div {
-    margin: 4px 3px 0 0;
+    margin: 4px 3px 4px 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
   }
 
   .primary-text-divider {
@@ -380,7 +384,7 @@
   }
 
   .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
-    //background-color: $faint-neutral-color;
+    background-color: #f2f2f2;
     display: block;
     height: 27px;
     line-height: 25px;
@@ -403,7 +407,7 @@
 
   .webcat-toolbar-bulk-res {
     background-color: #255c7d !important;
-    //color: $type-lightest !important;
+    color: #fff !important;
 
     &:disabled {
       opacity: 0.5;
@@ -411,10 +415,10 @@
   }
 
   .webcat-toolbar-tall-wrapper {
-    height: 45px;
+    height: 43px;
     line-height: 45px;
     margin: 0 0 0 3px;
-    padding: 0 15px;
+    padding: 0 15px 0 40px;
 
     input {
       margin: 16px 0 0;
@@ -422,12 +426,13 @@
   }
 
   .webcat-manage-templates-button {
-    //background-color: $faint-neutral-color;
+    background-color: #f2f2f2;
     padding-left: 24px;
   }
 
   .webcat-toolbar-push {
     margin-left: auto;
+    margin-right: 20px !important;
   }
 }
 
@@ -589,93 +594,6 @@ table.dataTable tbody tr.submitting-entry {
   }
 }
 
-.toolbar#webcat-index-toolbar {
-  background: white;
-  bottom: 2px;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  flex-direction: row;
-  float: left;
-  margin: 2px 0 -35px 0;
-  padding: 0 0 0 20px;
-  position: relative;
-  width: 100%;
-  z-index: 1;
-
-  .toolbar-checkbox-wrapper {
-    padding-top: 0;
-    padding-left: 5px;
-    font-weight: normal;
-  }
-
-  div {
-    margin: 4px 3px 0 0;
-  }
-
-  .toolbar-dropdown {
-    margin-top: 0 !important;
-  }
-
-  .primary-text-divider {
-    margin-top: 0 !important;
-  }
-
-  .btn-group.toolbar-btn-group {
-    margin: 0;
-    vertical-align: baseline;
-  }
-
-  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
-    background-color: #f2f2f2;
-    display: block;
-    height: 27px;
-    line-height: 25px;
-    float: none;
-    margin: 0;
-    padding: 0 8px;
-
-    input {
-      margin: 6px 0 0;
-      vertical-align: top;
-    }
-
-    label {
-      display: inline-block;
-      font-weight: 400;
-      height: 27px;
-      margin-left: 2px;
-    }
-  }
-
-  .webcat-toolbar-bulk-res {
-    background-color: #255c7d !important;
-    color: #fff !important;
-
-    &:disabled {
-      opacity: 0.5;
-    }
-  }
-
-  .webcat-toolbar-tall-wrapper {
-    height: 45px;
-    line-height: 45px;
-    margin: 0 0 0 3px;
-    padding: 0 15px 0 40px;
-
-    input {
-      margin: 16px 0 0;
-    }
-  }
-
-  .webcat-manage-templates-button {
-    background-color: #f2f2f2;
-    padding-left: 24px;
-  }
-
-  .webcat-toolbar-push {
-    margin-left: auto;
-  }
-}
-
 //sticky toolbar needs extra top spacing on small screens
 @media (max-width: 999px) {
   .toolbar#webcat-index-toolbar {
@@ -777,6 +695,7 @@ table.dataTable tbody tr.submitting-entry {
     display: flex;
     height: 27px;
     margin-top: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   .assignment-type-input {
