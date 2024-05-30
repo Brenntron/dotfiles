@@ -105,7 +105,7 @@
       %label.content-label-sm
         Resolved IP/URI
       %input.ce-input.ce-ip-uri-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                       value: @submitted_ip_uri }
+                                       value: @input_ip_uri }
       .ce-resolved-ip-uri-button-wrapper
         %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
                                                 # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
@@ -174,14 +174,16 @@
         %option{ value: 'fixed', selected: true } Fixed - Default Response
       %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
                                                        id: "entry-email-response-to-customers_#{@complaint_entry.id}",
-                                                       name: 'ce_customer_comment_textarea',
-                                                       maxlength: '64000' }
+                                                       maxlength: '64000',
+                                                       name: 'ce_customer_comment_textarea' }
+        = @complaint_entry.resolution_comment
     .ce-internal-comment-wrapper
       %label.content-label-sm
         Internal Comment
       %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
                                                        name: 'ce_internal_comment_textarea',
                                                        placeholder: 'Internal note for choosing categories' }
+        = @complaint_entry.internal_comment
     - if @complaint_entry.is_important
       .row.text-center
         .col-xs-6

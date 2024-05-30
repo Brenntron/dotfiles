@@ -378,7 +378,7 @@ window.get_resolution_templates = (resolution, dialog_type, entry_ids) ->
           text_area = $("#entry-email-response-to-customers_" + entry_id)
           select.empty()
           select.append(template_options)
-          $(text_area).val(email_text)
+          text_area.val(email_text) unless text_area.val()
 
       error: (response) ->
         std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
