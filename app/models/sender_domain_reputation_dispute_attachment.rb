@@ -24,7 +24,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
       payload[:url] = payload["url"]
     end
     if remote == true
-      file_content = open(payload[:url]).read
+      file_content = get_attachemnt_content(payload[:url])
     else
       file_content = payload[:file_content].read
     end
@@ -269,5 +269,11 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   def self.extract_emails_to_array(txt)
     reg = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
     txt.scan(reg).uniq
+  end
+
+  def self.get_attachemnt_content(url)
+    uri = URI.parse(url)
+    response = Net::HTTP.get_response(uri)
+    response.body
   end
 end
