@@ -14,31 +14,32 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   def show
     @complaint_entry = ComplaintEntry.find(params[:id])
     @complaint = @complaint_entry.complaint
-    @lookup = @complaint_entry.domain.present? ? @complaint_entry.domain : @complaint_entry.ip_address
+    @lookup = @complaint_entry.domain.presence || @complaint_entry.ip_address
     @org_name = if @complaint.customer.nil?
                   'Guest'
                 else
                   @complaint.customer_org
                 end
     @source = @complaint.ticket_source
-    @submitted_ip_uri = if ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) && !@complaint_entry.uri_as_categorized&.empty?
-                          @complaint_entry.uri_as_categorized
-                        elsif ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) || !@complaint_entry.domain.empty?
-                          @complaint_entry.domain || @complaint_entry.ip_address
-                        else
-                          @complaint_entry.uri || @complaint_entry.ip_address
-                        end
+    @submitted_ip_uri = @complaint_entry.uri || @complaint_entry.ip_address
+    @input_ip_uri = if ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) && !@complaint_entry.uri_as_categorized&.empty?
+                      @complaint_entry.uri_as_categorized
+                    elsif ['COMPLETED', 'PENDING', 'REOPENED'].include?(@complaint_entry.status) || !@complaint_entry.domain.empty?
+                      @complaint_entry.domain || @complaint_entry.ip_address
+                    else
+                      @complaint_entry.uri || @complaint_entry.ip_address
+                    end
     @tags = @complaint.complaint_tags.map(&:name)
     @wbrs_score = @complaint_entry.wbrs_score.nil? ? 0 : @complaint_entry.wbrs_score.round(1)
     @webcat_users = User.joins(:roles).where('roles.role like "%webcat%"').distinct.order(:display_name)
   end
 
-  def update; end
+  def update
+  end
 
   def serve_image
     complaint_entry = ComplaintEntry.find(params[:complaint_entry_id])
-    data = complaint_entry.complaint_entry_screenshot&.screenshot # <—this should return a binary blob
-
+    data = complaint_entry.complaint_entry_screenshot&.screenshot     #<—this should return a binary blob
     if data
       send_data data, type: 'image/jpeg'
     else
@@ -46,6 +47,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
       send_data file_data, type: 'image/jpeg'
     end
   end
+
 
   private
 
