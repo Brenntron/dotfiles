@@ -39,13 +39,14 @@ $ ->
 
   $body = $('body')
   # webcat: have top navigation bar scroll with page per user request
-  if $('body').hasClass("escalations--webcat--complaints-controller") && $body.hasClass("index-action")
+  if $body.hasClass("escalations--webcat--complaints-controller") && $body.hasClass("index-action")
     $('#nav-banner').addClass('fixed-nav')
 
     #pin webcat toolbar under navigation bar, add padding
     toolbar = $('#webcat-index-toolbar')
 
     $('#nav-banner').append(toolbar)
+    $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top', '60px')
 
     #align tooltips under toolbar
     $body.addClass('pinned-toolbar-true')
