@@ -1125,7 +1125,7 @@ $ ->
         render: ( data )->
 
           { is_important } = data
-          if is_important == 'true'
+          if is_important == true
             '<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
       }
       {
