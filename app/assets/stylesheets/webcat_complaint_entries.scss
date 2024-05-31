@@ -154,7 +154,7 @@ $selectize-border: #E5E5E5;
   h2 {
     font-size: 15px;
     font-weight: 700;
-    padding: 3px 3px 10px;
+    padding: 3px 0 10px;
     margin-top: 20px;
   }
   .toolbar {
@@ -587,15 +587,13 @@ $selectize-border: #E5E5E5;
     align-items: center;
     display: flex;
     justify-content: center;
-    margin: 15px auto 0 auto;
-    padding: 12px 20px;
+    margin: 0 auto;
+    padding: 0;
     text-align: center;
     width: 100%;
 
-    .loader-gears {
-      height: 40px;
-      width: 40px;
-      margin: 5px;
+    .gear-loader-wrapper {
+      margin: -1px 4px 0 0;
     }
   }
 }

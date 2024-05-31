@@ -77,10 +77,11 @@
 
     .external-categories-section
       %h2 Current Categories
-    .loader-div#current_categories_loader
-      %span.loader-msg Loading Current Categories...
-      .loader-gears
-        = inline_svg 'icon_gears_loader.svg'
+      .loader-div#current_categories_loader
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg'
+        %span.loader-msg Loading Current Categories...
+
 
     .tags-section
       %h2 Tags
@@ -204,11 +205,13 @@
 
   .col-xs-4.ce-research-column
     %h2 Whois
-    .whois-data-container#whois_data_container
     .loader-div#whois_loader
-      %span.loader-msg Loading Whois data...
-      .loader-gears
+      .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading Whois data...
+    .whois-data-container#whois_data_container
+
+
 
 :javascript
   $(document).ready(function() {
