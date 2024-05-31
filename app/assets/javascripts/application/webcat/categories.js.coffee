@@ -154,24 +154,25 @@ namespace 'AC.WebCat', (exports) ->
               certainties_cell += '</tr>'
               wbrs_table += certainties_cell
             else
-              wbrs_table += "<td></td></tr>"
+              wbrs_table += "<td colspan='3'></td></tr>"
 
             if conf == '1.0' && is_index_page
               primary_cat = '<a class="esc-tooltipped tooltip-underline">' + current_category.mnem + ' - ' + current_category.descr + ' <span class="ex-category-source">WBRS</span></a>'
-
-          wbrs_table += '</tbody></table>'
         else
           wbrs_table += '<tr><td style="text-align: center;" colspan="4">No assigned categories.</td></tr>'
 
-        if sds_category && is_index_page
-          primary_cat = "<a class='esc-tooltipped tooltip-underline'>
-                          #{sds_category} <span class='ex-category-source'>SDS URI</span>
-                         </a>"
+          if sds_category && is_index_page
+            primary_cat = "<a class='esc-tooltipped tooltip-underline'>
+                            #{sds_category} <span class='ex-category-source'>SDS URI</span>
+                           </a>"
 
-        else if sds_domain_category && is_index_page
-          primary_cat = "<a class='esc-tooltipped tooltip-underline'>
-                          #{sds_domain_category} <span class='ex-category-source'>SDS Domain</span>
-                         </a>"
+          else if sds_domain_category && is_index_page
+            primary_cat = "<a class='esc-tooltipped tooltip-underline'>
+                            #{sds_domain_category} <span class='ex-category-source'>SDS Domain</span>
+                           </a>"
+
+
+        wbrs_table += '</tbody></table>'
 
         # build the rest of the tooltip if there is stuff from SDS
         sds_table = if is_index_page
