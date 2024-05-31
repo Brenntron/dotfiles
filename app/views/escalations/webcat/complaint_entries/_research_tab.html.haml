@@ -92,92 +92,102 @@
 
   .col-xs-4.ce-research-column.form-wrapper-column
     %h2 Categorization Resolution
-    .ce-resolved-ip-uri-wrapper
-      %label.content-label-sm
-        Resolved IP/URI
-      %input.ce-input.ce-ip-uri-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                       value: @input_ip_uri }
-      .ce-resolved-ip-uri-button-wrapper
-        %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
-                                                # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
-                                                disabled: missing_path?(@complaint_entry) && missing_subdomain?(@complaint_entry),
-                                                onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
-          domain
-        %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
-                                                   disabled: missing_subdomain?(@complaint_entry),
-                                                   onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
-          subdomain
-        %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
-                                                  disabled: true,
-                                                  onclick: "update_uri_input('#{@complaint_entry.uri}', 'original uri')" }
-          original uri
-    .ce-categories-wrapper
-      %label.content-label-sm
-        Categories
-      %input.ce-categories-select.ce-input#ce_categories_select{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Resolved IP/URI
+        %input.ce-input.ce-ip-uri-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                         value: @input_ip_uri }
+        .ce-resolved-ip-uri-button-wrapper
+          %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
+                                                  # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
+                                                  disabled: missing_path?(@complaint_entry) && missing_subdomain?(@complaint_entry),
+                                                  onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
+            domain
+          %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
+                                                     disabled: missing_subdomain?(@complaint_entry),
+                                                     onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
+            subdomain
+          %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
+                                                    disabled: true,
+                                                    onclick: "update_uri_input('#{@complaint_entry.uri}', 'original uri')" }
+            original uri
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Categories
+        %input.ce-categories-select.ce-input#ce_categories_select{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+
                                                                  placeholder: 'Enter Categories / Confidence Order' }
-    .ce-resolution-wrapper
-      %label.content-label-sm
-        Resolution
-      - if @complaint_entry.status == 'PENDING'
-        .ce-radio-group-wrapper
-          .ce-radio-group
-            %input.review-radio-button{ name: 'resolution',
-                                        type: 'radio',
-                                        value: 'commit' }
-            %label.radio-label{ for: 'commit' }
-              Commit
-          .ce-radio-group
-            %input.review-radio-button{ name: 'resolution',
-                                        type: 'radio',
-                                        value: 'decline' }
-            %label.radio-label{ for: 'decline' }
-              Decline
-      - else
-        .ce-radio-group-wrapper
-          .ce-radio-group
-            %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                            name: 'resolution',
-                                            type: 'radio',
-                                            value: 'unchanged' }
-            %label.radio-label{ for: 'unchanged' }
-              Unchanged
-          .ce-radio-group
-            %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                            name: 'resolution',
-                                            checked: true,
-                                            type: 'radio',
-                                            value: 'fixed' }
-            %label.radio-label{ for: 'fixed' }
-              Fixed
-          .ce-radio-group
-            %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-                                            name: 'resolution',
-                                            type: 'radio',
-                                            value: 'invalid' }
-            %label.radio-label{ for: 'invalid' }
-              Invalid
-    .ce-customer-comment-wrapper
-      %label.content-label-sm
-        Email Response to Customer
-      - if ['COMPLETED', 'PENDING'].include? @complaint_entry.status
-        .email-response-text= @complaint_entry.resolution_comment.presence || 'No response created or sent to customer.'
-      - else
-        %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
-                                                                                  id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
-          %option{ value: 'fixed', selected: true } Fixed - Default Response
-        %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
-                                                         id: "entry-email-response-to-customers_#{@complaint_entry.id}",
-                                                         maxlength: '64000',
-                                                         name: 'ce_customer_comment_textarea' }
-          = @complaint_entry.resolution_comment
-    .ce-internal-comment-wrapper
-      %label.content-label-sm
-        Internal Comment
-      %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
-                                                       name: 'ce_internal_comment_textarea',
-                                                       placeholder: 'Internal note for choosing categories' }
-        = @complaint_entry.internal_comment
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Resolution
+        - if @complaint_entry.status == 'PENDING'
+          .ce-radio-group-wrapper
+            .ce-radio-group
+              %input#review-commit-radio.review-radio-button{ name: 'resolution',
+                                          type: 'radio',
+                                          value: 'commit' }
+              %label.radio-label{ for: 'review-commit-radio' }
+                Commit
+            .ce-radio-group
+              %input#review-decline-radio.review-radio-button{ name: 'resolution',
+                                          type: 'radio',
+                                          value: 'decline' }
+              %label.radio-label{ for: 'review-decline-radio' }
+                Decline
+        - else
+          .ce-radio-group-wrapper
+            .ce-radio-group
+              %input#res-unchanged-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                              name: 'resolution',
+                                              type: 'radio',
+                                              value: 'unchanged' }
+              %label.radio-label{ for: 'res-unchanged-radio' }
+                Unchanged
+            .ce-radio-group
+              %input#res-fixed-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                              name: 'resolution',
+                                              checked: true,
+                                              type: 'radio',
+                                              value: 'fixed' }
+              %label.radio-label{ for: 'res-fixed-radio' }
+                Fixed
+            .ce-radio-group
+              %input#res-invalid-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                              name: 'resolution',
+                                              type: 'radio',
+                                              value: 'invalid' }
+              %label.radio-label{ for: 'res-invalid-radio' }
+                Invalid
+
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Email Response to Customer
+        - if ['COMPLETED', 'PENDING'].include? @complaint_entry.status
+          .email-response-text= @complaint_entry.resolution_comment.presence || 'No response created or sent to customer.'
+        - else
+          %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
+                                                                                    id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
+            %option{ value: 'fixed', selected: true } Fixed - Default Response
+          %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
+                                                           id: "entry-email-response-to-customers_#{@complaint_entry.id}",
+                                                           maxlength: '64000',
+                                                           name: 'ce_customer_comment_textarea' }
+            = @complaint_entry.resolution_comment
+
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Internal Comment
+        %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if ["COMPLETED", "PENDING"].include?(@complaint_entry.status)),
+                                                         name: 'ce_internal_comment_textarea',
+                                                         placeholder: 'Internal note for choosing categories' }
+          = @complaint_entry.internal_comment
+
     - if @complaint_entry.is_important
       .row.text-center
         .col-xs-6

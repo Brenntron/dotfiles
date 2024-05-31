@@ -181,9 +181,6 @@ $selectize-border: #E5E5E5;
 }
 
 .ce-research-column, .ce-history-column {
-  & > div:not(.alert) {
-    padding: 0 0 10px;
-  }
 
   & > label {
     width: 100%;
@@ -337,7 +334,7 @@ $selectize-border: #E5E5E5;
   }
 
   .ce-resolved-ip-uri-button-wrapper {
-    margin: 5px 0 40px;
+    margin-top: 5px;
   }
 
   #ce_tags_wrapper {
@@ -352,6 +349,8 @@ $selectize-border: #E5E5E5;
 
     .tag-capsule {
       cursor: unset;
+      font-size: 12px;
+      padding-top: 3px;
 
       &:hover {
         background-color: $primary-section-color;
@@ -383,11 +382,6 @@ $selectize-border: #E5E5E5;
     }
   }
 
-  .ce-categories-wrapper, .ce-resolution-wrapper, .ce-customer-comment-wrapper,
-  .ce-internal-comment-wrapper {
-    margin-bottom: 20px;
-  }
-
   .ce-input {
     border: 1px solid #E5E5E5;
     background-color: #EEF7FB;
@@ -396,7 +390,11 @@ $selectize-border: #E5E5E5;
     width: 100%;
     min-height: 26px;
     font-size: 12px;
+    &.selectize-dropdown {
+      background-color: #fff;
+    }
   }
+
 
   .ip-uri-button {
     background-color: darken($type-faint-accent, 5%);
@@ -418,12 +416,40 @@ $selectize-border: #E5E5E5;
     margin: 0;
     min-height: 33px;
     padding: 3px 4px 7px 4px;
+    &::placeholder {
+      font-size: 11px;
+      font-style: italic;
+      line-height: 18px;
+    }
   }
 
   .ce-categories-select {
+    min-height: 33px;
+    font-size: 11px;
+
     .selectize-input {
-      background-color: lighten($faint-accent-color, 5%);
+      background-color: transparent;
       margin-bottom: -7px !important;
+      &::placeholder {
+        font-size: 11px;
+        font-style: italic;
+        line-height: 18px;
+      }
+      input {
+        margin-top: 5px !important;
+      }
+      input::placeholder {
+        font-size: 11px;
+        font-style: italic;
+        line-height: 18px;
+      }
+
+      .item {
+        padding: 4px 6px;
+        font-size: 11px;
+        line-height: 1.25em;
+        margin: 4px 2px 0 2px !important;
+      }
     }
 
     .selectize-input.disabled {
@@ -467,13 +493,13 @@ $selectize-border: #E5E5E5;
       background-color: $content-bg-color;
       border: 1px solid $type-lighter-color;
       border-radius: 50%;
-      // color: black;
       display: grid;
       height: 14px;
       margin: 0;
       place-content: center;
       transform: translateY(-1px);
       width: 14px;
+      cursor: pointer;
 
       &::before {
         border-radius: 50%;
@@ -520,6 +546,8 @@ $selectize-border: #E5E5E5;
 
     .radio-label {
       display: inline;
+      font-size: 11px;
+      cursor: pointer;
     }
   }
 
@@ -600,5 +628,8 @@ $selectize-border: #E5E5E5;
 .form-wrapper-column {
   .content-label-sm {
     margin-bottom: 0;
+  }
+  .row .col-xs-12 {
+    padding-bottom: 10px;
   }
 }
