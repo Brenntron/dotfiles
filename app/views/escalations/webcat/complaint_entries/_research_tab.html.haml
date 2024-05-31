@@ -73,7 +73,7 @@
           %label.content-label-sm Description
           %p#ce_description= @complaint.description
 
-    .external-categories-section
+    .external-categories-section.bottom-divider
       %h2 Current Categories
       .loader-div#current_categories_loader
         .gear-loader-wrapper
@@ -90,7 +90,7 @@
         -# %button.primary.save-tags{ onClick: 'webcat_show_page_edit_tags()' }
         -#   Save
 
-  .col-xs-4.ce-research-column
+  .col-xs-4.ce-research-column.form-wrapper-column
     %h2 Categorization Resolution
     .ce-resolved-ip-uri-wrapper
       %label.content-label-sm

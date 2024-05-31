@@ -195,6 +195,7 @@ $selectize-border: #E5E5E5;
 
   #ce_description {
     word-break: break-all;
+    line-height: 1.2em;
   }
 
   .ce-input:disabled {
@@ -388,13 +389,13 @@ $selectize-border: #E5E5E5;
   }
 
   .ce-input {
-    background-color: lighten($faint-accent-color, 5%);
-    border: 2px solid lighten($faint-accent-color, 5%);
+    border: 1px solid #E5E5E5;
+    background-color: #EEF7FB;
     border-radius: 1px;
-    margin: 0;
-    padding: 0;
-    outline: 1px solid $type-faint-accent;
+    padding: 2px 4px;
     width: 100%;
+    min-height: 26px;
+    font-size: 12px;
   }
 
   .ip-uri-button {
@@ -593,5 +594,11 @@ $selectize-border: #E5E5E5;
     .gear-loader-wrapper {
       margin: -1px 4px 0 0;
     }
+  }
+}
+
+.form-wrapper-column {
+  .content-label-sm {
+    margin-bottom: 0;
   }
 }
