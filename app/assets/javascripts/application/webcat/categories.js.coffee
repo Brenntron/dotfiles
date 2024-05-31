@@ -156,10 +156,10 @@ namespace 'AC.WebCat', (exports) ->
             else
               wbrs_table += "<td></td></tr>"
 
-            wbrs_table += '</tbody></table>'
-
             if conf == '1.0' && is_index_page
               primary_cat = '<a class="esc-tooltipped tooltip-underline">' + current_category.mnem + ' - ' + current_category.descr + ' <span class="ex-category-source">WBRS</span></a>'
+
+          wbrs_table += '</tbody></table>'
         else
           wbrs_table += '<tr><td style="text-align: center;" colspan="4">No assigned categories.</td></tr>'
 
