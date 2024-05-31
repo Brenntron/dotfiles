@@ -780,7 +780,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     get_current_categories()
     get_entry_history()
 
-    get_resolution_templates(resolution, 'individual', [entry_id])
+    if resolution
+      get_resolution_templates(resolution, 'individual', [entry_id])
 
     # Show page resolution select
     $('.show-action .webcat-ticket-status-radio').click ->

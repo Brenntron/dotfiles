@@ -122,40 +122,41 @@ namespace 'AC.WebCat', (exports) ->
             return 'continue' unless current_category.is_active
 
             { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = current_category
+            rowspan = if certainties && certainties.length > 0 then certainties.length else 0
+            wbrs_table += "<tr>
+                             <td rowspan='#{rowspan}'>
+                               #{confidence}
+                             </td>
+                             <td rowspan='#{rowspan}'>
+                               #{mnemonic} - #{name}
+                             </td>
+                             <td rowspan='#{rowspan}'>
+                               #{top_certainty}
+                             </td>"
 
+            # This adds another row to the feeds column
             if certainties
-              rowspan = certainties.length
-
+              certainties_cell = ''
               certainties.forEach (certainty, index) ->
                 { certainty: source_certainty, source_description, source_mnemonic } = certainty
+                certainties_cell += '<tr>' unless index == 0
 
-                wbrs_table += "<tr>
-                                    <td class='alt-col}'>
-                                       #{source_certainty}
-                                     </td>
-                                     <td class='alt-col}'>
-                                       #{source_mnemonic}
-                                     </td>
-                                     <td class='alt-col}'>
-                                       #{source_description}
-                                     </td>
-                                     <td></td>
-                                   </tr>"
+                certainties_cell += "<td class='alt-col'>
+                                 #{source_certainty}
+                               </td>
+                               <td class='alt-col'>
+                                 #{source_mnemonic}
+                               </td>
+                               <td class='alt-col'>
+                                 #{source_description}
+                               </td>"
+
+              certainties_cell += '</tr>'
+              wbrs_table += certainties_cell
             else
-              wbrs_table += "<tr>
-                               <td>
-                                 #{confidence}
-                               </td>
-                               <td>
-                                 #{mnemonic} - #{name}
-                               </td>
-                               <td>
-                                 #{top_certainty}
-                               </td>
-                              <td></td>
-                             </tr>"
+              wbrs_table += "<td></td></tr>"
 
-            wbrs_table += '</tr></tbody></table>'
+            wbrs_table += '</tbody></table>'
 
             if conf == '1.0' && is_index_page
               primary_cat = '<a class="esc-tooltipped tooltip-underline">' + current_category.mnem + ' - ' + current_category.descr + ' <span class="ex-category-source">WBRS</span></a>'
