@@ -61,10 +61,8 @@
                       Convert Ticket
 
       .ce-submitted-wbrs-wrapper.customer-submitted-data-wrapper
-        #ce_wbrs_score_wrapper
-          %div
-            %span{ class: ['webcat-research-svg', wbrs_score_icon(@complaint_entry.wbrs_score)] }
-            %p#ce_wbrs_score= @wbrs_score
+        #ce_wbrs_score_wrapper.webcat-research-svg{ class: wbrs_score_icon(@complaint_entry.wbrs_score) }
+          = @wbrs_score
 
         #ce_submitted_ip_uri_wrapper
           %p.ce-submitted-ip-uri= @submitted_ip_uri

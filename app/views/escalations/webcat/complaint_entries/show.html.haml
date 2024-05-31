@@ -74,7 +74,7 @@
                 - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
                   - if no_user?(@complaint_entry.reviewer)
                     %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-reviewer{ onclick: "take_single_webcat_complaint('reviewer');",
-                                                                                                                    title: 'Assign this ticket to me' }
+                                                                                                                    title: 'Assign me as reviewer' }
                   %span.dropdown
                     .dropdown-menu#show-change-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
                       .change-assignee-dropdown-wrapper
@@ -91,7 +91,7 @@
                     %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#webcat-index-change-reviewer{ 'aria-expanded': 'false',
                                                                                                                                       'aria-haspopup': 'true',
                                                                                                                                       'data-toggle': 'dropdown',
-                                                                                                                                      title: 'Change Assignee' }
+                                                                                                                                      title: 'Change Reviewer' }
         .top-info-data.complaint-second-reviewer-wrapper
           .complaint-owner-wrapper
             %div
@@ -106,7 +106,7 @@
                 - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
                   - if no_user?(@complaint_entry.second_reviewer)
                     %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-second-reviewer{ onclick: "take_single_webcat_complaint('second_reviewer');",
-                                                                                                                           title: 'Assign this ticket to me' }
+                                                                                                                           title: 'Assign me as second reviewer' }
                   %span.dropdown
                     .dropdown-menu#show-change-second-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
                       .change-assignee-dropdown-wrapper
@@ -123,7 +123,7 @@
                     %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#webcat-index-change-second-reviewer{ 'aria-expanded': 'false',
                                                                                                                                              'aria-haspopup': 'true',
                                                                                                                                            'data-toggle': 'dropdown',
-                                                                                                                                           title: 'Change Assignee' }
+                                                                                                                                           title: 'Change Second Reviewer' }
     .col-xs-2.col-with-divider
       .top-info-wrapper
         %label.content-label-sm Submitted At

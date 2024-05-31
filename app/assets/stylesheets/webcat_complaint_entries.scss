@@ -189,10 +189,6 @@ $selectize-border: #E5E5E5;
     width: 100%;
   }
 
-  div {
-    box-sizing: border-box;
-  }
-
   p {
     font-size: 12px;
   }
@@ -282,11 +278,13 @@ $selectize-border: #E5E5E5;
   #ce_wbrs_score_wrapper {
     width: 50px;
 
-    .webcat-research-svg {
-      bottom: 5px;
-      margin-right: 0;
-      display: initial;
-      position: relative;
+    &.webcat-research-svg {
+      display: block;
+      background-repeat: no-repeat;
+      padding-left: 19px;
+      background-position: top -4px left;
+      font-size: 12px;
+      margin-right: 8px;
     }
   }
 
