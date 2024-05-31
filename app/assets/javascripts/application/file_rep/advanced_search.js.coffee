@@ -49,7 +49,8 @@ namespace 'AC.FileRep', (exports) ->
         $search_label = $('#in-sample-zoo-input')
         $search_label.prop('checked', searchCriteria)
 
-      $search_label.removeClass('hidden')
+      if $search_label != null
+        $search_label.removeClass('hidden')
 
 
   exports.update_slider_values = (slider_id, values) ->
@@ -92,7 +93,7 @@ namespace 'AC.FileRep', (exports) ->
 
   multiselects_inputs_mapping = {
     'assigned': '#assignee-input',
-    'platforms': '#platform-input'
+    'platform_ids': '#platform-input'
   }
 
   handle_common_inputs = (label, criteria) ->
