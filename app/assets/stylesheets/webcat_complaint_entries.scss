@@ -286,7 +286,7 @@ $selectize-border: #E5E5E5;
     }
   }
 
-  .categories-table {
+  .categories-table, .whois-data-container table {
     font-size: 11px;
     text-align: left;
     margin-top: 0;
@@ -584,11 +584,6 @@ $selectize-border: #E5E5E5;
     }
   }
 
-  .alert.alert-dismissable.alert-streamlined {
-    left: 75px;
-    top: 0;
-  }
-
   .ce-allow-review-container {
     align-items: center;
     background-color: $faint-neutral-color;
@@ -631,5 +626,12 @@ $selectize-border: #E5E5E5;
   }
   .row .col-xs-12 {
     padding-bottom: 10px;
+  }
+}
+
+.whois-column {
+  .alert {
+    margin-left: 15px;
+    margin-top: -32px;
   }
 }
