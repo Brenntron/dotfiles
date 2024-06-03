@@ -25,7 +25,7 @@ $ ->
     )
 
 
-  $('#webcat-advanced-search-button').on 'click', ->
+  $('#advanced-search-button').on 'click', ->
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_names'
       method: 'GET'
