@@ -1,6 +1,6 @@
 module Escalations::Webcat::ComplaintEntriesHelper
   def no_user?(user)
-    user.nil? || user.display_name == 'vrtincom'
+    user.nil? || user.display_name == 'Vrt Incoming'
   end
 
   def complaint_entry_age(complaint_entry)

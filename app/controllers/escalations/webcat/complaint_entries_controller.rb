@@ -14,7 +14,6 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   def show
     @complaint_entry = ComplaintEntry.find(params[:id])
     @complaint = @complaint_entry.complaint
-    @lookup = @complaint_entry.domain.presence || @complaint_entry.ip_address
     @org_name = if @complaint.customer.nil?
                   'Guest'
                 else
