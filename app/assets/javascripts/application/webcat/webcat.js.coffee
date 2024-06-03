@@ -55,7 +55,7 @@ $ ->
       refresh_url()
 
 
-  $('#filter-cases-list a').on 'click', (e)->
+  $('.webcat-filter-dropdown #filter-cases-list a').on 'click', (e)->
     e.preventDefault()
     filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
@@ -225,6 +225,9 @@ $ ->
     if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
 
 
+  is_default_saved_search = (chosen_icon) ->
+    chosen_icon.closest('#saved-search > #saved-search-tbody').length > 0
+
   is_default_filter = (chosen_icon) ->
     chosen_icon.closest('#filter-dropdown > #filter-cases-list').length > 0
 
@@ -234,7 +237,7 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     { icon: fav_icon, link: link, name: name }
 
-  window.current_page_is_favourite = (search_name) ->
+  window.current_page_is_favorite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
       filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
@@ -248,17 +251,34 @@ $ ->
           if link_text == search_name
             return true
 
+    else if is_default_saved_search(icon)
+      saved_search_dropdown = $("#saved-search > span.favorite-search-icon-active")
+      if saved_search_dropdown
+        #Check if saved search link matches current url path
+        if name == decodeURIComponent(window.location.search)
+          return true
+        #If no url path check if active link matches current filter name
+        else
+          link_text = $("#saved-search > #saved-search-tbody a.active-link").text().trim()
+          if link_text == search_name
+            return true
+
     #check if on current saved search
     if name == localStorage.webcat_search_name
       return true
 
-    #catch for when no favorites are set - currently loads All Tickets page, will need to be adjusted if that changes
-    else if $('.favorite-search-icon-active').length == 0 && search_name == 'all tickets'
-      return true
+    #catch for when no favorites are set
+    else if $('.favorite-search-icon-active').length == 0
+
+      #'My Open Tickets' filter is now default - if no favorites set, do not include clear filter button
+      if search_name == 'my open tickets'
+        return true
+      else
+        return false
 
     #check if saved search favorite is set but there's no local storage saved
     else
-      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      saved_search_dropdown = $("#saved-searches-wrapper span.favorite-search-icon-active")
       if saved_search_dropdown.length > 0
         saved_name = $('#saved-searches-wrapper .active-link').text().trim()
         if search_name == saved_name

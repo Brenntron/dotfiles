@@ -859,3 +859,27 @@ table.dataTable tbody tr.submitting-entry {
   padding-top: 4px;
   line-height: 1.15em;
 }
+
+#complaints-index table.nested-col-table .assignee-row td,
+#complaints-index table.nested-col-table .reviewer-row td,
+#complaints-index table.nested-col-table .second-reviewer-row td {
+  background-repeat: no-repeat;
+  padding-left: 16px;
+  min-height: 12px;
+}
+
+.assignee-row td {
+  background-image: url(image_path('icon_user_grey.svg'));
+  background-size: 12px;
+  background-position: left center;
+}
+.reviewer-row td {
+  background-image: url(image_path('icon_check_grey.svg'));
+  background-size: 15px;
+  background-position: left -1px center;
+}
+.second-reviewer-row td {
+  background-image: url(image_path('icon_doublecheck_grey.svg'));
+  background-size: 15px;
+  background-position: left -1px center;
+}

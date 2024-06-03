@@ -10,6 +10,7 @@ class Complaint < ApplicationRecord
 
   FILTER_VIEW_OPTIONS = [
     { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
+    { label: 'My Pending Tickets', param: 'MY PENDING TICKETS', icon: 'icon-my-pending-bugs'},
     { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
     { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
     { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
@@ -21,7 +22,6 @@ class Complaint < ApplicationRecord
     { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
     { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
-    { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
@@ -122,12 +122,20 @@ For future web and email reputation requests, please open a web and email reputa
     uri = Addressable::URI.parse(Addressable::URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     #subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
-    {
-        subdomain: domain.trd || '',
-        domain: domain.domain,
-        path: uri.path,
-        query: uri.query
+    result = {
+      subdomain: nil,
+      domain: nil,
+      path: uri.path,
+      query: uri.query
     }
+     # when we have url like "101.79.74.67/www/huh/what/grrr.apx" we should not save subdomain of it
+    if ComplaintEntry.is_ip?(URI.parse(uri.to_s).host)
+      result[:domain] = URI.parse(uri.to_s).host
+    else
+      result[:domain] = domain.domain
+      result[:subdomain] = domain.trd || ''
+    end
+    result
   end
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)

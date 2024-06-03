@@ -282,17 +282,25 @@ window.build_complaints_table = (url) ->
         data: 'assigned_to'
         className: 'users-col'
         render: (data, type, full, meta) ->
-          if data == ''
+          if data == '' || data == 'Vrt Incoming'
             user = '<span class="missing-data">No assignee</span>'
           else
             user = data
+
+          reviewer = full.reviewer
+          if full.reviewer == ''
+            reviewer = '<span class="missing-data">No reviewer</span>'
+
+          second_reviewer = full.second_reviewer
+          if full.second_reviewer == ''
+            second_reviewer = '<span class="missing-data">No 2nd reviewer</span>'
 
           users_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
               '<tr class="assignee-row"><td>' + user + '</td></tr>' +
-              '<tr class="reviewer-row"><td>' + full.reviewer + '</td></tr>' +
-              '<tr class="second-reviewer-row"><td>' + full.second_reviewer + '</td></tr>' +
+              '<tr class="reviewer-row"><td>' + reviewer + '</td></tr>' +
+              '<tr class="second-reviewer-row"><td>' + second_reviewer + '</td></tr>' +
               '</tbody>' +
               '</table>'
 
@@ -779,12 +787,17 @@ window.build_header = (data) ->
         search_name = search_name.replace('?f=', '')
 
     if search_type == 'standard'
+
+      #'My Open Tickets' filter is now default, so load that instead of any 'all' filters that load whole table
+      if search_name == 'all'
+        search_name = "MY OPEN COMPLAINTS"
+
       search_name = search_name.toLowerCase().replace('complaints', 'tickets')
 
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
       search_name = search_name.replace(/_|%20/g, " ")
-      reset_icon = get_reset_icon(search_name)
+      reset_icon = get_reset_icon(search_name, search_type)
       new_header =
         '<div>' +
           '<span class="text-capitalize">' + search_name + ' </span>' +
@@ -800,7 +813,7 @@ window.build_header = (data) ->
       build_subheader(webcat_search_conditions)
 
     else if search_type == 'named'
-      reset_icon = get_reset_icon(search_name)
+      reset_icon = get_reset_icon(search_name, search_type)
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
           reset_icon +
@@ -821,10 +834,10 @@ window.build_header = (data) ->
           reset_icon +
           '</div>'
     else
-      new_header = 'All Tickets'
+      new_header = ''
     $('#webcat-index-title')[0].innerHTML = new_header
   else
-    $('#webcat-index-title')[0].innerHTML = 'All Tickets'
+    $('#webcat-index-title')[0].innerHTML = ''
 
 
 
@@ -864,11 +877,19 @@ get_visible_reset_icon = ->
     class='reset-filter esc-tooltipped'
     title='Clear Search Results' onclick='webcat_refresh()'></span>"
 
+set_icon_and_url_if_current_page_is_favorite = (search_name, search_type) ->
+  #bug fix - set favorited link as selected in case filters were just cleared
+  $('.favorite-search-icon-active').parent('li').addClass 'selected'
+  #update url if favorite is a standard search
+  if search_type == 'standard'
+    search_url = $('.favorite-search-icon-active').siblings('.active-link').attr('href')
+    window.history.pushState('', '', "/escalations/webcat/complaints#{search_url}");
+
 #for filters and saved searches we need to check if currently on the favorite page since it's the index
-get_reset_icon = (search_name) ->
-  if current_page_is_favourite(search_name)
+get_reset_icon = (search_name, search_type, webcat_search_name) ->
+  if current_page_is_favorite(search_name)
     reset_icon_class = 'hidden style="display: none"'
-    $('#filter-cases-list')
+    set_icon_and_url_if_current_page_is_favorite(search_name, search_type)
   else
     reset_icon_class = ''
   reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
