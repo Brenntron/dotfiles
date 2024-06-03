@@ -570,6 +570,11 @@ $selectize-border: #E5E5E5;
     }
   }
 
+  .internal-comment {
+    display: inline-block;
+    width: 100%;
+  }
+
   .dataTables_wrapper {
     .datatable-top-tools {
       float: left;

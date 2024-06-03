@@ -94,7 +94,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             if name.trim() == value_name
               category_ids.push(y)
 
-        if entry_status == 'COMPLETED'
+        if ['COMPLETED', 'PENDING', 'RESOLVED'].includes entry_status
           # need to initialize the selectize function but disable it here if entry is completed
           $completed_selectize = $('#ce_categories_select').selectize {
             persist: true,
@@ -757,6 +757,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('.resolution-radio-button').each ->
           $(this).prop('disabled', false)
         $('#ce_categories_select')[0].selectize.enable()
+        $('.email-response-text').hide()
+        $('.ce-customer-comment-select-box').removeClass('hidden')
+        $('.ce-customer-comment-textarea').removeClass('hidden')
+        $('.internal-comment').hide()
+        $('.ce-internal-comment-textarea').removeClass('hidden')
         $('.ce-input').prop('disabled', false)
 
         store_entry_changes(entry_id, 'submit')
@@ -779,32 +784,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     if resolution
       get_resolution_templates(resolution, 'individual', [entry_id])
-
-    # Show page resolution select
-    $('.show-action .webcat-ticket-status-radio').click ->
-      if $(this).is(':checked')
-        wrapper = $(this).parent()
-        $('.show-action .status-radio-wrapper').removeClass('selected')
-        $(wrapper).addClass('selected')
-
-      if $(this).attr('id') == 'RESOLVED'
-        $('#show-ticket-resolution-submenu').show()
-        stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-        $('#ticket-non-res-submit').hide()
-        $(stat_comment).val('')
-        # check first resolution checkbox (and Fixed-FP parent) if none checked after opening
-        if !($("input.ticket-resolution-radio").is(':checked'))
-          $('input#FIXED').prop('checked', true)
-          is_customer = check_for_customer_show_page_webcat()
-          populate_resolved_webcat_templates('Fixed - FP: Sudden Spike', is_customer)
-      else
-        $('#ticket-non-res-submit').show()
-        res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-        $('.ticket-resolution-radio').prop('checked', false)
-        $('#show-ticket-resolution-submenu').hide()
-        $(res_comment[0]).val('')
-
-      store_entry_changes(entry_id, 'submit')
 
     $(document).on 'change', '.resolution-radio-button, .review-radio-button, .ce-input', ->
       store_entry_changes(entry_id, 'submit')
