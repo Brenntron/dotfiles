@@ -186,7 +186,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   window.set_lookup = (lookup) ->
     get_domain_history(lookup)
-    get_related_history(lookup)
+#    get_related_history(lookup)
     render_whois_table(lookup)
     get_xbrs_history(lookup)
 
@@ -455,7 +455,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         'url': url
       success: (response) ->
         data = response.data
-
+        debugger
         if data.error?
           console.error(data.error)
           std_msg_error(data.error, [])
@@ -512,37 +512,37 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('#ce_xbrs_history_loader').hide()
     )
 
-  get_related_history = (domain) ->
-    # TODO: implement this when the related history endpoint exists.
-    $('#ce_related_history_loader').hide()
-    $('#ce_related_history_table').DataTable({
-      data: {}
-      ordering: true
-      info: false
-      paging: false
-      searching: false
-      stateSave: false
-      columns: [
-        {
-          data: 'subdomain'
-        }
-        {
-          data: 'domain'
-        }
-        {
-          data: 'path'
-        }
-        {
-          data: 'categories'
-        }
-        {
-          data: 'user/source'
-        }
-        {
-          data: 'last modified'
-        }
-      ]
-    })
+#  get_related_history = (domain) ->
+#    # TODO: implement this when the related history endpoint exists.
+#    $('#ce_related_history_loader').hide()
+#    $('#ce_related_history_table').DataTable({
+#      data: {}
+#      ordering: true
+#      info: false
+#      paging: false
+#      searching: false
+#      stateSave: false
+#      columns: [
+#        {
+#          data: 'subdomain'
+#        }
+#        {
+#          data: 'domain'
+#        }
+#        {
+#          data: 'path'
+#        }
+#        {
+#          data: 'categories'
+#        }
+#        {
+#          data: 'user/source'
+#        }
+#        {
+#          data: 'last modified'
+#        }
+#      ]
+#    })
 
   check_for_customer_show_page_webcat = () ->
     submitter_type = $(".submitter-type-wrapper p").text().toLowerCase()

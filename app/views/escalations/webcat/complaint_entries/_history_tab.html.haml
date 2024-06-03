@@ -2,85 +2,65 @@
   .col-xs-12.ce-history-column
     %h1.ce-tab-title
       History
-    %h5.text-uppercase
-      domain history
+
+    %h2 Domain History
     %table.data-report-table.bottom-divider#ce_domain_history_table
       %thead
         %tr
-          %th
-            action
-          %th
-            confidence
-          %th
-            description
-          %th
-            time
-          %th
-            user
-          %th
-            category
+          %th Action
+          %th Confidence
+          %th Description
+          %th Time
+          %th User
+          %th Category
       %tbody#ce_domain_history_table_body
     .loader-div#ce_domain_history_loader
-      %span.loader-msg Loading Whois data...
-      .loader-gears
+      .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
-    %h5.text-uppercase
-      entry history
+        %span.loader-msg Loading...
+
+    %h2 Entry History
     %table.data-report-table.bottom-divider#ce_entry_history_table
       %thead
         %tr
-          %th
-            time
-          %th
-            user
-          %th
-            changes
+          %th Time
+          %th User
+          %th Changes
       %tbody#ce_entry_history_table_body
     .loader-div#ce_entry_history_loader
-      %span.loader-msg Loading Whois data...
-      .loader-gears
+      .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
-    %h5.text-uppercase
-      xbrs history
+      %span.loader-msg Loading...
+
+    %h2 XBRS Timeline
     %table.data-report-table.bottom-divider#ce_xbrs_history_table
       %thead
         %tr
-          %th
-            timestamp
-          %th
-            score
-          %th
-            v2 content cats
-          %th
-            v3 content cats
-          %th
-            threat cats
-          %th
-            rule hits
+          %th Timestamp
+          %th Score
+          %th V2 Content Cats
+          %th V3 Content Cats
+          %th Threat Cats
+          %th Rule Hits
       %tbody#ce_xbrs_history_table_body
     .loader-div#ce_xbrs_history_loader
-      %span.loader-msg Loading Whois data...
-      .loader-gears
+      .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
-    %h5.text-uppercase
-      related history
-    %table.data-report-table#ce_related_history_table
-      %thead
-        %tr
-          %th
-            subdomain
-          %th
-            domain
-          %th
-            path
-          %th
-            categories
-          %th
-            user/source
-          %th
-            last modified
-      %tbody#ce_related_history_table_body
-    .loader-div#ce_related_history_loader
-      %span.loader-msg Loading Whois data...
-      .loader-gears
-        = inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading...
+
+    -# THIS DOES NOT YET EXIST
+    -#%h2 Related History
+    -#%table.data-report-table#ce_related_history_table
+    -#  %thead
+    -#    %tr
+    -#      %th Subdomain
+    -#      %th Domain
+    -#      %th Path
+    -#      %th Categories
+    -#      %th User/Source
+    -#      %th Last Modified
+    -#  %tbody#ce_related_history_table_body
+    -#.loader-div#ce_related_history_loader
+    -#  .gear-loader-wrapper
+    -#    = inline_svg 'icon_gears_loader.svg'
+    -#  %span.loader-msg Loading...
