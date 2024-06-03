@@ -3,7 +3,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   headers = ''
   entry_id = 0
 
-  window.set_tags = (tags) ->
+  window.set_tags = (tags, entry_status) ->
     split_tags = tags.split(', ')
     createTagOptions = ->
       tags = $('#complaint_tag_list')[0]
@@ -61,7 +61,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     #     $('#ce_tags_select')[0].selectize.disable()
     #     $ce_tags.show()
 
-  window.set_complaint_entry_data = (category_data, ce_entry_status) ->
+  window.set_complaint_entry_data = (category_data, entry_status) ->
     ce_current_categories = if category_data? then category_data.split(', ') else []
 
     AC.WebCat.getAUPCategories()
@@ -94,7 +94,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             if name.trim() == value_name
               category_ids.push(y)
 
-        if ce_entry_status == 'COMPLETED'
+        if entry_status == 'COMPLETED'
           # need to initialize the selectize function but disable it here if entry is completed
           $completed_selectize = $('#ce_categories_select').selectize {
             persist: true,
@@ -629,10 +629,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     else
       $domain.prop('disabled', true)
 
-      unless $subdomain.attr('data-val') == ''
-        $subdomain.prop('disabled', false)
-      unless $original.attr('data-val') == ''
-        $original.prop('disabled', false)
+      $subdomain.prop('disabled', false) if $subdomain.data('val')
+      $original.prop('disabled', false) if $original.data('val')
 
   window.submit_show_page_changes = (entry_id) ->
     std_msg_ajax(
@@ -643,10 +641,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       success: (response) ->
         data = $.parseJSON(response).data
         { status: curr_status } = data.complaint
-        { uri } = data.complaint_entry
         cat_ids = null
         # slight differences in data sent
-        { uri } = data.complaint_entry
+        uri = $('.ce-ip-uri-input').val()
         category_names = []
         comment = $('.ce-internal-comment-textarea').val()
         commit = ''
@@ -809,10 +806,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
       store_entry_changes(entry_id, 'submit')
 
-    $(document).on 'change', '.resolution-radio-button, .ce-input', ->
+    $(document).on 'change', '.resolution-radio-button, .review-radio-button, .ce-input', ->
       store_entry_changes(entry_id, 'submit')
-      $('.ce-submit-button').prop('disabled', false)
-
-    $(document).on 'change', '.review-radio-button', ->
-      store_entry_changes(entry_id, 'review')
       $('.ce-submit-button').prop('disabled', false)

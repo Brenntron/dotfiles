@@ -14,14 +14,14 @@ module Escalations::Webcat::ComplaintEntriesHelper
     unless complaint_entry.status == 'COMPLETED' || complaint_entry.status == 'RESOLVED'
       age_int = (Time.now - complaint_entry.created_at).to_i
 
-      if age_int > 43200
+      if age_int > 43_200
         age_class = 'ticket-age-over12hr'
-      elsif age_int > 10800
+      elsif age_int > 10_800
         age_class = 'ticket-age-over3hr'
       end
     end
 
-    return age_class
+    age_class
   end
 
   def search_condition_json(named_search)
@@ -76,13 +76,5 @@ module Escalations::Webcat::ComplaintEntriesHelper
     else
       content_tag :p, 'No tags', id: 'ce_tags', class: 'missing-data'
     end
-  end
-
-  def missing_path?(complaint_entry)
-    @complaint_entry.path.nil? || @complaint_entry.path.empty?
-  end
-
-  def missing_subdomain?(complaint_entry)
-    @complaint_entry.subdomain.nil? || @complaint_entry.subdomain.empty?
   end
 end
