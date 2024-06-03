@@ -157,13 +157,13 @@ class ComplaintEntry < ApplicationRecord
     elsif assignment_type == 'assignee' && (self.user.nil? || self.user.display_name == 'Vrt Incoming')
       update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
       complaint.set_status("ASSIGNED")
-    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id
+    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id && !self.user.enabled_self_review
       return('The Assignee cannot also be a Reviewer.')
-    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id
+    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id && !self.user.enabled_self_review
       return('The Reviewer cannot also be the Second Reviewer.')
     elsif assignment_type == 'reviewer' && reviewer.nil?
       update(reviewer: current_user)
-    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id
+    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id && !self.user.enabled_self_review
       return('The Second Reviewer cannot also be the Reviewer.')
     elsif assignment_type == 'second_reviewer' && second_reviewer.nil?
       update(second_reviewer: current_user)
