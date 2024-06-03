@@ -15,7 +15,13 @@
           %div
             %label.toolbar-section-label Edit
             %span.dropdown
-              %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-haspopup': 'true', 'aria-expanded': 'false', 'data-toggle': 'dropdown', onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})", title: 'Convert ticket to web reputation ticket', type: 'button' }
+              %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-expanded': 'false',
+                                                                                                                                'aria-haspopup': 'true',
+                                                                                                                                'data-toggle': 'dropdown',
+                                                                                                                                disabled: ([ComplaintEntry::COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
+                                                                                                                                onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})",
+                                                                                                                                title: 'Convert ticket to web reputation ticket',
+                                                                                                                                type: 'button' }
                 %span.toolbar-button-text Convert to Webrep
               .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{ 'aria-labelledby': 'convert-ticket-button' }
                 .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
