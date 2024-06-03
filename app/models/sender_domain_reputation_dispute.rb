@@ -66,9 +66,9 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     begin
       customer_payload = {
-        customer_name: message_payload[:payload][:customer_name],
-        customer_email: message_payload[:payload][:customer_email],
-        company_name: message_payload[:payload][:company_name]
+        customer_name: message_payload.dig(:payload,:customer_name),
+        customer_email: message_payload.dig(:payload,:customer_name),
+        company_name: message_payload.dig(:payload,:customer_name)
       }
 
       is_duplicate = false
