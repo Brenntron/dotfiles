@@ -227,8 +227,7 @@ $(document).on 'click', '.imports-url-checkbox-bulk',->
   $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
   $(".imports-url-checkbox-#{issue_key}").trigger("change")
 
-$(document).on 'change', '.imports-url-checkbox',->
-
+window.assignment_buttons_toggle = ->
   checked_rows = $(".imports-url-checkbox:checked").closest('tr')
   current_username = $('input[name="current_user_name"]').val()
   can_take =     false
@@ -263,6 +262,9 @@ $(document).on 'change', '.imports-url-checkbox',->
     $(".remove-assignee-toolbar-button").removeAttr('disabled')
   else
     $(".remove-assignee-toolbar-button").attr('disabled', true)
+
+$(document).on 'change', '.imports-url-checkbox', ->
+  assignment_buttons_toggle()
 
 $(document).on 'click', '.imports_check_box',->
   row = $(this).closest('tr')
@@ -519,6 +521,7 @@ window.jira_assignee_hub = (type) ->
           if assignee
             $(selected_rows).each ->
               $(this).find('.entry-assignee').text(assignee)
+            assignment_buttons_toggle()
 
       error: (response) ->
         std_api_error(response, 'Error assigning', reload: false)
