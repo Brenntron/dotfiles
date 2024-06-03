@@ -15,7 +15,13 @@
           %div
             %label.toolbar-section-label Edit
             %span.dropdown
-              %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-haspopup': 'true', 'aria-expanded': 'false', 'data-toggle': 'dropdown', onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})", title: 'Convert ticket to web reputation ticket', type: 'button' }
+              %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-expanded': 'false',
+                                                                                                                                'aria-haspopup': 'true',
+                                                                                                                                'data-toggle': 'dropdown',
+                                                                                                                                disabled: ([ComplaintEntry::COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
+                                                                                                                                onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})",
+                                                                                                                                title: 'Convert ticket to web reputation ticket',
+                                                                                                                                type: 'button' }
                 %span.toolbar-button-text Convert to Webrep
               .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{ 'aria-labelledby': 'convert-ticket-button' }
                 .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
@@ -102,11 +108,11 @@
         .ce-resolved-ip-uri-button-wrapper
           %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
                                                   # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
-                                                  disabled: missing_path?(@complaint_entry) && missing_subdomain?(@complaint_entry),
+                                                  disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain,
                                                   onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
             domain
           %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
-                                                     disabled: missing_subdomain?(@complaint_entry),
+                                                     disabled: @complaint_entry.subdomain.blank?,
                                                      onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
             subdomain
           %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
@@ -118,8 +124,7 @@
         %label.content-label-sm
           Categories
         %input.ce-categories-select.ce-input#ce_categories_select{ disabled: (true if @complaint_entry.status == "COMPLETED"),
-
-                                                                 placeholder: 'Enter Categories / Confidence Order' }
+                                                                   placeholder: 'Enter Categories / Confidence Order' }
     .row
       .col-xs-12
         %label.content-label-sm
@@ -224,6 +229,6 @@
 :javascript
   $(document).ready(function() {
     window.set_complaint_entry_data("#{@complaint_entry.url_primary_category}", '#{@complaint_entry.status}');
-    window.set_tags("#{@tags.join(', ')}");
+    window.set_tags("#{@tags.join(', ')}", "#{@complaint_entry.status}");
     window.set_lookup("#{@lookup}")
   });
