@@ -298,18 +298,20 @@ $selectize-border: #E5E5E5;
 
   .data-report-table {
     margin-bottom: 20px;
+    line-height: 1.25em;
 
     > thead > tr > th {
       border-bottom-color: $faint-neutral-color;
-      color: $type-base-color;
-      padding-left: 0;
-      padding-right: 0;
+      &.col-align-right {
+        padding-right: 30px;
+      }
     }
 
     > tbody > tr > td {
-      color: $type-lighter-color;
-      padding-left: 0;
-      padding-right: 0;
+      font-size: 11px;
+      &.col-align-right {
+        padding-right: 40px;
+      }
     }
 
     .description-wrapper {

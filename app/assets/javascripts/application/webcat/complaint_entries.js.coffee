@@ -188,7 +188,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     get_domain_history(lookup)
 #    get_related_history(lookup)
     render_whois_table(lookup)
-    get_xbrs_history(lookup)
+    get_ce_show_xbrs_history(lookup)
 
   window.webcat_complaint_drop_down = () ->
     # deselect all statuses
@@ -324,14 +324,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               data: 'user'
             }
             {
-              data: null
-              render: (data) ->
-                { category } = data
-
-                if category?
-                  return "<p>#{category}</p>"
-                else
-                  return ''
+              data: 'category'
             }
           ]
       error: (errorResponse) ->
@@ -446,7 +439,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('#ce_entry_history_loader').hide()
     )
 
-  get_xbrs_history = (url) ->
+  get_ce_show_xbrs_history = (url) ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
       method: 'POST'
@@ -461,8 +454,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           std_msg_error(data.error, [])
           $('#ce_xbrs_history_loader').hide()
         else
-          for datum in data
-            datum['sortable_time'] = moment(datum.time, 'MMMM D, YYYY at HH:mm A')
 
           $('#ce_xbrs_history_loader').hide()
 
@@ -484,9 +475,16 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             columns: [
               {
                 data: 'time'
+                render: (data) ->
+                  date = moment(data)
+                  formatted = date.format('LLL')
+                  return formatted
               }
               {
                 data: 'score'
+                className: 'col-align-right'
+                render: (data) ->
+                  return data.toFixed(1)
               }
               {
                 data: 'v2'
@@ -501,9 +499,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                 data: 'ruleHits'
               }
               {
-                data: 'sortable_time'
-                visible: false
-              }
+               data: 'time'
+               visible: false
+             }
             ]
           })
       error: (error) ->

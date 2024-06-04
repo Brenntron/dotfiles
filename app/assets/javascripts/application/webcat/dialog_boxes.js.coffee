@@ -179,6 +179,10 @@ window.get_xbrs_history = (url, tab) ->
           data_row = ""
 
           for key, value of row
+            if key == 'time'
+              date = moment(value)
+              value = date.format('LLL')
+
             data_row += "<td>#{value || '-'}</td>"
 
           tbody.append("<tr>#{data_row}</tr>")
