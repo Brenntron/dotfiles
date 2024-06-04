@@ -185,7 +185,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         )
 
   window.set_lookup = (lookup) ->
-    get_domain_history(lookup)
+    get_ce_show_domain_history(lookup)
 #    get_related_history(lookup)
     render_whois_table(lookup)
     get_ce_show_xbrs_history(lookup)
@@ -285,7 +285,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     AC.WebCat.get_current_categories(entry_id, false, error_callback)
 
-  get_domain_history = (domain) ->
+  get_ce_show_domain_history = (domain) ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
       method: 'GET'
@@ -334,7 +334,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('#ce_domain_history_loader').hide()
       )
 
-  get_entry_history = () ->
+  get_ce_show_entry_history = () ->
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
       method: 'POST'
@@ -779,7 +779,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
 
     get_current_categories()
-    get_entry_history()
+    get_ce_show_entry_history()
 
     if resolution
       get_resolution_templates(resolution, 'individual', [entry_id])
