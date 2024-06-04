@@ -293,7 +293,7 @@ $(document).on 'change', '.imports_check_box', ->
     $('.close-ticket-button').attr('disabled', true)
 
   for item in checked_data
-    if item.status == 'Awaiting Bast Verdict'
+    if item.status == 'Awaiting Bast Verdict' || item.status == 'Generating Tickets'
       includes_awaiting_verdict = true
     if item.status == 'Failure'
       can_retry = true
