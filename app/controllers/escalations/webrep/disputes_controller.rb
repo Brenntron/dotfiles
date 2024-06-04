@@ -41,12 +41,17 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @is_processing = @dispute.status == "PROCESSING"
     @is_unassigned = @dispute.assignee == 'Unassigned'
     @entry_disabled =
-        if @is_duplicate || !@is_resolved || !@is_processing
+        if @is_duplicate || @is_resolved || @is_processing
           true
         else
           false
         end
-
+    @disabled_when_processing =
+      if @dispute.status == "PROCESSING"
+        true
+      else
+        false
+      end
     @versioned_items = @dispute.compose_versioned_items
     @tmi_manager = current_user.has_role?('tmi manager')
     @tmi_viewer = current_user.has_role?('tmi viewer')

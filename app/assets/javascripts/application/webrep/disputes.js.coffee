@@ -366,6 +366,8 @@ window.toolbar_show_change_assignee = () ->
         $('.container_unassign').attr('disabled', false)
         $('.return-ticket-button').attr('disabled', true)
 
+      $('#unassign-dispute-button').attr('disabled', false)
+
       $('#show-edit-ticket-status-button').text('ASSIGNED')
       $('#index_change_assign').dropdown('toggle')
 
@@ -442,6 +444,9 @@ window.toolbar_unassign_dispute = () ->
       $('#show_ticket_assign').attr('disabled', false)
       $('#index_change_assign').attr('disabled', false)
       $('#show-edit-ticket-status-button').text('NEW')
+      $('#unassign-dispute-button').attr('disabled', true)
+
+
 
       clearTimeout(assigned_timeout_id)
       $('#assignedAlert').addClass('hidden') if !$('#assignedAlert').hasClass('hidden')
