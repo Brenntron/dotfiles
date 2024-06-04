@@ -571,12 +571,6 @@ $selectize-border: #E5E5E5;
     width: 100%;
   }
 
-  .dataTables_wrapper {
-    .datatable-top-tools {
-      float: left;
-    }
-  }
-
   .whois-data-container th {
     border-bottom: 1px solid $faint-neutral-color;
 
@@ -644,5 +638,20 @@ $selectize-border: #E5E5E5;
     font-weight: 700;
     padding: 3px 0 10px;
     margin-top: 20px;
+  }
+}
+
+.ce-history-column {
+  h2 {
+    display: inline-block;
+  }
+
+  // Pulls the results length selector to same level as table header
+  .dataTables_wrapper {
+    margin-top: -30px;
+
+    .dataTables_info, .dataTables_paginate {
+      margin-top: 0;
+    }
   }
 }

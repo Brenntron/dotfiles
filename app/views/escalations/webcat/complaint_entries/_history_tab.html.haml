@@ -4,7 +4,7 @@
       History
 
     %h2 Domain History
-    %table.data-report-table.bottom-divider#ce_domain_history_table
+    %table.data-report-table.ce-history-dt#ce_domain_history_table
       %thead
         %tr
           %th Action
@@ -19,8 +19,10 @@
         = inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Loading...
 
+    %hr.thin
+
     %h2 Entry History
-    %table.data-report-table.bottom-divider#ce_entry_history_table
+    %table.data-report-table.ce-history-dt#ce_entry_history_table
       %thead
         %tr
           %th Time
@@ -32,8 +34,10 @@
         = inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Loading...
 
+    %hr.thin
+
     %h2 XBRS Timeline
-    %table.data-report-table.bottom-divider#ce_xbrs_history_table
+    %table.data-report-table.ce-history-dt#ce_xbrs_history_table
       %thead
         %tr
           %th Timestamp

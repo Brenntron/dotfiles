@@ -302,11 +302,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
         $('#ce_domain_history_table').DataTable
           data: data
+          dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
           ordering: true
-          info: false
-          paging: false
           searching: false
           stateSave: false
+          pageLength: 10
+          pagingType: 'simple_numbers'
           columns: [
             {
               data: 'action'
@@ -365,15 +366,15 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
           $('#ce_entry_history_table').DataTable
             data: formatted_entry_history
-            dom: 'fi<"datatable-top-tools no-margin-datatable-top-tool"l>tipr'
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
             ordering: true
             order: [[ 3, 'desc' ]]
-            info: false
             drawCallback: () ->
               # for longer descriptions let user toggle full vs truncated
               $('.truncated-description').on 'click', () ->
                 toggle_truncation($(this))
             pageLength: 10
+            pagingType: 'simple_numbers'
             searching: false
             stateSave: false
             columnDefs: [
@@ -459,11 +460,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
           $('#ce_xbrs_history_table').DataTable({
             data: data
-            dom: 'fi<"datatable-top-tools no-margin-datatable-top-tool"l>tipr'
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
             ordering: true
             order: [[ 6, 'desc' ]]
-            info: false
             pageLength: 10
+            pagingType: 'simple_numbers'
             searching: false
             stateSave: false
             columnDefs: [
