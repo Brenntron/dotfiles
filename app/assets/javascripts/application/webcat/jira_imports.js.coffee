@@ -286,6 +286,7 @@ $(document).on 'change', '.imports_check_box', ->
   resolve_button = $('.toolbar-button.close-ticket-button')
   can_retry = false
   can_resolve = false
+  includes_awaiting_verdict = false
   checked_data = checked_row_data() || [];
 
   if checked_data.length > 0
@@ -293,11 +294,16 @@ $(document).on 'change', '.imports_check_box', ->
   else
     $('.close-ticket-button').attr('disabled', true)
 
-  checked_data.each ->
-    if this.status == 'Failure'
+  for item in checked_data
+    if item.status == 'Awaiting Bast Verdict' || item.status == 'Generating Tickets'
+      includes_awaiting_verdict = true
+    if item.status == 'Failure'
       can_retry = true
-    if this.issue_status != 'Resolved'
+    if item.issue_status != 'Resolved'
       can_resolve = true
+    
+  if includes_awaiting_verdict == true
+    can_resolve = false
 
   if can_retry
     retry_button.removeAttr('disabled')
