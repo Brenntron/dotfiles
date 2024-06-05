@@ -298,18 +298,20 @@ $selectize-border: #E5E5E5;
 
   .data-report-table {
     margin-bottom: 20px;
+    line-height: 1.25em;
 
     > thead > tr > th {
       border-bottom-color: $faint-neutral-color;
-      color: $type-base-color;
-      padding-left: 0;
-      padding-right: 0;
+      &.col-align-right {
+        padding-right: 30px;
+      }
     }
 
     > tbody > tr > td {
-      color: $type-lighter-color;
-      padding-left: 0;
-      padding-right: 0;
+      font-size: 11px;
+      &.col-align-right {
+        padding-right: 40px;
+      }
     }
 
     .description-wrapper {
@@ -569,12 +571,6 @@ $selectize-border: #E5E5E5;
     width: 100%;
   }
 
-  .dataTables_wrapper {
-    .datatable-top-tools {
-      float: left;
-    }
-  }
-
   .whois-data-container th {
     border-bottom: 1px solid $faint-neutral-color;
 
@@ -642,5 +638,26 @@ $selectize-border: #E5E5E5;
     font-weight: 700;
     padding: 3px 0 10px;
     margin-top: 20px;
+    .submitted-entry-header {
+      font-weight: 500;
+      font-size: 14px;
+      margin-left: 10px;
+      text-transform: lowercase;
+    }
+  }
+}
+
+.ce-history-column {
+  h2 {
+    display: inline-block;
+  }
+
+  // Pulls the results length selector to same level as table header
+  .dataTables_wrapper {
+    margin-top: -30px;
+
+    .dataTables_info, .dataTables_paginate {
+      margin-top: 0;
+    }
   }
 }

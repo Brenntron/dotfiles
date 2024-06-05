@@ -3,8 +3,10 @@
     %h1.ce-tab-title
       History
 
-    %h2 Domain History
-    %table.data-report-table.bottom-divider#ce_domain_history_table
+    %h2
+      Domain History:
+      %span.submitted-entry-header= @submitted_ip_uri
+    %table.data-report-table.ce-history-dt#ce_domain_history_table
       %thead
         %tr
           %th Action
@@ -17,10 +19,12 @@
     .loader-div#ce_domain_history_loader
       .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
-        %span.loader-msg Loading...
+      %span.loader-msg Loading...
+
+    %hr.thin
 
     %h2 Entry History
-    %table.data-report-table.bottom-divider#ce_entry_history_table
+    %table.data-report-table.ce-history-dt#ce_entry_history_table
       %thead
         %tr
           %th Time
@@ -32,8 +36,12 @@
         = inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Loading...
 
-    %h2 XBRS Timeline
-    %table.data-report-table.bottom-divider#ce_xbrs_history_table
+    %hr.thin
+
+    %h2
+      XBRS Timeline:
+      %span.submitted-entry-header= @submitted_ip_uri
+    %table.data-report-table.ce-history-dt#ce_xbrs_history_table
       %thead
         %tr
           %th Timestamp

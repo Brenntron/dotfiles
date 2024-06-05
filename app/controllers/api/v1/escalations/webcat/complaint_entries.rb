@@ -749,7 +749,7 @@ module API
               formatted_data = []
               formatted_data = data.each_with_object([]) do |item, result|
                 row = {}
-                row[:time] = Time.at(item['time'] / 1000).strftime('%B %e, %Y at %I:%M %p')
+                row[:time] = item['time']
                 row[:score] = item['score']
                 row[:v2] = item['aups'].select { |aup| aup['version'] == 'V2' }.pluck('cat').join(', ')
                 row[:v3] = item['aups'].select { |aup| aup['version'] == 'V3' }.pluck('cat').join(', ')

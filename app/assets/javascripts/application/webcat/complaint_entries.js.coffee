@@ -205,10 +205,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       )
 
   window.set_lookup = (lookup) ->
-    get_domain_history(lookup)
+    get_ce_show_domain_history(lookup)
 #    get_related_history(lookup)
     render_whois_table(lookup)
-    get_xbrs_history(lookup)
+    get_ce_show_xbrs_history(lookup)
 
   window.webcat_complaint_drop_down = () ->
     # deselect all statuses
@@ -305,7 +305,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     AC.WebCat.get_current_categories(entry_id, false, error_callback)
 
-  get_domain_history = (domain) ->
+  get_ce_show_domain_history = (domain) ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
       method: 'GET'
@@ -322,11 +322,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
         $('#ce_domain_history_table').DataTable
           data: data
+          dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
           ordering: true
-          info: false
-          paging: false
           searching: false
           stateSave: false
+          pageLength: 10
+          pagingType: 'simple_numbers'
           columns: [
             {
               data: 'action'
@@ -344,14 +345,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               data: 'user'
             }
             {
-              data: null
-              render: (data) ->
-                { category } = data
-
-                if category?
-                  return "<p>#{category}</p>"
-                else
-                  return ''
+              data: 'category'
             }
           ]
       error: (errorResponse) ->
@@ -360,7 +354,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('#ce_domain_history_loader').hide()
       )
 
-  get_entry_history = () ->
+  get_ce_show_entry_history = () ->
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
       method: 'POST'
@@ -392,15 +386,15 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
           $('#ce_entry_history_table').DataTable
             data: formatted_entry_history
-            dom: 'fi<"datatable-top-tools no-margin-datatable-top-tool"l>tipr'
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
             ordering: true
             order: [[ 3, 'desc' ]]
-            info: false
             drawCallback: () ->
               # for longer descriptions let user toggle full vs truncated
               $('.truncated-description').on 'click', () ->
                 toggle_truncation($(this))
             pageLength: 10
+            pagingType: 'simple_numbers'
             searching: false
             stateSave: false
             columnDefs: [
@@ -466,7 +460,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('#ce_entry_history_loader').hide()
     )
 
-  get_xbrs_history = (url) ->
+  get_ce_show_xbrs_history = (url) ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
       method: 'POST'
@@ -481,18 +475,16 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           std_msg_error(data.error, [])
           $('#ce_xbrs_history_loader').hide()
         else
-          for datum in data
-            datum['sortable_time'] = moment(datum.time, 'MMMM D, YYYY at HH:mm A')
 
           $('#ce_xbrs_history_loader').hide()
 
           $('#ce_xbrs_history_table').DataTable({
             data: data
-            dom: 'fi<"datatable-top-tools no-margin-datatable-top-tool"l>tipr'
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
             ordering: true
             order: [[ 6, 'desc' ]]
-            info: false
             pageLength: 10
+            pagingType: 'simple_numbers'
             searching: false
             stateSave: false
             columnDefs: [
@@ -504,9 +496,16 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             columns: [
               {
                 data: 'time'
+                render: (data) ->
+                  date = moment(data)
+                  formatted = date.format('LLL')
+                  return formatted
               }
               {
                 data: 'score'
+                className: 'col-align-right'
+                render: (data) ->
+                  return data.toFixed(1)
               }
               {
                 data: 'v2'
@@ -521,9 +520,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                 data: 'ruleHits'
               }
               {
-                data: 'sortable_time'
-                visible: false
-              }
+               data: 'time'
+               visible: false
+             }
             ]
           })
       error: (error) ->
@@ -821,7 +820,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     resolution_comment = $('.ce-customer-comment-textarea').val()
 
     get_current_categories()
-    get_entry_history()
+    get_ce_show_entry_history()
 
     if resolution_option
       get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
