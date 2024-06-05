@@ -3,7 +3,9 @@
     %h1.ce-tab-title
       History
 
-    %h2 Domain History
+    %h2
+      Domain History:
+      %span.submitted-entry-header= @submitted_ip_uri
     %table.data-report-table.ce-history-dt#ce_domain_history_table
       %thead
         %tr
@@ -36,7 +38,9 @@
 
     %hr.thin
 
-    %h2 XBRS Timeline
+    %h2
+      XBRS Timeline:
+      %span.submitted-entry-header= @submitted_ip_uri
     %table.data-report-table.ce-history-dt#ce_xbrs_history_table
       %thead
         %tr

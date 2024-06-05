@@ -638,6 +638,12 @@ $selectize-border: #E5E5E5;
     font-weight: 700;
     padding: 3px 0 10px;
     margin-top: 20px;
+    .submitted-entry-header {
+      font-weight: 500;
+      font-size: 14px;
+      margin-left: 10px;
+      text-transform: lowercase;
+    }
   }
 }
 
