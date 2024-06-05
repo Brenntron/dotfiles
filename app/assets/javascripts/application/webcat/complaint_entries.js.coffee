@@ -33,7 +33,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     }
 
   verifySubmit = () ->
-    return true if resolution_option == 'decline'
+    return true if ['commit', 'decline'].includes(resolution_option)
 
     changes_for_type = change_store.getTypeChanges(resolution_option)
     email_response_text = $('.email-response-text')[0].innerText
@@ -827,9 +827,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('.ce-customer-comment-textarea').val(resolution_comment)
 
     $(document).on 'change', '.resolution-radio-button, .review-radio-button', ->
-      radio_options = ['COMMIT', 'DECLINE', 'UNCHANGED', 'INVALID', 'FIXED']
       resolution_option = $(this).val().toLowerCase()
-
       disable_submit = !verifySubmit()
 
       $('.ce-submit-button').prop('disabled', disable_submit)
