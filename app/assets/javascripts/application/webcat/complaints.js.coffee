@@ -424,7 +424,6 @@ window.fetch_complaints = () ->
 # Enables the bulk submit button if there have been
 window.verifyMasterSubmit = () ->
   changes = getTouchedFormCount()
-  debugger
   enable_submit = false
   if changes > 0
     enable_submit = true
