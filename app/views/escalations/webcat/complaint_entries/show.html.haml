@@ -14,7 +14,7 @@
           .top-info-data#complaint_entry_id
             = @complaint_entry.id.to_s
 
-        .top-info-wrapper
+        .status-wrapper.top-info-wrapper
           %label.content-label-sm Status
           - if @complaint_entry.resolution == ComplaintEntry::STATUS_RESOLVED_DUPLICATE
             .top-info-data.duplicate-status-notice

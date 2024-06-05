@@ -2,6 +2,64 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   #set empty string header so it can be updated on document ready
   headers = ''
   entry_id = 0
+  resolution_option = ''
+  # We do not want unsubmitted changes to persist across page reloads
+  # So we store themm in memory
+  change_store = do () ->
+    types = {
+      'fixed': [],
+      'unchanged': [],
+      'invalid': [],
+    }
+
+    {
+      add: (type, change) ->
+        if types[type].indexOf(change) < 0
+          types[type].push change
+      category_changed: (type) ->
+        types[type].some (change) ->
+          change.includes('category')
+      getTypeChanges: (type) ->
+        types[type]
+      hasChange: (type, change) ->
+        change_index = types[type].indexOf(change)
+
+        return change_index > -1
+      remove: (type, change) ->
+        change_index = types[type].indexOf(change)
+
+        if change_index > -1
+          types[type].splice(change_index, 1)
+    }
+
+  verifySubmit = () ->
+    return true if resolution_option == 'decline'
+
+    changes_for_type = change_store.getTypeChanges(resolution_option)
+    email_response_text = $('.email-response-text')[0].innerText
+    resolution_comment = if email_response_text == 'No response created or sent to customer.'
+                           ''
+                         else
+                           $('.ce-customer-comment-textarea').val()
+
+    submitted_ip_uri = $('.ce-ip-uri-input').val()
+
+    # All resolution options, as well as the commit review option, requite a user comment
+    # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
+    # then it can only be declined.
+    return false unless (resolution_comment && submitted_ip_uri)
+
+    # The fixed resolution requires a change to the category list and at least one category.
+    can_submit = if resolution_option == 'fixed' && change_store.category_changed(resolution_option) && $('#ce_categories_select')[0].selectize.items.length > 0
+                   true
+                 else if ['unchanged', 'invalid'].includes(resolution_option) && changes_for_type == ''
+                   true
+                 else if ['commit', 'decline'].includes(resolution_option)
+                   true
+                 else
+                   false
+
+    return can_submit
 
   window.set_tags = (tags, entry_status) ->
     split_tags = tags.split(', ')
@@ -26,27 +84,20 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       searchField: 'name'
       options: createTagOptions(),
       items: split_tags,
-      onItemAdd: ->
-        # User shouldn't be able to change cats in pending, but just in case
-        unless entry_status == 'PENDING'
-          store_entry_changes(entry_id, 'submit')
+      onItemAdd: (value) ->
+        change_store.add(resolution_option, "tags: #{value}")
 
-          if verifyMasterSubmit() == true
-            $('.ce-submit-button').prop('disabled', false)
-            window.prevent_close('true')
-          else
-            $('.ce-submit-button').prop('disabled', true)
-            window.prevent_close()
-      onItemRemove: ->
-        unless entry_status == 'PENDING'
-          store_entry_changes(entry_id, 'submit')
+        can_submit = verifySubmit()
 
-          if verifyMasterSubmit() == true
-            $('.ce-submit-button').prop('disabled', false)
-            window.prevent_close('true')
-          else
-            $('.ce-submit-button').prop('disabled', true)
-            window.prevent_close()
+        $('.ce-submit-button').prop('disabled', !can_submit)
+        window.prevent_close(can_submit.toString())
+      onItemRemove: (value) ->
+        change_store.remove(resolution_option, "tags: #{value}")
+
+        can_submit = verifySubmit()
+
+        $('.ce-submit-button').prop('disabled', !can_submit)
+        window.prevent_close(can_submit.toString())
     }
 
     # $('#edit_tags').on 'click', () ->
@@ -63,6 +114,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   window.set_complaint_entry_data = (category_data, entry_status) ->
     ce_current_categories = if category_data? then category_data.split(', ') else []
+    selectize = null
 
     AC.WebCat.getAUPCategories()
       .then((response) ->
@@ -94,95 +146,63 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             if name.trim() == value_name
               category_ids.push(y)
 
-        if ['COMPLETED', 'PENDING', 'RESOLVED'].includes entry_status
-          # need to initialize the selectize function but disable it here if entry is completed
-          $completed_selectize = $('#ce_categories_select').selectize {
-            persist: true,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: cat_options,
-            items: category_ids,
-            onItemAdd: ->
-              # User shouldn't be able to change cats in pending, but just in case
-              unless entry_status == 'PENDING'
-                store_entry_changes(entry_id, 'submit')
+        selectize = $('#ce_categories_select').selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: cat_options,
+          items: category_ids,
+          onItemAdd: (value) ->
+            # User shouldn't be able to change cats in pending, but just in case
+            unless entry_status == 'PENDING'
+              if change_store.hasChange(resolution_option, "removed category: #{value}")
+                change_store.remove(resolution_option, "removed category: #{value}")
+              else
+                change_store.add(resolution_option, "category: #{value}")
 
-                if verifyMasterSubmit() == true
-                  $('.ce-submit-button').prop('disabled', false)
-                  window.prevent_close('true')
-                else
-                  $('.ce-submit-button').prop('disabled', true)
-                  window.prevent_close()
-            onItemRemove: ->
-              unless entry_status == 'PENDING'
-                store_entry_changes(entry_id, 'submit')
+              can_submit = verifySubmit()
 
-                if verifyMasterSubmit() == true
-                  $('.ce-submit-button').prop('disabled', false)
-                  window.prevent_close('true')
-                else
-                  $('.ce-submit-button').prop('disabled', true)
-                  window.prevent_close()
-          }
-          select_complete = $completed_selectize[0].selectize
-          select_complete.disable()
-        else
-          $('#ce_categories_select').selectize {
-            persist: false,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: cat_options,
-            items: category_ids,
-            onItemAdd: ->
-              # User shouldn't be able to change cats in pending, but just in case
-              unless entry_status == 'PENDING'
-                store_entry_changes(entry_id, 'submit')
+              $('.ce-submit-button').prop('disabled', !can_submit)
+              window.prevent_close(can_submit.toString())
+          onItemRemove: (value) ->
+            unless entry_status == 'PENDING'
+              # Track adding categories and removing existing categories
+              if change_store.hasChange(resolution_option, "category: #{value}")
+                change_store.remove(resolution_option, "category: #{value}")
+              else
+                change_store.add(resolution_option, "removed category: #{value}")
 
-                if verifyMasterSubmit() == true
-                  $('.ce-submit-button').prop('disabled', false)
-                  window.prevent_close('true')
-                else
-                  $('.ce-submit-button').prop('disabled', true)
-                  window.prevent_close()
-            onItemRemove: ->
-              unless entry_status == 'PENDING'
-                store_entry_changes(entry_id, 'submit')
+              can_submit = verifySubmit()
 
-                if verifyMasterSubmit() == true
-                  $('.ce-submit-button').prop('disabled', false)
-                  window.prevent_close('true')
-                else
-                  $('.ce-submit-button').prop('disabled', true)
-                  window.prevent_close()
-            score: (input) ->
-              #  Adding some customization for autofill
-              #  restricting on certain cats to avoid accidental categorization
-              #  (replaces selectize's built-in `getScoreFunction()` with our own)
-              (item) ->
-                if item.category_code == 'cprn' ||
-                  item.category_code == 'xpol' ||
-                  item.category_code == 'xita' ||
-                  item.category_code == 'xgbr' ||
-                  item.category_code == 'xdeu' ||
-                  item.category_code == 'piah'
-                    item.category_code == input ? 1 : 0
-                else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-                  1
-                else if item.category_name.toLowerCase().includes(input.toLowerCase()) ||
-                  item.category_code.toLowerCase().includes(input.toLowerCase())
-                    0.9
-                else
-                  0
-          }
-        )
+              $('.ce-submit-button').prop('disabled', !can_submit)
+              window.prevent_close(can_submit.toString())
+          score: (input) ->
+            #  Adding some customization for autofill
+            #  restricting on certain cats to avoid accidental categorization
+            #  (replaces selectize's built-in `getScoreFunction()` with our own)
+            (item) ->
+              if item.category_code == 'cprn' ||
+                item.category_code == 'xpol' ||
+                item.category_code == 'xita' ||
+                item.category_code == 'xgbr' ||
+                item.category_code == 'xdeu' ||
+                item.category_code == 'piah'
+                  item.category_code == input ? 1 : 0
+              else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+                1
+              else if item.category_name.toLowerCase().includes(input.toLowerCase()) ||
+                item.category_code.toLowerCase().includes(input.toLowerCase())
+                  0.9
+              else
+                0
+        }
+
+        selectize[0].selectize.disable() if ['COMPLETED', 'PENDING', 'RESOLVED'].includes entry_status
+      )
 
   window.set_lookup = (lookup) ->
     get_domain_history(lookup)
@@ -632,6 +652,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       $subdomain.prop('disabled', false) if $subdomain.data('val')
       $original.prop('disabled', false) if $original.data('val')
 
+    disable_submit = !verifySubmit()
+
+    $('.ce-submit-button').prop('disabled', disable_submit)
+
   window.submit_show_page_changes = (entry_id) ->
     std_msg_ajax(
       method: 'POST'
@@ -645,9 +669,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         # slight differences in data sent
         uri = $('.ce-ip-uri-input').val()
         category_names = []
-        comment = $('.ce-internal-comment-textarea').val()
+        internal_comment = $('.ce-internal-comment-textarea').val()
         commit = ''
-        resolution_msg = $('ce-customer-comment-textarea').val()
+        customer_comment = $('.ce-customer-comment-textarea').val()
 
         # slight differences in data sent
         if status == 'PENDING'
@@ -656,8 +680,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         else
           status = $('input[name=resolution]:checked').val()
 
-        if $('#ce_categories_select').val() != null
-          cat_ids = $('#ce_categories_select').val().toString()
+        categories_selectize = $('#ce_categories_select')[0].selectize
+
+        if categories_selectize.items.length > 0
+          cat_ids = categories_selectize.items.join(',')
 
         $('#ce_categories_select').next('.selectize-control').find('.item').each ->
           category_names.push($(this).text())
@@ -669,35 +695,38 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           'category_names': category_names.toString(),
           'status': status,
           'commit': commit,
-          'comment': comment,
-          'resolution_comment': resolution_msg,
+          'comment': internal_comment,
+          'resolution_comment': customer_comment,
           'uri_as_categorized': uri
         }
 
         # check data here before submitting
         # If resolution is set to fixed, make sure it has categories applied
-        if entry_data.categories == null && entry_data.status == "FIXED"
-          std_msg_error("Must include at least one category.","", reload: false)
+        if entry_data.categories == null && entry_data.status == 'FIXED'
+          std_msg_error('Must include at least one category.','', reload: false)
           return
-        else if entry_data.status == "INVALID" && entry_data.categories != null
-          std_msg_error("Cannot include categories with an INVALID resolution.", "", reload: false)
+        else if entry_data.resolution_comment == '' && entry_data.status == 'FIXED'
+          std_msg_error('Must have a message to the customer.','', reload: false)
+          return
+        else if entry_data.uri_as_categorized == '' && entry_data.status == 'FIXED'
+          std_msg_error('Must have an IP/URI.','', reload: false)
+          return
+        else if entry_data.status == 'INVALID' && entry_data.categories != null
+          std_msg_error('Cannot include categories with an INVALID resolution.', '', reload: false)
           return
 
         # need number of cols for replacement temp col
         visible_cols = $('#complaints-index thead th').length
 
         if curr_status == 'PENDING'
-          remove_entry_from_changes(entry_id, 'review')
           process_review(entry_data)
         else
-          remove_entry_from_changes(entry_id, 'submit')
           process_entry(entry_data)
           # submit for real
     )
 
   # Sending individual entry info to the backend
   process_entry = (entry_data) ->
-    headers = { 'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val() }
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
@@ -707,7 +736,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         data = $.parseJSON(response)
 
         if data.error?
-          show_message('error', "Submittions failed: #{data.error}", false, '#alert_message')
+          show_message('error', "Submissions failed: #{data.error}", false, '#alert_message')
         else
           show_message('success', 'Submitted. Refreshing to see new results.', false, '#alert_message')
           setTimeout ->
@@ -718,13 +747,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         msg = response.resonseJSON.error
 
         std_msg_error("Error submitting entry", msg, reload: false)
-        remove_entry_from_changes(data.entry_id, 'submit')
         console.error(msg)
     , this)
 
   # Sending individual reviewed (PENDING) entry info to the backend
   process_review = (entry_data) ->
-    headers = { 'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val() }
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
       method: 'POST'
@@ -734,7 +761,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       }
       success: (response) ->
         show_message('success', 'Submitted. Refreshing to see new results.', false, '#alert_message')
-        remove_entry_from_changes(data.entry_id, 'submit')
         setTimeout ->
           location.reload()
         , 5000
@@ -751,23 +777,37 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       data: { 'complaint_entry_id': entry_id }
       success: (response) ->
         $button = $('.ce-submit-button')
+        customer_comment = $('.ce-customer-comment-textarea').val()
 
-        $('#RE-OPENED').prop('checked', true)
+        unless customer_comment.includes('This dispute has been re-opened.')
+          customer_comment = customer_comment + "<br />" + " --This dispute has been re-opened."
+
+        $('.status-wrapper > .top-info-data').text('REOPENED')
+        $('.ce-submitted-ip-uri').hide()
+
+        $ip_uri_input = $('.ce-ip-uri-input')
+
+        $ip_uri_input.removeClass('hidden')
+        $ip_uri_input.prop('disabled', false)
 
         $('.resolution-radio-button').each ->
           $(this).prop('disabled', false)
+        $('#ce_categories_select').prop('disabled', false)
         $('#ce_categories_select')[0].selectize.enable()
         $('.email-response-text').hide()
         $('.ce-customer-comment-select-box').removeClass('hidden')
+        $('.ce-customer-comment-textarea').val(customer_comment)
         $('.ce-customer-comment-textarea').removeClass('hidden')
         $('.internal-comment').hide()
         $('.ce-internal-comment-textarea').removeClass('hidden')
         $('.ce-input').prop('disabled', false)
 
-        store_entry_changes(entry_id, 'submit')
+        get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
+          $('.ce-customer-comment-textarea').val(customer_comment)
+
         $button.attr('onclick', "submit_show_page_changes(#{entry_id});")
         $button.text('submit')
-        $button.removeAttr('disabled')
+        $('.ce-submit-button').prop('disabled', true)
 
       error: (response) ->
         console.error(response)
@@ -777,14 +817,27 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   $ ->
     entry_id = Number($('#complaint_entry_id')[0].innerText)
     headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-    resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
+    resolution_option = $('.ce-radio-group > .resolution-radio-button:checked').val()
+    resolution_comment = $('.ce-customer-comment-textarea').val()
 
     get_current_categories()
     get_entry_history()
 
-    if resolution
-      get_resolution_templates(resolution, 'individual', [entry_id])
+    if resolution_option
+      get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
+        $('.ce-customer-comment-textarea').val(resolution_comment)
 
-    $(document).on 'change', '.resolution-radio-button, .review-radio-button, .ce-input', ->
-      store_entry_changes(entry_id, 'submit')
-      $('.ce-submit-button').prop('disabled', false)
+    $(document).on 'change', '.resolution-radio-button, .review-radio-button', ->
+      radio_options = ['COMMIT', 'DECLINE', 'UNCHANGED', 'INVALID', 'FIXED']
+      resolution_option = $(this).val().toLowerCase()
+
+      disable_submit = !verifySubmit()
+
+      $('.ce-submit-button').prop('disabled', disable_submit)
+
+    $(document).on 'change', '.ce-input', ->
+      # The onItemRemove and onItemAdd events for the selectize dropdowns will handle the submit button for categories
+      unless $(this).attr('id') == 'ce_categories_select'
+        disable_submit = !verifySubmit()
+
+        $('.ce-submit-button').prop('disabled', disable_submit)

@@ -103,36 +103,36 @@
       .col-xs-12
         %label.content-label-sm
           Resolved IP/URI
-        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)
-          %p.ce-submitted-ip-uri= @input_ip_uri
-        - else
-          %input.ce-input.ce-ip-uri-input{ disabled: true,
-                                           value: @input_ip_uri }
-          .ce-resolved-ip-uri-button-wrapper
-            %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
-                                                    # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
-                                                    disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain,
-                                                    onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
-              domain
-            %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
-                                                       disabled: @complaint_entry.subdomain.blank?,
-                                                       onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
-              subdomain
-            %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
-                                                      disabled: true,
-                                                      onclick: "update_uri_input('#{@complaint_entry.uri}', 'original uri')" }
-              original uri
+        %p.ce-submitted-ip-uri{ class: ('hidden' if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)) }
+          = @input_ip_uri
+        %input.ce-input.ce-ip-uri-input{ class: ('hidden' if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
+                                         disabled: [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status),
+                                         value: @input_ip_uri }
+        .ce-resolved-ip-uri-button-wrapper
+          %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
+                                                  # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
+                                                  disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain,
+                                                  onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
+            domain
+          %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
+                                                     disabled: @complaint_entry.subdomain.blank?,
+                                                     onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
+            subdomain
+          %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
+                                                    disabled: true,
+                                                    onclick: "update_uri_input('#{@complaint_entry.uri}', 'original uri')" }
+            original uri
     .row
       .col-xs-12
         %label.content-label-sm
           Categories
-        %input.ce-categories-select.ce-input#ce_categories_select{ disabled: (true if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED),
+        %input.ce-categories-select.ce-input#ce_categories_select{ disabled: [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status),
                                                                    placeholder: 'Enter Categories / Confidence Order' }
     .row
       .col-xs-12
-        %label.content-label-sm
-          Resolution
         - if @complaint_entry.status == 'PENDING'
+          %label.content-label-sm
+            Review
           .ce-radio-group-wrapper
             .ce-radio-group
               %input#review-commit-radio.review-radio-button{ name: 'resolution',
@@ -147,6 +147,8 @@
               %label.radio-label{ for: 'review-decline-radio' }
                 Decline
         - else
+          %label.content-label-sm
+            Resolution
           .ce-radio-group-wrapper
             .ce-radio-group
               %input#res-unchanged-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED),
@@ -205,16 +207,18 @@
             %label{ for: 'self_review' }
               Allow Self Review
         .col-xs-6
-          - if @complaint_entry.status == 'COMPLETED'
-            %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+          - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
+            %button.tertiary.ce-submit-button{ disabled: (@complaint_entry.status == ComplaintEntry::RESOLVED),
+                                               onclick: "reopen_complaint(#{@complaint_entry.id})" }
               Reopen
           - else
             %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
               Submit
     - else
       .text-center
-        - if @complaint_entry.status == 'COMPLETED'
-          %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
+          %button.tertiary.ce-submit-button{ disabled: (@complaint_entry.status == ComplaintEntry::RESOLVED),
+                                             onclick: "reopen_complaint(#{@complaint_entry.id})" }
             Reopen
         - else
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
