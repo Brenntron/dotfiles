@@ -54,7 +54,8 @@ build_complaints_table = (url) ->
     select: true
     ajax:
       url: url
-      data: build_data()
+      data: (d) ->
+        $.extend d, build_data()
       error: () ->
         ###
           If there is an error with the build_data call, the localstorage and url will be blown away
@@ -69,7 +70,6 @@ build_complaints_table = (url) ->
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
         create_ind_res_dialogs()
-        load_self_review_setting()
 
         $('#complaints-index tbody tr.cat-index-main-row .nested-col-table tr td').click ->
           # allows individual selection of rows while clicking in nested data, is a little buggy with the multiselect
@@ -698,7 +698,7 @@ build_data = () ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
-
+    data.allow_self_review = $("#self_review").prop('checked')
     build_header(data)
     return data
 
@@ -894,13 +894,3 @@ set_icon_for_favorite_filter = (filter_name) ->
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
     saved_search.addClass 'active-link'
 
-
-load_self_review_setting = () ->
-  if $('#self_review')?
-    if $('#self_review:checked').length > 0
-      self_review = true
-    else
-      self_review = false
-    window.toggle_self_review(self_review)
-  else
-    return
