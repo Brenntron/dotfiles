@@ -402,10 +402,10 @@ class AbusiveContentTool
     end
     email_list.each do |email_address|
       report_alert_args[:to] = email_address
-      Rails.logger.info("process_email_report, before scheduling event, Delayed::Job.count: #{Delayed::Job.count}")
+      Rails.logger.info("generate_email_for_notification, before scheduling event, Delayed::Job.count: #{Delayed::Job.count}")
       conn = ::Bridge::SendGenericEmailEvent.new(addressee: 'talos-intelligence')
       conn.post(report_alert_args, attachments_to_mail)
-      Rails.logger.info("process_email_report, after scheduling event, Delayed::Job.count: #{Delayed::Job.count}")
+      Rails.logger.info("generate_email_for_notification, after scheduling event, Delayed::Job.count: #{Delayed::Job.count}")
     end
 
   end
