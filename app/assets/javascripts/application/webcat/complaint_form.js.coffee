@@ -21,7 +21,7 @@ $ ->
         $('#platformList').append '<option value="' + platform.public_name + '"></option>'
     )
 
-  $('#webcat-advanced-search-button').on 'click', ->
+  $('#advanced-search-button').on 'click', ->
     AC.DataLoaders.load_customer_names().then( (data) =>
       $('#channel-input-list').empty()
       $('#status-input-list').empty()
