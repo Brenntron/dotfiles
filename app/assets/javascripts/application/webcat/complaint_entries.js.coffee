@@ -113,7 +113,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     #     $ce_tags.show()
 
   window.set_complaint_entry_data = (category_data, entry_status) ->
-    ce_current_categories = if category_data? then category_data.split(', ') else []
+    ce_current_categories = if category_data? then category_data.split(',') else []
     selectize = null
 
     AC.WebCat.getAUPCategories()

@@ -26,11 +26,8 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
                     else
                       @complaint_entry.uri || @complaint_entry.ip_address
                     end
-    @input_domain = if @complaint_entry.uri_as_categorized? && @complaint_entry.uri_as_categorized != @complaint_entry.domain
-                      @complaint_entry.domain.presence || @complaint_entry.ip_address
-                    end
     @tags = @complaint.complaint_tags.map(&:name)
-    @wbrs_score = @complaint_entry.wbrs_score.nil? ? 0 : @complaint_entry.wbrs_score.round(1)
+    @wbrs_score = @complaint_entry.wbrs_score.nil? ? '' : @complaint_entry.wbrs_score.round(1)
     @webcat_users = User.joins(:roles).where('roles.role like "%webcat%"').distinct.order(:display_name)
   end
 
