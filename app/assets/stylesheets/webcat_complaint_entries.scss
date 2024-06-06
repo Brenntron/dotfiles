@@ -55,6 +55,8 @@ $selectize-border: #E5E5E5;
     display: flex;
     justify-content: space-between;
     margin-bottom: 2px;
+    align-items: center;
+    min-height: 20px;
     &:last-of-type {
       margin-bottom: 0;
     }
@@ -71,9 +73,13 @@ $selectize-border: #E5E5E5;
     }
     #complaint_reviewer {
       background-image: url(image_path('icon_check_grey.svg'));
+      background-size: 18px;
+      background-position: left top -2px
     }
     #complaint_second_reviewer {
       background-image: url(image_path('icon_doublecheck_grey.svg'));
+      background-size: 18px;
+      background-position: left top -2px
     }
   }
 
@@ -392,19 +398,24 @@ $selectize-border: #E5E5E5;
   }
 
 
-  .ip-uri-button {
-    background-color: darken($type-faint-accent, 5%);
+  button.ip-uri-button {
+    background-color: #d8dadb;
     border: none;
     border-radius: 2px;
     color: $type-lighter-color;
     float: left;
     font-size: 10px;
-    margin: 0 5px 5px;
+    margin: 0 3px 5px;
     min-height: 15px;
     padding: 0 10px;
 
     &:first-child {
       margin-left: 0;
+    }
+
+    &:disabled {
+      background-color: #d8dadb !important;
+      opacity: .5;
     }
   }
 

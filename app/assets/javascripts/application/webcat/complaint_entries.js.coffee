@@ -361,7 +361,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         'domain': domain
       success: (response) ->
         data = response.data
-
         # remove baseline domain entry
         data.splice(0, 1)
 
@@ -371,6 +370,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           data: data
           dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
           ordering: true
+          order: [[ 3, 'desc' ]]
           searching: false
           stateSave: false
           pageLength: 10
@@ -448,15 +448,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               {
                 targets: [ 0 ]
                 orderData: 3
-                width: '15%'
-              }
-              {
-                targets: [ 1 ],
-                width: '10%'
-              }
-              {
-                targets: [ 2 ],
-                width: '75%'
               }
             ]
             columns: [

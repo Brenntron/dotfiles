@@ -31,8 +31,8 @@
         .top-info-data.complaint-assignee-wrapper
           %input{type: 'hidden', name: 'current_user_id', value: "#{current_user.id}"}
           .complaint-owner-wrapper
-            %div
-              %span.user-image#complaint_assignee{ class: ('missing-data' if no_user?(@complaint_entry.user) ) }= no_user?(@complaint_entry.user) ? 'Unassigned' : @complaint_entry.user.display_name
+            .user-image#complaint_assignee{ class: ('missing-data' if no_user?(@complaint_entry.user) ) }
+              = no_user?(@complaint_entry.user) ? 'Unassigned' : @complaint_entry.user.display_name
           - if can?(:update, ComplaintEntry) && [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
             .complaint-owner-buttons-wrapper
               %button.return-ticket-button.esc-tooltipped#webcat_return_ticket_assignee{ class: ('hidden' if @complaint_entry.status == ComplaintEntry::PENDING || @complaint_entry.user_id != current_user.id),
@@ -61,9 +61,8 @@
                                                                                                                                 title: 'Change Assignee' }
         .top-info-data.complaint-reviewer-wrapper
           .complaint-owner-wrapper
-            %div
-              %span.user-image#complaint_reviewer{ class: ('missing-data' if no_user?(@complaint_entry.reviewer)) }
-                = @complaint_entry.reviewer&.display_name || 'No Reviewer'
+            .user-image#complaint_reviewer{ class: ('missing-data' if no_user?(@complaint_entry.reviewer)) }
+              = @complaint_entry.reviewer&.display_name || 'No Reviewer'
           - if can?(:update, ComplaintEntry) && [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
             .complaint-owner-buttons-wrapper
               %button.return-ticket-button.esc-tooltipped{ class: ('hidden' unless @complaint_entry.reviewer_id == current_user.id),
@@ -93,9 +92,8 @@
                                                                                                                                   title: 'Change Reviewer' }
         .top-info-data.complaint-second-reviewer-wrapper
           .complaint-owner-wrapper
-            %div
-              %span.user-image#complaint_second_reviewer{ class: ('missing-data' if no_user?(@complaint_entry.second_reviewer)) }
-                = @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
+            .user-image#complaint_second_reviewer{ class: ('missing-data' if no_user?(@complaint_entry.second_reviewer)) }
+              = @complaint_entry.second_reviewer&.display_name || 'No 2nd Reviewer'
           - if can?(:update, ComplaintEntry) && [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
             .complaint-owner-buttons-wrapper
               %button.return-ticket-button.esc-tooltipped{ class: ('hidden' unless @complaint_entry.second_reviewer_id == current_user.id),
@@ -174,13 +172,13 @@
                                     'data-toggle': 'tab',
                                     href: '#research-tab',
                                     role: 'tab' }
-      research
+      Research
   %li.nav-item{ role: 'presentation' }
     %a.nav-link#history-tab-link{ 'aria-controls': 'history',
                                    'data-toggle': 'tab', href: '#history-tab',
                                    role: 'tab' }
-      history
--# Bootstrap tabs: https://getbootstrap.com/docs/3.4/javascript/#tabs
+      History
+
 .tab-content.content-wrapper#ce_tab_content
   .tab-pane.active#research-tab{ role: 'tabpanel' }
     = render 'escalations/webcat/complaint_entries/research_tab'
