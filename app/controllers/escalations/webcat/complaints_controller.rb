@@ -1,4 +1,5 @@
 class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
+  before_action :dashboard_metrics, only: [:index, :show]
   load_and_authorize_resource class: 'Complaint'
 
   def index

@@ -17,18 +17,13 @@ namespace 'AC.FileRep', (exports) ->
     )
 
   exports.createPlatformOptions = ->
-    std_msg_ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/webcat/platforms_names'
-      success_reload: false
-      success: (response) ->
-        element = $('#platform-input')
-        selectize = element[0].selectize
-
-        for platform in response.data
-          selectize.addOption(platform)
+    AC.DataLoaders.load_plaforms().then( (platforms) ->
+      element = $('#platform-input')
+      selectize = element[0].selectize
+      for platform in platforms.data
+        selectize.addOption(platform)
     )
-
+  
   exports.populateSearchCriteria = ->
     return unless localStorage.search_conditions
 

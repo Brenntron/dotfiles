@@ -1,14 +1,12 @@
 class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatController
-
+  before_action :dashboard_metrics, only: [:index, :show]
+ 
   def index
-    respond_to do |format|
-      format.html
-      format.json do
-        render json: ComplaintEntryDatatable.new(params,
-                                                 initialize_params,
-                                                 user: current_user)
-      end
-    end
+  end
+
+  # we shoud have separate endpoint, to avoid running dashboard_metrics on every request
+  def datatable
+    render json: ComplaintEntryDatatable.new(params, initialize_params, user: current_user)
   end
 
   def show
