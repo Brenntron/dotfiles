@@ -5414,6 +5414,18 @@ table > tbody > tr > td.dispute_rep_tools {
 .no-margin-datatable-top-tool {
   margin: 0 !important;
 }
+
+// webrep dispute index datatable
+.custom-margin-datatable {
+  margin: 0 0 15px;
+  #disputes-index_filter {
+    padding-right: 4px;
+    .table-search-input {
+      margin-left: 4px;
+    }
+  }
+}
+
 .dispute-count, .entry-count {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
@@ -10793,13 +10805,13 @@ hr.thin.form-divider {
   overflow: scroll;
 }
 
-// dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
+// new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
   min-width: 540px;
   margin-left: 35px;
 }
 
-#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container, #dispute-advaced-search-selected-filters{
+#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container, #dispute-advanced-search-selected-filters{
   & {
     color: $primary-section-color;
     max-width: 100%;
@@ -10827,6 +10839,11 @@ hr.thin.form-divider {
     font-weight: bold;
   }
 }
+
+#dispute-advanced-search-selected-filters {
+  margin-bottom: 5px;
+}
+
 .in-sample-zoo_container{
   label{
     position: relative;
@@ -10840,9 +10857,8 @@ hr.thin.form-divider {
   }
 }
 
-// dbinebri: file reputation - new ticket specific styles inside the new ticket container
+// file reputation - new ticket specific styles inside the new ticket container
 .escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
-
   // radio specific styles
   .file-rep-radio-wrapper {
     input[type="radio"] {
@@ -11219,7 +11235,7 @@ button.secondary.view-report-external-button {
     display: contents;
   }
 }
-// dbinebri: updates below for file rep navbar layout new
+// updates below for file rep navbar layout new
 .escalations--file_rep--disputes-controller {
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
@@ -11299,13 +11315,13 @@ button.secondary.view-report-external-button {
     }
   }
 
-  // dbinebri: the tooltips for file rep get too wide, limit the max-width
+  // the tooltips for file rep get too wide, limit the max-width
   .tooltipster-sidetip {
     max-width: 460px !important;
   }
 }
 
-// dbinebri: wrapper for naming-guide-dialog, jquery generates this, leave this here
+// wrapper for naming-guide-dialog, jquery generates this, leave this here
 .ui-dialog[aria-describedby=naming-guide-dialog] {
   margin-top: 55px;
   margin-right: 20px;
@@ -11325,7 +11341,7 @@ button.secondary.view-report-external-button {
   }
 }
 
-// dbinebri: file rep - naming guide dialog internal specific styles here
+// file rep - naming guide dialog internal specific styles here
 #naming-guide-dialog {
   display: none;
   font-family: 'Open Sans', sans-serif;
@@ -11693,7 +11709,7 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 
-// dbinebri: adding button here for download json buttons
+// adding button here for download json buttons
 .download-small-button {
   background-image: url(image_path('icon_download.svg'));
   background-repeat: no-repeat;
@@ -11876,7 +11892,7 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// dbinebri: add file rep datatable bg color white in case all cols are showing
+// add file rep datatable bg color white in case all cols are showing
 #file-rep-datatable {
   background-color: $content-bg-color;
 }
@@ -11894,7 +11910,7 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// dbinebri: on Show, assignee column width fix on laptop screens
+// on Show, assignee column width fix on laptop screens
 @media screen and (max-width: 1700px) and (min-width: 1201px){
   .ticket-overview-wrapper {
     .col-ticket-left {
@@ -11922,7 +11938,7 @@ div[aria-describedby='create-detection-dialog'] {
     }
 
 
-// dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
+// on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
 .table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
   min-width: 90px !important;
 }
@@ -11930,7 +11946,7 @@ td.channel-col{
   text-transform: capitalize;
 }
 
- // dbinebri: adding a specific on-click sha tooltip
+ // adding a specific on-click sha tooltip
 .copied-sha-tooltip {
   opacity: 0;
   width: 100px;
@@ -11963,7 +11979,7 @@ td.channel-col{
 }
 
 
-// dbinebri: INDEX, RL HOVER TABLE STYLES HERE, this is a one-off tooltip as of now
+// INDEX, RL HOVER TABLE STYLES HERE, this is a one-off tooltip as of now
 // top row for rl hover table
 table.rl-header {
   padding: 0;
@@ -12054,7 +12070,7 @@ table.rl-content {
 }
 
 
-// dbinebri: this is the WRAPPER for the RENDERED full rl table hover, remove padding and add border radius
+// this is the WRAPPER for the RENDERED full rl table hover, remove padding and add border radius
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
   padding: 0;
   border-radius: 5px;
@@ -12082,7 +12098,7 @@ table.rl-content {
   flex-direction: row;
 }
 
-// dbinebri: small tweak for copycat placeholder text
+// small tweak for copycat placeholder text
 .selectize-input #copycat-categories-selectized {
   font-size: 12px;
 }
@@ -12402,31 +12418,25 @@ input[type="radio"].resolution_radio_button, input[type="radio"].review_radio_bu
   }
 }
 
-@media screen and (max-width: 1699px)  and (min-width: 908px ) {
-  #disputes-index_wrapper {
-    top: -55px;
-  }
+#disputes-index_wrapper {
+  top: -55px;
 }
-@media (min-width: 1850px) {
 
+
+// toolbar condense breakpoint chosen for browser compatibility
+@media (min-width: 2190px) {
   #webrep-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
-      padding-left: 13px;
-      padding-right: 7px;
+      padding-left: 14px;
+      padding-right: 8px;
       min-height: 25px;
-      background-size: 14px 14px; // icon size
+      background-size: 15px 15px;
       transition: background-color 0.2s;
       .toolbar-button-text {
         display: inline-block;
       }
     }
-  }
-}
-
-@media (min-width: 2030px) {
-  #disputes-index_wrapper {
-    top: -55px;
   }
 }
 
@@ -14398,3 +14408,8 @@ td > a.ban {
     margin-left: 10px;
   }
 }
+
+.icon-autoresolved {
+  margin-left: 3px;
+}
+

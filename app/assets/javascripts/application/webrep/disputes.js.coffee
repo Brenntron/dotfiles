@@ -1156,7 +1156,7 @@ $ ->
       9
       'desc'
     ] ]
-    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    dom: '<"datatable-top-tools custom-margin-datatable"lf>t<ip>'
     language: {
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
@@ -1560,7 +1560,7 @@ $ ->
         filters = JSON.parse(localStorage.webRepFilters)
 
         #Need to check if this a saved or basic search, since those don't load in the data to the local storage
-        if filters.search_type != 'named' && filters.search_type != 'contains' && $('#dispute-advaced-search-selected-filters').html() != ''
+        if filters.search_type != 'named' && filters.search_type != 'contains' && $('#dispute-advanced-search-selected-filters').html() != ''
           filter_data_found = true
 
           #Case ID field
@@ -3029,11 +3029,11 @@ window.format_webrep_header = (data) ->
           selectedFilters.push({name: 'Submission Type', value: search_conditions[conditionName].map((e) => e.toUpperCase()).join(', ')})
         else if condition_types[conditionName]
           selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
-        container = $('#dispute-advaced-search-selected-filters')
+        container = $('#dispute-advanced-search-selected-filters')
       if container.html() == ''
         for item in selectedFilters
           html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
-          $('#dispute-advaced-search-selected-filters').append(html)
+          $('#dispute-advanced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
