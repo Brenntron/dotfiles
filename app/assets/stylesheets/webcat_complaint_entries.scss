@@ -64,15 +64,15 @@ $selectize-border: #E5E5E5;
       padding-left: 20px
     }
 
-    #complaint-assignee {
+    #complaint_assignee {
       background-image: url(image_path('icon_user_grey.svg'));
       background-size: 15px;
       background-position: center left 2px;
     }
-    #complaint-reviewer {
+    #complaint_reviewer {
       background-image: url(image_path('icon_check_grey.svg'));
     }
-    #complaint-second-reviewer {
+    #complaint_second_reviewer {
       background-image: url(image_path('icon_doublecheck_grey.svg'));
     }
   }
