@@ -484,21 +484,15 @@ $ ->
 
 
 window.get_current_cats = (rows) ->
-  # Grab up-to-date list of categories ONE time for all entries
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-      all_categories = response
-      # Initialize category selectizes
-      $(rows).each ->
-        entry_id = $(this).attr('id')
-        entry_cats = $(this).attr('data-categories')
-        entry_status = $(this).attr('data-status')
-        load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
-        fetch_external_categories(entry_id)
+  AC.WebCat.getAUPCategories().then( (categories) =>
+    all_categories = categories
+    # Initialize category selectizes
+    $(rows).each ->
+      entry_id = $(this).attr('id')
+      entry_cats = $(this).attr('data-categories')
+      entry_status = $(this).attr('data-status')
+      load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
+      fetch_external_categories(entry_id)
   )
 
 # Compares the categories of an entry in AC to the full list of
