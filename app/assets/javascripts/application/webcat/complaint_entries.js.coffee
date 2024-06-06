@@ -1,5 +1,6 @@
 if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   #set empty string header so it can be updated on document ready
+  current_user_id = 0
   headers = ''
   entry_id = 0
   resolution_option = ''
@@ -35,7 +36,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   verifySubmit = () ->
     return true if ['commit', 'decline'].includes(resolution_option)
 
-    changes_for_type = change_store.getTypeChanges(resolution_option)
     email_response_text = $('.email-response-text')[0].innerText
     resolution_comment = if email_response_text == 'No response created or sent to customer.'
                            ''
@@ -52,7 +52,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     # The fixed resolution requires a change to the category list and at least one category.
     can_submit = if resolution_option == 'fixed' && change_store.category_changed(resolution_option) && $('#ce_categories_select')[0].selectize.items.length > 0
                    true
-                 else if ['unchanged', 'invalid'].includes(resolution_option) && changes_for_type == ''
+                 else if ['unchanged', 'invalid'].includes(resolution_option) && change_store.getTypeChanges(resolution_option).length == 0
                    true
                  else if ['commit', 'decline'].includes(resolution_option)
                    true
@@ -226,12 +226,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     wrapper = radio.parent()
     wrapper.addClass('selected')
 
-  window.take_single_webcat_complaint = (type) ->
+  window.take_single_webcat_complaint = (assignment_type) ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
       method: 'POST'
       headers: headers
-      data: 'complaint_entry_ids': [entry_id], 'assignment_type': type
+      data: 'complaint_entry_ids': [entry_id], 'assignment_type': assignment_type
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
@@ -240,24 +240,22 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           else
             std_msg_error('Error Taking Entries', [json.error])
         else
-          # TODO add flash success
-          $(selected_rows).each ->
-            row = this
-            if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text(json.name)
-              status = $(row).find('.state-row td')
-              if ($(status).text() == 'NEW') || ($(status).text() == 'REOPENED')
-                $(status).text('ASSIGNED')
-            else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text(json.name)
-            else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text(json.name)
+          $status = $('.status-wrapper > .top-info-data')
 
+          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text())
+            $status.text('ASSIGNED')
+
+          $assignee_type = $("#complaint_#{assignment_type}")
+
+          $assignee_type.text(json.name)
+          $assignee_type.removeClass('missing-data')
+          $("#webcat_take_ticket_#{assignment_type}").addClass('hidden')
+          $("#webcat_return_ticket_#{assignment_type}").removeClass('hidden')
       error: (response) ->
         std_msg_error('Error Taking Entries', response.responseText)
     , this)
 
-  window.return_single_webcat_complaint = (type) ->
+  window.return_single_webcat_complaint = (assignment_type) ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
@@ -271,21 +269,70 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           else
             std_msg_error('Error Returning Entries', [json.error.join(' ')])
         else
-          $(selected_rows).each ->
-            row = this
-            if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text("Vrt Incoming")
-              status = $(row).find('.state-row td')
-              if $(status).text() == 'ASSIGNED'
-                $(status).text('NEW')
-            else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text("")
-            else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text("")
+          $status = $('.status-wrapper > .top-info-data')
 
+          if assignment_type == 'assignee' && $status.text() == 'ASSIGNED'
+            $status.text('NEW')
+
+          $assignee_type = $("#complaint_#{assignment_type}")
+          assignment_text = switch assignment_type
+            when 'assignee' then 'Unassigned'
+            when 'reviewer' then 'No Reviewer'
+            when 'second_reviewer' then 'No 2nd Reviewer'
+
+          $assignee_type.text(assignment_text)
+          $assignee_type.addClass('missing-data')
+          $("#webcat_take_ticket_#{assignment_type}").removeClass('hidden')
+          $("#webcat_return_ticket_#{assignment_type}").addClass('hidden')
       error: (response) ->
         std_msg_error('Error Returning Entries', [response.responseText])
     , this)
+
+  window.webcat_toolbar_show_change_assignee = (assignment_type) ->
+    user_id = Number($("#change_target_#{assignment_type}").val())
+    is_current_user = user_id == current_user_id
+    data = {
+      'complaint_entry_ids': [entry_id],
+      'user_id': user_id,
+      'assignment_type': assignment_type
+    }
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        $("#show_change_#{assignment_type}_dropdown").dropdown('toggle')
+        json = $.parseJSON(response)
+
+        if json.error
+          if JQuery.type(json.error) != 'array'
+            std_msg_error('Error Assigning Entries', [json.error])
+          else
+            std_msg_error('Error Assigning Entries', [json.error.join(' ')])
+        else
+          $status = $('.status-wrapper > .top-info-data')
+
+          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text())
+            $status.text('ASSIGNED')
+
+          $assignee_type = $("#complaint_#{assignment_type}")
+
+          $assignee_type.text(json.name)
+          $assignee_type.removeClass('missing-data')
+          $("#webcat_take_ticket_#{assignment_type}").addClass('hidden')
+
+          if is_current_user
+            $("#webcat_return_ticket_#{assignment_type}").removeClass('hidden')
+          else
+            $("#webcat_return_ticket_#{assignment_type}").addClass('hidden')
+        error: (response) ->
+          std_msg_error('Error Assigning Entries', [response.responseText])
+    )
+
+
 
   render_whois_table = (domain) ->
     whois_callback = (formattedData) ->
@@ -770,50 +817,24 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     , this)
 
   window.reopen_complaint = () ->
+    $('#reopen_loader').removeClass('hidden')
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
       method: 'POST'
       data: { 'complaint_entry_id': entry_id }
       success: (response) ->
-        $button = $('.ce-submit-button')
-        customer_comment = $('.ce-customer-comment-textarea').val()
-
-        unless customer_comment.includes('This dispute has been re-opened.')
-          customer_comment = customer_comment + "<br />" + " --This dispute has been re-opened."
-
-        $('.status-wrapper > .top-info-data').text('REOPENED')
-        $('.ce-submitted-ip-uri').hide()
-
-        $ip_uri_input = $('.ce-ip-uri-input')
-
-        $ip_uri_input.removeClass('hidden')
-        $ip_uri_input.prop('disabled', false)
-
-        $('.resolution-radio-button').each ->
-          $(this).prop('disabled', false)
-        $('#ce_categories_select').prop('disabled', false)
-        $('#ce_categories_select')[0].selectize.enable()
-        $('.email-response-text').hide()
-        $('.ce-customer-comment-select-box').removeClass('hidden')
-        $('.ce-customer-comment-textarea').val(customer_comment)
-        $('.ce-customer-comment-textarea').removeClass('hidden')
-        $('.internal-comment').hide()
-        $('.ce-internal-comment-textarea').removeClass('hidden')
-        $('.ce-input').prop('disabled', false)
-
-        get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
-          $('.ce-customer-comment-textarea').val(customer_comment)
-
-        $button.attr('onclick', "submit_show_page_changes(#{entry_id});")
-        $button.text('submit')
-        $('.ce-submit-button').prop('disabled', true)
-
+        $('#reopen_loader').addClass('hidden')
+        show_message('success', 'Reopened. Refreshing to see new results.', false, '#alert_message')
+        setTimeout ->
+          location.reload()
+        , 2000
       error: (response) ->
         console.error(response)
         std_msg_error(response,"", reload: false)
     )
 
   $ ->
+    current_user_id = Number($('input[name="current_user_id"]').val())
     entry_id = Number($('#complaint_entry_id')[0].innerText)
     headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
     resolution_option = $('.ce-radio-group > .resolution-radio-button:checked').val()
