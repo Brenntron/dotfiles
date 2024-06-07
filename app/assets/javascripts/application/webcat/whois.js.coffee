@@ -26,8 +26,6 @@ namespace 'AC.WebCat.Whois', (exports) ->
 
     keyedData = whoisData.split(/\r?\n/).map((s) -> keyify(s)).filter((str) -> str)
 
-    console.log('whoisData: ', whoisData)
-
     for data in keyedData
       key = Object.keys(data)[0].toLowerCase()
       value = Object.values(data)[0]

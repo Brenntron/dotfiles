@@ -36,21 +36,17 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   verifySubmit = () ->
     return true if ['commit', 'decline'].includes(resolution_option)
 
-    resolution_comment =  $('.ce-customer-comment-textarea').val()
-    resolution_comment = '' if resolution_comment == 'No response created or sent to customer.'
     submitted_ip_uri = $('.ce-ip-uri-input').val()
 
     # All resolution options, as well as the commit review option, requite a user comment
     # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
     # then it can only be declined.
-    return false unless (resolution_comment && submitted_ip_uri)
+    return false unless submitted_ip_uri
 
     # The fixed resolution requires a change to the category list and at least one category.
     can_submit = if resolution_option == 'fixed' && change_store.category_changed(resolution_option) && $('#ce_categories_select')[0].selectize.items.length > 0
                    true
                  else if ['unchanged', 'invalid'].includes(resolution_option) && change_store.getTypeChanges(resolution_option).length == 0
-                   true
-                 else if ['commit', 'decline'].includes(resolution_option)
                    true
                  else
                    false
