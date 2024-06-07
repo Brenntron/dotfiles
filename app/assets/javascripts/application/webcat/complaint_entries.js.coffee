@@ -7,30 +7,26 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   # We do not want unsubmitted changes to persist across page reloads
   # So we store themm in memory
   change_store = do () ->
-    types = {
-      'fixed': [],
-      'unchanged': [],
-      'invalid': [],
-    }
+    changes = []
 
     {
-      add: (type, change) ->
-        if types[type].indexOf(change) < 0
-          types[type].push change
-      category_changed: (type) ->
-        types[type].some (change) ->
+      add: (change) ->
+        if changes.indexOf(change) < 0
+          changes.push change
+      category_changed: () ->
+        changes.some (change) ->
           change.includes('category')
-      getTypeChanges: (type) ->
-        types[type]
-      hasChange: (type, change) ->
-        change_index = types[type].indexOf(change)
+      getChanges: () ->
+        changes
+      hasChange: (change) ->
+        change_index = changes.indexOf(change)
 
         return change_index > -1
-      remove: (type, change) ->
-        change_index = types[type].indexOf(change)
+      remove: (change) ->
+        change_index = changes.indexOf(change)
 
         if change_index > -1
-          types[type].splice(change_index, 1)
+          changes.splice(change_index, 1)
     }
 
   verifySubmit = () ->
@@ -44,9 +40,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     return false unless submitted_ip_uri
 
     # The fixed resolution requires a change to the category list and at least one category.
-    can_submit = if resolution_option == 'fixed' && change_store.category_changed(resolution_option) && $('#ce_categories_select')[0].selectize.items.length > 0
+    can_submit = if resolution_option == 'fixed' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
                    true
-                 else if ['unchanged', 'invalid'].includes(resolution_option) && change_store.getTypeChanges(resolution_option).length == 0
+                 else if ['unchanged', 'invalid'].includes(resolution_option) && change_store.getChanges().length == 0
                    true
                  else
                    false
@@ -77,14 +73,14 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       options: createTagOptions(),
       items: split_tags,
       onItemAdd: (value) ->
-        change_store.add(resolution_option, "tags: #{value}")
+        change_store.add("tags: #{value}")
 
         can_submit = verifySubmit()
 
         $('.ce-submit-button').prop('disabled', !can_submit)
         window.prevent_close(can_submit.toString())
       onItemRemove: (value) ->
-        change_store.remove(resolution_option, "tags: #{value}")
+        change_store.remove("tags: #{value}")
 
         can_submit = verifySubmit()
 
@@ -151,10 +147,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           onItemAdd: (value) ->
             # User shouldn't be able to change cats in pending, but just in case
             unless entry_status == 'PENDING'
-              if change_store.hasChange(resolution_option, "removed category: #{value}")
-                change_store.remove(resolution_option, "removed category: #{value}")
+              if change_store.hasChange("removed category: #{value}")
+                change_store.remove("removed category: #{value}")
               else
-                change_store.add(resolution_option, "category: #{value}")
+                change_store.add("category: #{value}")
 
               can_submit = verifySubmit()
 
@@ -163,10 +159,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           onItemRemove: (value) ->
             unless entry_status == 'PENDING'
               # Track adding categories and removing existing categories
-              if change_store.hasChange(resolution_option, "category: #{value}")
-                change_store.remove(resolution_option, "category: #{value}")
+              if change_store.hasChange("category: #{value}")
+                change_store.remove("category: #{value}")
               else
-                change_store.add(resolution_option, "removed category: #{value}")
+                change_store.add("removed category: #{value}")
 
               can_submit = verifySubmit()
 
