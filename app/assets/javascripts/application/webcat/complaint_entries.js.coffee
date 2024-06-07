@@ -36,12 +36,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   verifySubmit = () ->
     return true if ['commit', 'decline'].includes(resolution_option)
 
-    email_response_text = $('.email-response-text')[0].innerText
-    resolution_comment = if email_response_text == 'No response created or sent to customer.'
-                           ''
-                         else
-                           $('.ce-customer-comment-textarea').val()
-
+    resolution_comment =  $('.ce-customer-comment-textarea').val()
+    resolution_comment = '' if resolution_comment == 'No response created or sent to customer.'
     submitted_ip_uri = $('.ce-ip-uri-input').val()
 
     # All resolution options, as well as the commit review option, requite a user comment
@@ -201,7 +197,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                 0
         }
 
-        selectize[0].selectize.disable() if ['COMPLETED', 'PENDING', 'RESOLVED'].includes entry_status
+        selectize[0].selectize.disable() if entry_status == 'PENDING'
       )
 
   window.set_lookup = (lookup) ->
@@ -331,8 +327,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         error: (response) ->
           std_msg_error('Error Assigning Entries', [response.responseText])
     )
-
-
 
   render_whois_table = (domain) ->
     whois_callback = (formattedData) ->

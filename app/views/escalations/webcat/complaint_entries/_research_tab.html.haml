@@ -103,19 +103,19 @@
       .col-xs-12
         %label.content-label-sm
           Resolved IP/URI
-        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)
           %p.ce-submitted-ip-uri
             = @input_ip_uri
         - else
-          %input.ce-input.ce-ip-uri-input{ value: @input_ip_uri }
+          %input.ce-input.ce-ip-uri-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING, value: @input_ip_uri }
           .ce-resolved-ip-uri-button-wrapper
             %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
                                                     # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
-                                                    disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain,
+                                                    disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain || @complaint_entry.status == ComplaintEntry::PENDING,
                                                     onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
               domain
             %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
-                                                       disabled: @complaint_entry.subdomain.blank?,
+                                                       disabled: @complaint_entry.subdomain.blank? || @complaint_entry.status == ComplaintEntry::PENDING,
                                                        onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
               subdomain
             %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
@@ -126,48 +126,40 @@
       .col-xs-12
         %label.content-label-sm
           Categories
-        %input.ce-categories-select.ce-input#ce_categories_select{ disabled: [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status),
-                                                                   placeholder: 'Enter Categories / Confidence Order' }
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
+          %input.ce-categories-select.ce-input#ce_categories_select{ placeholder: 'Enter Categories / Confidence Order' }
+        - elsif @complaint_entry.url_primary_category.blank?
+          %p.category-list.missing-data= 'No submitted categories.'
+        - else
+          %p.category-list= @complaint_entry.url_primary_category
     .row
       .col-xs-12
-        - if @complaint_entry.status == 'PENDING'
-          %label.content-label-sm
-            Review
-          .ce-radio-group-wrapper
-            .ce-radio-group
-              %input#review-commit-radio.review-radio-button{ name: 'resolution',
-                                                              type: 'radio',
-                                                              value: 'commit' }
-              %label.radio-label{ for: 'review-commit-radio' }
-                Commit
-            .ce-radio-group
-              %input#review-decline-radio.review-radio-button{ name: 'resolution',
-                                                               type: 'radio',
-                                                               value: 'decline' }
-              %label.radio-label{ for: 'review-decline-radio' }
-                Decline
+        %label.content-label-sm
+          Resolution
+        - if [ComplaintEntry::RESOLVED, ComplaintEntry::STATUS_COMPLETED].include?(@complaint_entry.status)
+          %p.resolution= @complaint_entry.resolution.capitalize
         - else
-          %label.content-label-sm
-            Resolution
           .ce-radio-group-wrapper
             .ce-radio-group
-              %input#res-unchanged-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED),
+              %input.resolution-radio-button#res-unchanged-radio{ disabled: (true if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
                                                                   name: 'resolution',
+                                                                  checked: @complaint_entry.resolution == 'unchanged',
                                                                   type: 'radio',
                                                                   value: 'unchanged' }
               %label.radio-label{ for: 'res-unchanged-radio' }
                 Unchanged
             .ce-radio-group
-              %input#res-fixed-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED),
+              %input.resolution-radio-button#res-fixed-radio{ disabled: (true if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
                                                               name: 'resolution',
-                                                              checked: true,
+                                                              checked: @complaint_entry.resolution == 'fixed' || @complaint_entry.resolution.blank?,
                                                               type: 'radio',
                                                               value: 'fixed' }
               %label.radio-label{ for: 'res-fixed-radio' }
                 Fixed
             .ce-radio-group
-              %input#res-invalid-radio.resolution-radio-button{ disabled: (true if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED),
+              %input.resolution-radio-button#res-invalid-radio{ disabled: (true if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
                                                                 name: 'resolution',
+                                                                checked: @complaint_entry.resolution == 'invalid',
                                                                 type: 'radio',
                                                                 value: 'invalid' }
               %label.radio-label{ for: 'res-invalid-radio' }
@@ -177,13 +169,15 @@
       .col-xs-12
         %label.content-label-sm
           Email Response to Customer
-        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include? @complaint_entry.status
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
           .email-response-text
             = @complaint_entry.resolution_comment.presence || 'No response created or sent to customer.'
         - else
-          %select.ce-customer-comment-select-box.ce-input.response-template-select{ id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
+          %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                                                    id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
             %option{ value: 'fixed', selected: true } Fixed - Default Response
-          %textarea.ce-customer-comment-textarea.ce-input{ id: "entry-email-response-to-customers_#{@complaint_entry.id}",
+          %textarea.ce-customer-comment-textarea.ce-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                           id: "entry-email-response-to-customers_#{@complaint_entry.id}",
                                                            maxlength: '64000',
                                                            name: 'ce_customer_comment_textarea' }
             = @complaint_entry.resolution_comment
@@ -192,11 +186,12 @@
       .col-xs-12
         %label.content-label-sm
           Internal Comment
-        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include? @complaint_entry.status
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
           %span.missing-data.internal-comment
             = @complaint_entry.internal_comment.presence || 'No internal comment.'
         - else
-          %textarea.ce-internal-comment-textarea.ce-input{ name: 'ce_internal_comment_textarea',
+          %textarea.ce-internal-comment-textarea.ce-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                           name: 'ce_internal_comment_textarea',
                                                            placeholder: 'Internal note for choosing categories' }
             = @complaint_entry.internal_comment
 
@@ -204,7 +199,7 @@
       .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Reopening entry...
-    - if @complaint_entry.is_important
+    - if @complaint_entry.is_important && @complaint_entry.status != ComplaintEntry::PENDING
       .row.text-center
         .col-xs-6
           .ce-allow-review-container
@@ -212,22 +207,36 @@
             %label{ for: 'self_review' }
               Allow Self Review
         .col-xs-6
-          - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
-            %button.tertiary.ce-submit-button{ disabled: (@complaint_entry.status == ComplaintEntry::RESOLVED),
-                                               onclick: "reopen_complaint(#{@complaint_entry.id})" }
-              Reopen
-          - else
-            %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-              Submit
-    - else
-      .text-center
-        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
-          %button.tertiary.ce-submit-button{ disabled: (@complaint_entry.status == ComplaintEntry::RESOLVED),
-                                             onclick: "reopen_complaint(#{@complaint_entry.id})" }
-            Reopen
-        - else
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
+    - elsif @complaint_entry.status != ComplaintEntry::PENDING
+      .text-center
+        - if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
+          %button.tertiary.ce-submit-button{ disabled: ([ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status),
+                                             onclick: "reopen_complaint(#{@complaint_entry.id})" }
+            Reopen
+        - elsif @complaint_entry.status != ComplaintEntry::RESOLVED
+          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+            Submit
+    - elsif @complaint_entry.status == ComplaintEntry::PENDING && (@complaint_entry.reviewer_id == current_user.id || @complaint_entry.second_reviewer_id == current_user.id)
+      %label.content-label-sm
+        Review
+      .ce-radio-group-wrapper
+        .ce-radio-group
+          %input.review-radio-button#review-commit-radio{ name: 'resolution',
+                                                          type: 'radio',
+                                                          value: 'commit' }
+          %label.radio-label{ for: 'review-commit-radio' }
+            Commit
+        .ce-radio-group
+          %input.review-radio-button#review-decline-radio{ name: 'resolution',
+                                                           type: 'radio',
+                                                           value: 'decline' }
+          %label.radio-label{ for: 'review-decline-radio' }
+            Decline
+      .text-center
+        %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+          Submit
 
   .col-xs-4.ce-research-column.whois-column
     %h2 Whois
@@ -237,11 +246,14 @@
       %span.loader-msg Loading Whois data...
     .whois-data-container#whois_data_container
 
-
-
 :javascript
   $(document).ready(function() {
-    window.set_complaint_entry_data("#{@complaint_entry.url_primary_category}", '#{@complaint_entry.status}');
     window.set_tags("#{@tags.join(', ')}", "#{@complaint_entry.status}");
     window.set_lookup("#{@submitted_ip_uri}")
   });
+
+- if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
+  :javascript
+    $(document).ready(function() {
+      window.set_complaint_entry_data("#{@complaint_entry.url_primary_category}", '#{@complaint_entry.status}');
+    });
