@@ -830,7 +830,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     if resolution_option
       get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
-        $('.ce-customer-comment-textarea').val(resolution_comment)
+        $('.ce-customer-comment-textarea').val(resolution_comment) if resolution_comment != ''
+        $('.ce-submit-button').prop('disabled', !verifySubmit())
 
     $(document).on 'change', '.resolution-radio-button, .review-radio-button', ->
       resolution_option = $(this).val().toLowerCase()
