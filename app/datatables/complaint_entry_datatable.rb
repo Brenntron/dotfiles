@@ -6,6 +6,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     @search_type = initialize_params['search_type']
     @search_name = initialize_params['search_name']
     @search_conditions = initialize_params['search_conditions']
+    @allow_self_review = params['allow_self_review'] == 'true'
     super(params, {})
   end
 
@@ -119,13 +120,13 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   def filter_records(records)
     base_search =
         if @search_string.present?
-          ComplaintEntry.robust_search('contains', params: { 'value' => @search_string }, user: @user)
+          ComplaintEntry.robust_search('contains', params: { 'value' => @search_string, allow_self_review: @allow_self_review }, user: @user)
         else
           super
         end
 
     if @search_type
-      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions || {allow_self_review: @allow_self_review}, user: @user)
     else
       base_search
     end

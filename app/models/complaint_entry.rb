@@ -885,7 +885,7 @@ class ComplaintEntry < ApplicationRecord
     when 'named'
       named_search(search_name, user: user)
     when 'standard'
-      standard_search(search_name, user: user)
+      standard_search(search_name, user: user, params: params)
     when 'contains'
       contains_search(params['value'])
     else
@@ -925,7 +925,7 @@ class ComplaintEntry < ApplicationRecord
   # Searches specific to quick generic button filters.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name, user:)
+  def self.standard_search(search_name, user:, params: {})
     case search_name
     when "NEW"
       new_entries
@@ -934,7 +934,12 @@ class ComplaintEntry < ApplicationRecord
     when "ACTIVE"
       open.where.not(status:"NEW")
     when "REVIEW"
-      where(status: "PENDING")
+      if params[:allow_self_review]
+       where(status: "PENDING")
+      else
+        where(status: "PENDING").where.not(user_id: user.id)
+      end
+
     when "MY COMPLAINTS"
       where(user_id: user.id)
     when "MY OPEN COMPLAINTS"
