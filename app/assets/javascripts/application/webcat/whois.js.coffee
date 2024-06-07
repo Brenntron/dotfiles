@@ -22,11 +22,11 @@ namespace 'AC.WebCat.Whois', (exports) ->
   parseIcannData = (whoisData) ->
     domainStatuses = []
     keyedData = []
-    nservers = []
+    name_servers = []
 
-    splitData = whoisData.split(/\r?\n/)
+    keyedData = whoisData.split(/\r?\n/).map((s) -> keyify(s)).filter((str) -> str)
 
-    keyedData = splitData.map((s) -> keyify(s)).filter((str) -> str)
+    console.log('whoisData: ', whoisData)
 
     for data in keyedData
       key = Object.keys(data)[0].toLowerCase()
@@ -35,12 +35,10 @@ namespace 'AC.WebCat.Whois', (exports) ->
       if key == 'domain status'
         domainStatuses.push(value)
       else if ['nserver', 'nservers', 'name server'].includes(key)
-        nservers.push(value)
+        name_servers.push(value)
 
     reducedData = keyedData.reduce((accumulator, currentValue) ->
       key = Object.keys(currentValue)[0].toLowerCase()
-
-      return accumulator if key == 'name server'
 
       value = Object.values(currentValue)[0]
       accumulator[key] = value
@@ -48,41 +46,22 @@ namespace 'AC.WebCat.Whois', (exports) ->
     )
 
     reducedData['domain status'] = domainStatuses if domainStatuses.length > 0
-    reducedData['nserver'] = nservers
+    reducedData['name servers'] = name_servers
     reducedData['domain name'] = reducedData['name'].toLowerCase() if reducedData['name']?
     reducedData['domain name'] = reducedData['domain name'].toLowerCase() if reducedData['domain name']?
     reducedData['updated'] = reducedData['last-update'] if reducedData['last-update']
     return reducedData
 
-  keyify = (s) ->
-    # TESS doesn't send the same key/value pairs for every request....
-    keys = ['domain name',
-            'domain',
-            'name',
-            'organization name',
-            'registrant organization',
-            'registrant country',
-            'country',
-            'registrant state/province',
-            'state',
-            'province',
-            'name servers',
-            'created at',
-            'created',
-            'update at',
-            'last-update',
-            'updated date',
-            'registry expiry date',
-            'expiry date' ]
-    kv = s.split(': ')
+  keyify = (string) ->
+    [key, value] = string.split(': ')
 
-    if kv[1]? && (keys.filter((k) -> kv[0].toLowerCase().includes(k)).length > 0)
-      return { "#{kv[0].trim().replace('&quot;', '')}": kv[1].trim() }
+    if value.trim()
+      return { "#{key.replace(/&quot;/g, '').replace(/&gt;/g, '').trim()}": value.replace(/&lt;/g, '').trim() }
 
   stringifyData = (parsedData) ->
     dataString = '<table>'
     domainStatus = ''
-    nservers = ''
+    name_servers = ''
 
     for k,v of parsedData
       if k == 'domain status'
@@ -90,16 +69,16 @@ namespace 'AC.WebCat.Whois', (exports) ->
         for ds in v
           domainStatus += "<tr><td>#{ds}</td></tr>" unless ds.includes('www')
       else if k == 'name servers' && v.length > 0
-        nservers = '<h5>name servers</h5><table class="nested-dialog-table"'
+        name_servers = '<h5>name servers</h5><table class="nested-dialog-table"'
         for ns in v
-          nservers += "<tr><td>#{ns}</td></tr>"
-      else if k == 'nserver'
+          name_servers += "<tr><td>#{ns}</td></tr>"
+      else if k == 'name_server'
         continue
       else
         dataString += "<tr><th scope='row'>#{k}</th><td>#{v}</td></tr>"
 
     dataString += '</table>'
     domainStatus += '</table>' if domainStatus.length > 0
-    nservers += '</table>' if nservers.length > 0
+    name_servers += '</table>' if name_servers.length > 0
 
-    dataString += "#{domainStatus}#{nservers}"
+    dataString += "#{domainStatus}#{name_servers}"
