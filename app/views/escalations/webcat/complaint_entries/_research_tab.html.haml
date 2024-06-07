@@ -170,7 +170,7 @@
         %label.content-label-sm
           Email Response to Customer
         - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
-          .email-response-text{ class: ('missing-data' if @complaint_entry.resolution_comment.blank?) }
+          %p{ class: ('missing-data' if @complaint_entry.resolution_comment.blank?) }
             = @complaint_entry.resolution_comment.presence || 'No response created or sent to customer.'
         - else
           %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
