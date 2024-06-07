@@ -176,6 +176,7 @@ $selectize-border: #E5E5E5;
     margin-bottom: 10px;
     .content-label-sm {
       margin-top: 10px;
+      margin-bottom: 0;
     }
   }
 }
@@ -188,6 +189,7 @@ $selectize-border: #E5E5E5;
 
   p {
     font-size: 12px;
+    line-height: 1.2em;
   }
 
   #ce_description {

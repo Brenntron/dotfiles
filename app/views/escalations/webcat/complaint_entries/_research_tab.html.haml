@@ -187,7 +187,7 @@
         %label.content-label-sm
           Internal Comment
         - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
-          %span.internal-comment{ class: ('missing-data' if @complaint_entry.internal_comment.blank?) }
+          %p.internal-comment{ class: ('missing-data' if @complaint_entry.internal_comment.blank?) }
             = @complaint_entry.internal_comment.presence || 'No internal comment.'
         - else
           %textarea.ce-internal-comment-textarea.ce-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
