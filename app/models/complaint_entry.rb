@@ -946,8 +946,6 @@ class ComplaintEntry < ApplicationRecord
       open.where(user_id: user.id)
     when "MY PENDING TICKETS"
       where(status: 'PENDING').where(reviewer_id: user.id).or(where(status: 'PENDING').where(second_reviewer_id: user.id))
-    when "NOT MY PENDING TICKETS"
-      where(status: 'PENDING').where("complaint_entries.reviewer_id != #{user.id} AND complaint_entries.second_reviewer_id != #{user.id}")
     when "MY CLOSED COMPLAINTS"
       closed.where(user_id: user.id)
     when "MANAGER QUEUE"
