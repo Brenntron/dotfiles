@@ -212,8 +212,7 @@
     - elsif @complaint_entry.status != ComplaintEntry::PENDING
       .text-center
         - if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
-          %button.tertiary.ce-submit-button{ disabled: ([ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status),
-                                             onclick: "reopen_complaint(#{@complaint_entry.id})" }
+          %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
             Reopen
         - elsif @complaint_entry.status != ComplaintEntry::RESOLVED
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
