@@ -55,7 +55,7 @@ namespace 'AC.WebCat.Whois', (exports) ->
   keyify = (string) ->
     [key, value] = string.split(': ')
 
-    if value.trim()
+    if value? && value.trim()
       return { "#{key.replace(/&quot;/g, '').replace(/&gt;/g, '').trim()}": value.replace(/&lt;/g, '').trim() }
 
   stringifyData = (parsedData) ->
