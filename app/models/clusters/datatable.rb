@@ -1,10 +1,12 @@
+require 'beaker/verdicts'
+
 class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
   SUPPORTED_PLATFORMS = ['Umbrella', 'Meraki', 'NGFW'].freeze
   def initialize(params, user)
     @user = user
     @params = params
     @platforms = prepare_platforms_filter(params[:platform])
-    super(params, {})
+    super(params, {json_content: true})
   end
 
   def view_columns
@@ -37,9 +39,9 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
 
   def filter_records(records)
     records = records.where(cluster_type: @platforms) unless @platforms.empty?
-    records = records.where('domain REGEXP ?', @params[:regex]) if @params[:regex].present?
-    records = records.where('!IS_IPV4(domain)') if @params[:cluster_type] == 'domain'
-    records = records.where('IS_IPV4(domain)') if @params[:cluster_type] == 'ip'
+    records = records.where('web_cat_clusters.domain REGEXP ?', @params[:regex]) if @params[:regex].present?
+    records = records.where('!IS_IPV4(web_cat_clusters.domain)') if @params[:cluster_type] == 'domain'
+    records = records.where('IS_IPV4(web_cat_clusters.domain)') if @params[:cluster_type] == 'ip'
     case @params[:f]
     when 'my'
       records = records.where(domain: ClusterAssignment.get_assigned_cluster_domains_for(@user))
@@ -72,7 +74,7 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
         platform: cluster['cluster_type'],
         is_pending: cluster['status'] == 'pending' ? true : false,
         assigned_to: assignments.filter { |assignment| assignment['domain'] == cluster['domain'] }.first&.user&.cvs_username || '',
-        categories: cluster['category_ids'].nil? ? [] : JSON.parse(cluster['category_ids']),
+        categories: (cluster['category_ids'].nil? || cluster['category_ids'].empty?) ? [] : JSON.parse(cluster['category_ids']),
          }
     end
 
@@ -117,5 +119,19 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
     return [] if platforms.blank? || platforms.sort == SUPPORTED_PLATFORMS.sort
     
     platforms
+  end
+
+  def sanitize(data)
+    data.map do |record|
+      if record.is_a?(Array)
+        record.map { |td| ERB::Util.html_escape(td) }
+      elsif record.is_a?(Hash)
+        if options[:json_content]
+          record
+        else
+          record.update(record) { |_, v| ERB::Util.html_escape(v) }
+        end
+      end
+    end
   end
 end

@@ -14,10 +14,6 @@ class Bridge::SendGenericEmailEvent < Bridge::BaseMessage
                     s3_paths: s3_paths
                     })
     Delayed::Worker.logger.info("Finished Bridge::SendGenericEmailEvent with #{mail_params}")
-  rescue Exception => error
-    Delayed::Worker.logger.error('Bridge::SendGenericEmailEvent is failed')
-    Delayed::Worker.logger.error(error)
-    Delayed::Worker.logger.error(error.backtrace.join("\n"))
   end
   handle_asynchronously :post, :queue => "send_email"
 end

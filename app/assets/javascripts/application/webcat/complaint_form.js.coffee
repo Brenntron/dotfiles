@@ -15,56 +15,41 @@ $ ->
           $('#customerList').append '<option value="' + data + '"></option>'
     )
 
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/platforms_names'
-      method: 'GET'
-      success: (response) ->
-        $('#platformList').empty()
-        for platform in response.data
-          $('#platformList').append '<option value="' + platform.public_name + '"></option>'
+    AC.DataLoaders.load_plaforms().then( (platforms) =>
+      $('#platformList').empty()
+      for platform in platforms.data
+        $('#platformList').append '<option value="' + platform.public_name + '"></option>'
     )
 
+  $('#advanced-search-button').on 'click', ->
+    AC.DataLoaders.load_customer_names().then( (data) =>
+      $('#channel-input-list').empty()
+      $('#status-input-list').empty()
+      $('#resolution-input-list').empty()
+      $('#customerList').empty()
+      
+      for customer in data.data
+        $('#customerList').append '<option value="' + customer + '"></option>'
+    
+      for status in complaint_status_list
+        $('#status-input-list').append '<option value="' + status + '"></option>'
 
-  $('#webcat-advanced-search-button').on 'click', ->
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/customers_names'
-      method: 'GET'
-      dataType: 'json'
-      headers: headers
-      success: (response) ->
-        $('#channel-input-list').empty()
-        $('#status-input-list').empty()
-        $('#resolution-input-list').empty()
-        $('#customerList').empty()
+      for resolution in complaint_resolution_list
+        $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
 
-        uniques = []
+      if window.location.pathname.includes('webcat')
+        AC.WebCat.createCompanyOptions()
+        AC.WebCat.createCustomerNameOptions()
+        AC.FileRep.createPlatformOptions() #filerep and webcat use the same enddpoint to get platforms
+        AC.WebCat.createAssigneeOptions()
+        AC.WebCat.populateSearchCriteria()
 
-        for data, i in response.data
-          if uniques.indexOf(i) == -1
-            uniques.push(data)
+      if window.location.pathname.includes('file_rep')
+        AC.FileRep.createAssigneeOptions()
+        AC.FileRep.populateSearchCriteria()
+        AC.FileRep.createPlatformOptions()
 
-        for customer in uniques
-          $('#customerList').append '<option value="' + customer + '"></option>'
-
-        for status in complaint_status_list
-          $('#status-input-list').append '<option value="' + status + '"></option>'
-
-        for resolution in complaint_resolution_list
-          $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
-
-        if window.location.pathname.includes('webcat')
-          AC.WebCat.createCompanyOptions()
-          AC.WebCat.createCustomerNameOptions()
-          AC.FileRep.createPlatformOptions() #filerep and webcat use the same enddpoint to get platforms
-          AC.WebCat.createAssigneeOptions()
-          AC.WebCat.populateSearchCriteria()
-
-        if window.location.pathname.includes('file_rep')
-          AC.FileRep.createAssigneeOptions()
-          AC.FileRep.populateSearchCriteria()
-          AC.FileRep.createPlatformOptions()
-    )
-
+     )
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_company_name'
@@ -84,19 +69,17 @@ $ ->
           $('#customerCompanyList').append '<option value="' + company + '"></option>'
     )
 
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/customers_email'
-      method: 'GET'
-      dataType: 'json'
-      headers: headers
-      success: (response) ->
-        $('#customerEmailList').empty()
-        uniques = []
-        for data, i in response.data
-          if uniques.indexOf(i) == -1
-            uniques.push(data)
-        for email in uniques
-          $('#customerEmailList').append '<option value="' + email + '"></option>'
+    AC.DataLoaders.load_users_list().then( (customers) =>
+      $('#assigneeList').empty()
+      for customer in customers
+        $('#assigneeList').append '<option value="' + customer + '"></option>'
+    )
+
+
+    AC.DataLoaders.load_customers_emails().then( (emails) =>
+      $('#customerEmailList').empty()
+      for email in emails
+        $('#customerEmailList').append '<option value="' + email + '"></option>'
     )
 
   $('#new-complaint-form').submit (e) ->

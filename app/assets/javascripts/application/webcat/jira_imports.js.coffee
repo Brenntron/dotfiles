@@ -227,8 +227,7 @@ $(document).on 'click', '.imports-url-checkbox-bulk',->
   $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
   $(".imports-url-checkbox-#{issue_key}").trigger("change")
 
-$(document).on 'change', '.imports-url-checkbox',->
-
+window.assignment_buttons_toggle = ->
   checked_rows = $(".imports-url-checkbox:checked").closest('tr')
   current_username = $('input[name="current_user_name"]').val()
   can_take =     false
@@ -264,6 +263,9 @@ $(document).on 'change', '.imports-url-checkbox',->
   else
     $(".remove-assignee-toolbar-button").attr('disabled', true)
 
+$(document).on 'change', '.imports-url-checkbox', ->
+  assignment_buttons_toggle()
+
 $(document).on 'click', '.imports_check_box',->
   row = $(this).closest('tr')
   check = $('.imports_check_box')
@@ -284,6 +286,7 @@ $(document).on 'change', '.imports_check_box', ->
   resolve_button = $('.toolbar-button.close-ticket-button')
   can_retry = false
   can_resolve = false
+  includes_awaiting_verdict = false
   checked_data = checked_row_data() || [];
 
   if checked_data.length > 0
@@ -291,11 +294,16 @@ $(document).on 'change', '.imports_check_box', ->
   else
     $('.close-ticket-button').attr('disabled', true)
 
-  checked_data.each ->
-    if this.status == 'Failure'
+  for item in checked_data
+    if item.status == 'Awaiting Bast Verdict' || item.status == 'Generating Tickets'
+      includes_awaiting_verdict = true
+    if item.status == 'Failure'
       can_retry = true
-    if this.issue_status != 'Resolved'
+    if item.issue_status != 'Resolved'
       can_resolve = true
+    
+  if includes_awaiting_verdict == true
+    can_resolve = false
 
   if can_retry
     retry_button.removeAttr('disabled')
@@ -519,6 +527,7 @@ window.jira_assignee_hub = (type) ->
           if assignee
             $(selected_rows).each ->
               $(this).find('.entry-assignee').text(assignee)
+            assignment_buttons_toggle()
 
       error: (response) ->
         std_api_error(response, 'Error assigning', reload: false)

@@ -98,7 +98,7 @@
         Take Ticket
 
     %span.dropdown
-      %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Change Assignee
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
@@ -217,9 +217,11 @@
           .button-row-center
             %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
               Convert Ticket
-    %button.icon-autoresolved.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id});"}
+
+    %button.icon-autoresolved.toolbar-button.esc-tooltipped{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id});"}
       %span.toolbar-button-text
         Auto Resolve
+
   %div
     %label.toolbar-section-label
       Edit Dispute Entry
@@ -365,7 +367,7 @@
                   Submit Changes
 
     %span.dropdown
-      %button.toolbar-button.adjust-reptool-button.dropdown-button-margin-right.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
+      %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
         %span.toolbar-button-text
           Adjust RepTool BL
       .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}

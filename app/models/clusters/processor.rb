@@ -21,14 +21,14 @@ class Clusters::Processor
   end
 
   def process!
-    grouped_clusters = clusters.group_by{ |cluster| cluster[:platform] }
+    grouped_clusters = clusters.group_by{ |cluster| cluster['platform'] }
     grouped_clusters.each do |platform, clusters|
       PLATFORM_PROVIDERS[platform].new(clusters, user).process!
     end
   end
 
   def decline
-    grouped_clusters = clusters.group_by{ |cluster| cluster[:platform] }
+    grouped_clusters = clusters.group_by{ |cluster| cluster['platform'] }
     grouped_clusters.each do |platform, clusters|
       PLATFORM_PROVIDERS[platform].new(clusters, user).decline
     end

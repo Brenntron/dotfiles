@@ -65,7 +65,7 @@ $ ->
       $('#complaints-index').DataTable().state.clear()
       refresh_url()
 
-  $('#filter-cases-list a').on 'click', (e)->
+  $('.webcat-filter-dropdown #filter-cases-list a').on 'click', (e)->
     filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
     localStorage.setItem('webcat_search_type', 'standard')
@@ -230,8 +230,8 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     {icon: fav_icon, link: link, name: name}
 
-  window.current_page_is_favourite = (search_name) ->
-    {icon, name} = chosen_default_filter()
+  window.current_page_is_favorite = (search_name) ->
+    { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
       filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
       if filter_dropdown
@@ -271,14 +271,17 @@ $ ->
 
     #check if saved search favorite is set but there's no local storage saved
     else
-      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      saved_search_dropdown = $("#saved-searches-wrapper span.favorite-search-icon-active")
       if saved_search_dropdown.length > 0
         saved_name = $('#saved-searches-wrapper .active-link').text().trim()
         if search_name == saved_name
           return true
 
-  if $('#complaints-index').length || ($body.hasClass('escalations--webcat--complaint_entries-controller') && $body.hasClass('show-action'))
 
+
+
+
+  if window.location.href.includes('escalations/webcat') && !window.location.href.includes('clusters')
     ## WEBCAT ADVANCED SEARCH FUNCTIONS
 
     ## Note - this function is not currently used,
@@ -496,21 +499,15 @@ $ ->
 
 
 window.get_current_cats = (rows) ->
-  # Grab up-to-date list of categories ONE time for all entries
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-      all_categories = response
-      # Initialize category selectizes
-      $(rows).each ->
-        entry_id = $(this).attr('id')
-        entry_cats = $(this).attr('data-categories')
-        entry_status = $(this).attr('data-status')
-        load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
-        fetch_external_categories(entry_id)
+  AC.WebCat.getAUPCategories().then( (categories) =>
+    all_categories = categories
+    # Initialize category selectizes
+    $(rows).each ->
+      entry_id = $(this).attr('id')
+      entry_cats = $(this).attr('data-categories')
+      entry_status = $(this).attr('data-status')
+      load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
+      fetch_external_categories(entry_id)
   )
 
 # Compares the categories of an entry in AC to the full list of
