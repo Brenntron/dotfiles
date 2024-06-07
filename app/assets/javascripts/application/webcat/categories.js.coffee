@@ -1,4 +1,4 @@
-namespace 'AC.WebCat', (exports) ->categories.js
+namespace 'AC.WebCat', (exports) ->
 
   oneDayInMiliseconds = 86400000
 
