@@ -199,7 +199,7 @@
       .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Reopening entry...
-    - if @complaint_entry.is_important && @complaint_entry.status != ComplaintEntry::PENDING
+    - if @complaint_entry.is_important && [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
       .row.text-center
         .col-xs-6
           .ce-allow-review-container
@@ -209,14 +209,14 @@
         .col-xs-6
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
-    - elsif @complaint_entry.status != ComplaintEntry::PENDING
+    - elsif [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
       .text-center
-        - if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
-          %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
-            Reopen
-        - elsif @complaint_entry.status != ComplaintEntry::RESOLVED
-          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-            Submit
+        %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+          Submit
+    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
+      .text-center
+        %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+          Reopen
     - elsif @complaint_entry.status == ComplaintEntry::PENDING && (@complaint_entry.reviewer_id == current_user.id || @complaint_entry.second_reviewer_id == current_user.id)
       %label.content-label-sm
         Review
