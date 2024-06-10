@@ -143,7 +143,7 @@
             .ce-radio-group
               %input.resolution-radio-button#res-unchanged-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
                                                                   name: 'resolution',
-                                                                  checked: @complaint_entry.resolution.upcase == 'UNCHANGED',
+                                                                  checked: @complaint_entry.resolution&.upcase == 'UNCHANGED',
                                                                   type: 'radio',
                                                                   value: 'unchanged' }
               %label.radio-label{ for: 'res-unchanged-radio' }
@@ -151,7 +151,7 @@
             .ce-radio-group
               %input.resolution-radio-button#res-fixed-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
                                                               name: 'resolution',
-                                                              checked: @complaint_entry.resolution.upcase == 'FIXED' || @complaint_entry.resolution.blank?,
+                                                              checked: @complaint_entry.resolution&.upcase == 'FIXED' || @complaint_entry.resolution.blank?,
                                                               type: 'radio',
                                                               value: 'FIXED' }
               %label.radio-label{ for: 'res-fixed-radio' }
@@ -159,7 +159,7 @@
             .ce-radio-group
               %input.resolution-radio-button#res-invalid-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
                                                                 name: 'resolution',
-                                                                checked: @complaint_entry.resolution.upcase == 'INVALID',
+                                                                checked: @complaint_entry.resolution&.upcase == 'INVALID',
                                                                 type: 'radio',
                                                                 value: 'INVALID' }
               %label.radio-label{ for: 'res-invalid-radio' }
