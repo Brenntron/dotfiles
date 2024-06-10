@@ -141,27 +141,27 @@
         - else
           .ce-radio-group-wrapper
             .ce-radio-group
-              %input.resolution-radio-button#res-unchanged-radio{ disabled: (true if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
+              %input.resolution-radio-button#res-unchanged-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
                                                                   name: 'resolution',
-                                                                  checked: @complaint_entry.resolution == 'unchanged',
+                                                                  checked: @complaint_entry.resolution.upcase == 'UNCHANGED',
                                                                   type: 'radio',
                                                                   value: 'unchanged' }
               %label.radio-label{ for: 'res-unchanged-radio' }
                 Unchanged
             .ce-radio-group
-              %input.resolution-radio-button#res-fixed-radio{ disabled: (true if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
+              %input.resolution-radio-button#res-fixed-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
                                                               name: 'resolution',
-                                                              checked: @complaint_entry.resolution == 'fixed' || @complaint_entry.resolution.blank?,
+                                                              checked: @complaint_entry.resolution.upcase == 'FIXED' || @complaint_entry.resolution.blank?,
                                                               type: 'radio',
-                                                              value: 'fixed' }
+                                                              value: 'FIXED' }
               %label.radio-label{ for: 'res-fixed-radio' }
                 Fixed
             .ce-radio-group
-              %input.resolution-radio-button#res-invalid-radio{ disabled: (true if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)),
+              %input.resolution-radio-button#res-invalid-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
                                                                 name: 'resolution',
-                                                                checked: @complaint_entry.resolution == 'invalid',
+                                                                checked: @complaint_entry.resolution.upcase == 'INVALID',
                                                                 type: 'radio',
-                                                                value: 'invalid' }
+                                                                value: 'INVALID' }
               %label.radio-label{ for: 'res-invalid-radio' }
                 Invalid
 

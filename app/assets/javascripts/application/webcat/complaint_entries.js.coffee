@@ -40,9 +40,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     return false unless submitted_ip_uri
 
     # The fixed resolution requires a change to the category list and at least one category.
-    can_submit = if resolution_option == 'fixed' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
+    can_submit = if resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
                    true
-                 else if ['unchanged', 'invalid'].includes(resolution_option) && change_store.getChanges().length == 0
+                 else if ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
                    true
                  else
                    false
@@ -826,7 +826,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('.ce-submit-button').prop('disabled', !verifySubmit())
 
     $(document).on 'change', '.resolution-radio-button, .review-radio-button', ->
-      resolution_option = $(this).val().toLowerCase()
+      resolution_option = $(this).val()
       disable_submit = !verifySubmit()
 
       $('.ce-submit-button').prop('disabled', disable_submit)
