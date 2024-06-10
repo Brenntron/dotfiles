@@ -54,13 +54,36 @@ $ ->
       $('#complaints-index').DataTable().state.clear()
       refresh_url()
 
+
   $('.webcat-filter-dropdown #filter-cases-list a').on 'click', (e)->
+    e.preventDefault()
     filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
     localStorage.setItem('webcat_search_type', 'standard')
     localStorage.setItem('webcat_search_name', filter_url)
     localStorage.removeItem('webcat_search_conditions')
     $('#complaints-index').DataTable().state.clear()
+    $('.search-condition').remove()
+
+    new_url = '/escalations/webcat/complaints' + filter_url
+    if $('#complaints-index').length
+      # manually change the selected filter
+      $('#filter-cases-list li').removeClass('selected')
+      selected = $(this).parent().addClass('selected')
+      # update address bar with new filter without refreshing the page
+      window.history.replaceState( {} , 'Web Categorization Complaints - Analyst Console', new_url )
+
+      # hiding loading tbody until data is fetched
+      # (prevent errant clicks while new filter is loading)
+      $('#complaints-index tbody').addClass('hide')
+      $('#complaints-index').DataTable().destroy()
+      $('#filter-complaints').dropdown('toggle')
+      window.build_complaints_table()
+
+    else
+      # need to go to index (useful if person was on show page, research page, etc)
+      window.location.assign(new_url)
+
 
 
   window.set_webcat_advanced = () ->
@@ -140,6 +163,7 @@ $ ->
   window.webcat_refresh = ()->
     refresh_webcat_localStorage()
     refresh_url()
+    # add 'selected' to default filter
 
 
   refresh_url = (href) ->
@@ -156,7 +180,6 @@ $ ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
-    $('#complaints-index').DataTable().state.clear()
 
 
 
@@ -187,6 +210,7 @@ $ ->
     )
 
 
+  # I don't see this being used anywhere
   window.use_user_preference_filter = () ->
     return if window.location.pathname != '/escalations/webcat/complaints'
 
