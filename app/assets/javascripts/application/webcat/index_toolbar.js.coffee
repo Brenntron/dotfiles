@@ -139,9 +139,14 @@ window.sort_webcat_index = () ->
 
 
 window.toggle_direct_sort = (col, field, button) ->
+
   current_order = $(button).attr('data-sort')
-  window.unset_active_sort()
   if $(button).hasClass('active-sort')
+    active_button = true
+
+  window.unset_active_sort()
+
+  if active_button == true
     # if button is currently active, then toggle to opposite direction on click
     # otherwise the displayed order on the button is the desired order to change to
     if current_order == 'asc'
