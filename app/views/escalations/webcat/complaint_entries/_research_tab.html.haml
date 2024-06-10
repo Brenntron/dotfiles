@@ -119,10 +119,10 @@
             %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
                                                        disabled: @complaint_entry.subdomain.blank? ||
                                                         @complaint_entry.status == ComplaintEntry::PENDING ||
-                                                        @complaint_entry.domain == @input_ip_uri,
+                                                        @complaint_entry.subdomain == @input_ip_uri,
                                                        onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
               subdomain
-            %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
+            %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.uri },
                                                       disabled: true,
                                                       onclick: "update_uri_input('#{@complaint_entry.uri}', 'original uri')" }
               original uri

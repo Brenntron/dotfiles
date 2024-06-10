@@ -675,26 +675,38 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         when 'original uri'
           $original.prop('disabled', true)
 
-          unless $('#ce_ip_uri_subdomain').attr('data-val') == ''
+          unless $subdomain.attr('data-val') == '' || $subdomain.attr('data-val') == ''
             $subdomain.prop('disabled', false)
 
           break
         when 'subdomain'
           $subdomain.prop('disabled', true)
 
-          unless $('#ce_ip_uri_original').attr('data-val') == ''
+          unless $original.attr('data-val') == '' || $original.attr('data-val') == '/'
             $original.prop('disabled', false)
 
           break
     else
       $domain.prop('disabled', true)
-
-      $subdomain.prop('disabled', false) if $subdomain.data('val')
-      $original.prop('disabled', false) if $original.data('val')
+      $subdomain.prop('disabled', ($subdomain.attr('data-val') != ''))
+      $original.prop('disabled', ($original.data('path') != '' || $original.data('path') != '/'))
 
     disable_submit = !verifySubmit()
 
     $('.ce-submit-button').prop('disabled', disable_submit)
+    check_ip_uri_input(value)
+
+  check_ip_uri_input = (text) ->
+    $domain = $('#ce_ip_uri_domain')
+    $subdomain = $('#ce_ip_uri_subdomain')
+    $original = $('#ce_ip_uri_original')
+    domain_text = $domain.data('val')
+    subdomain_text = $subdomain.data('val')
+    original_text = $original.data('val')
+
+    $domain.prop('disabled', text == domain_text)
+    $subdomain.prop('disabled', text == "#{subdomain_text}.#{domain_text}")
+    $original.prop('disabled', text == original_text)
 
   window.submit_show_page_changes = (entry_id) ->
     std_msg_ajax(
@@ -840,18 +852,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     get_ce_show_entry_history()
 
     $(document).on 'change', '.ce-ip-uri-input', ->
-      $domain = $('#ce_ip_uri_domain')
-      $subdomain = $('#ce_ip_uri_subdomain')
-      $original = $('#ce_ip_uri_original')
       text = $(this).val()
-      domain_text = $domain.data('val')
-      subdomain_text = $subdomain.data('val')
-      original_text = $original.data('val')
-
-      $domain.prop('disabled', true) if text == domain_text
-      $subdomain.prop('disabled', true) if text == "#{subdomain_text}.#{domain_text}"
-      $original.prop('disabled', true) if text == "#{subdomain_text}.#{domain_text}#{original_text}"
-
+      check_ip_uri_input(text)
 
     if resolution_option
       get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
