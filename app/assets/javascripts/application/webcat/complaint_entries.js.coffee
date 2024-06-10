@@ -839,6 +839,20 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     get_current_categories()
     get_ce_show_entry_history()
 
+    $(document).on 'change', '.ce-ip-uri-input', ->
+      $domain = $('#ce_ip_uri_domain')
+      $subdomain = $('#ce_ip_uri_subdomain')
+      $original = $('#ce_ip_uri_original')
+      text = $(this).val()
+      domain_text = $domain.data('val')
+      subdomain_text = $subdomain.data('val')
+      original_text = $original.data('val')
+
+      $domain.prop('disabled', true) if text == domain_text
+      $subdomain.prop('disabled', true) if text == "#{subdomain_text}.#{domain_text}"
+      $original.prop('disabled', true) if text == "#{subdomain_text}.#{domain_text}#{original_text}"
+
+
     if resolution_option
       get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
         $('.ce-customer-comment-textarea').val(resolution_comment) if resolution_comment != ''

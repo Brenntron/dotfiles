@@ -111,11 +111,15 @@
           .ce-resolved-ip-uri-button-wrapper
             %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
                                                     # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
-                                                    disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain || @complaint_entry.status == ComplaintEntry::PENDING,
+                                                    disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain ||
+                                                      @complaint_entry.status == ComplaintEntry::PENDING ||
+                                                      @complaint_entry.domain == @input_ip_uri,
                                                     onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
               domain
             %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
-                                                       disabled: @complaint_entry.subdomain.blank? || @complaint_entry.status == ComplaintEntry::PENDING,
+                                                       disabled: @complaint_entry.subdomain.blank? ||
+                                                        @complaint_entry.status == ComplaintEntry::PENDING ||
+                                                        @complaint_entry.domain == @input_ip_uri,
                                                        onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
               subdomain
             %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
