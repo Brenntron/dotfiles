@@ -145,7 +145,7 @@
                                                                   name: 'resolution',
                                                                   checked: @complaint_entry.resolution&.upcase == 'UNCHANGED',
                                                                   type: 'radio',
-                                                                  value: 'unchanged' }
+                                                                  value: 'UNCHANGED' }
               %label.radio-label{ for: 'res-unchanged-radio' }
                 Unchanged
             .ce-radio-group
@@ -199,25 +199,7 @@
       .gear-loader-wrapper
         = inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Reopening entry...
-    - if @complaint_entry.is_important && [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
-      .row.text-center
-        .col-xs-6
-          .ce-allow-review-container
-            %input{ type: 'checkbox', id: 'self_review', checked: (true if current_user.enabled_self_review) }
-            %label{ for: 'self_review' }
-              Allow Self Review
-        .col-xs-6
-          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-            Submit
-    - elsif [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
-      .text-center
-        %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-          Submit
-    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
-      .text-center
-        %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
-          Reopen
-    - elsif @complaint_entry.status == ComplaintEntry::PENDING && (@complaint_entry.reviewer_id == current_user.id || @complaint_entry.second_reviewer_id == current_user.id)
+    - if @complaint_entry.status == ComplaintEntry::PENDING
       %label.content-label-sm
         Review
       .ce-radio-group-wrapper
@@ -233,6 +215,25 @@
                                                            value: 'decline' }
           %label.radio-label{ for: 'review-decline-radio' }
             Decline
+    - if @complaint_entry.is_important && @complaint_entry.status == ComplaintEntry::PENDING && @complaint_entry.user_id == current_user.id
+      .row.text-center
+        .col-xs-6
+          .ce-allow-review-container
+            %input{ type: 'checkbox', id: 'self_review', checked: current_user.enabled_self_review }
+            %label{ for: 'self_review' }
+              Allow Self Review
+        .col-xs-6
+          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+            Submit
+    - elsif [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
+      .text-center
+        %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+          Submit
+    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
+      .text-center
+        %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+          Reopen
+    - elsif @complaint_entry.status == ComplaintEntry::PENDING && [@complaint_entry.reviewer_id, @complaint_entry.second_reviewer_id].include?(current_user.id)
       .text-center
         %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
           Submit

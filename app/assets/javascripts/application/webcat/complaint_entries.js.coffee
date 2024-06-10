@@ -1,9 +1,11 @@
 if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   #set empty string header so it can be updated on document ready
   current_user_id = 0
-  headers = ''
   entry_id = 0
+  headers = ''
+  initial_status = ''
   resolution_option = ''
+  review_option = ''
   # We do not want unsubmitted changes to persist across page reloads
   # So we store themm in memory
   change_store = do () ->
@@ -30,24 +32,39 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     }
 
   verifySubmit = () ->
-    return true if ['commit', 'decline'].includes(resolution_option)
+    if initial_status == 'PENDING'
+      return true if ['commit', 'decline'].includes(review_option) && canReview()
+    else
+      submitted_ip_uri = $('.ce-ip-uri-input').val()
 
-    submitted_ip_uri = $('.ce-ip-uri-input').val()
+      # All resolution options, as well as the commit review option, requite a user comment
+      # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
+      # then it can only be declined.
+      return false unless submitted_ip_uri
 
-    # All resolution options, as well as the commit review option, requite a user comment
-    # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
-    # then it can only be declined.
-    return false unless submitted_ip_uri
+      # The fixed resolution requires a change to the category list and at least one category.
+      can_submit = if resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
+                     true
+                   else if ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
+                     true
+                   else
+                     false
 
-    # The fixed resolution requires a change to the category list and at least one category.
-    can_submit = if resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
-                   true
-                 else if ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
-                   true
-                 else
-                   false
+      return can_submit
 
-    return can_submit
+  canReview = () ->
+    allow_self_review = $('#self_review')
+
+    # #self_review only appears if the current user is the assignee.
+    # If there is no #self_review, then the current user is a reviewer and can review.
+    if allow_self_review.length > 0
+      return allow_self_review.prop('checked')
+    else
+      true
+
+  toggleSubmitButton = () ->
+    can_submit = verifySubmit()
+    $('.ce-submit-button').prop('disabled', !can_submit)
 
   window.set_tags = (tags, entry_status) ->
     split_tags = tags.split(', ')
@@ -814,8 +831,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     current_user_id = Number($('input[name="current_user_id"]').val())
     entry_id = Number($('#complaint_entry_id')[0].innerText)
     headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-    resolution_option = $('.ce-radio-group > .resolution-radio-button:checked').val()
+    initial_status = $('.status-wrapper > .top-info-data').text()
+    resolution_option = $('.resolution-radio-button:checked').val()
     resolution_comment = $('.ce-customer-comment-textarea').val()
+    review_option = $('.review-radio-button:checked').val()
 
     get_current_categories()
     get_ce_show_entry_history()
@@ -825,13 +844,15 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('.ce-customer-comment-textarea').val(resolution_comment) if resolution_comment != ''
         $('.ce-submit-button').prop('disabled', !verifySubmit())
 
-    $(document).on 'change', '.resolution-radio-button, .review-radio-button', ->
+    $(document).on 'change', '.resolution-radio-button', ->
       resolution_option = $(this).val()
-      disable_submit = !verifySubmit()
+      toggleSubmitButton()
 
-      $('.ce-submit-button').prop('disabled', disable_submit)
+    $(document).on 'change', '.review-radio-button', ->
+      review_option = $(this).val()
+      toggleSubmitButton()
 
-    $(document).on 'change', '.ce-input', ->
+    $(document).on 'change', '.ce-input, #self_review', ->
       # The onItemRemove and onItemAdd events for the selectize dropdowns will handle the submit button for categories
       unless $(this).attr('id') == 'ce_categories_select'
         disable_submit = !verifySubmit()
