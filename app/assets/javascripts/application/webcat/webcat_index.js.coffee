@@ -672,7 +672,7 @@ build_data = () ->
     webcat_search_type = 'standard'
     urlParams = new URLSearchParams(location.search);
 
-  if webcat_search_type?
+  if webcat_search_type? && webcat_search_type != 'undefined'
     switch(webcat_search_type)
       when 'advanced'
         data = {
@@ -742,7 +742,7 @@ build_data = () ->
     else
       data = {
         search_type: 'standard'
-        search_name: 'all'
+        search_name: 'MY OPEN COMPLAINTS'
       }
       build_header(data)
       return data
@@ -797,6 +797,7 @@ window.build_header = (data) ->
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
       search_name = search_name.replace(/_|%20/g, " ")
+
       reset_icon = get_reset_icon(search_name, search_type)
       new_header =
         '<div>' +
@@ -881,12 +882,12 @@ set_icon_and_url_if_current_page_is_favorite = (search_name, search_type) ->
   #bug fix - set favorited link as selected in case filters were just cleared
   $('.favorite-search-icon-active').parent('li').addClass 'selected'
   #update url if favorite is a standard search
-  if search_type == 'standard'
+  if search_type == 'standard' && $('.favorite-search-icon-active').length > 0
     search_url = $('.favorite-search-icon-active').siblings('.active-link').attr('href')
     window.history.pushState('', '', "/escalations/webcat/complaints#{search_url}");
 
 #for filters and saved searches we need to check if currently on the favorite page since it's the index
-get_reset_icon = (search_name, search_type, webcat_search_name) ->
+get_reset_icon = (search_name, search_type) ->
   if current_page_is_favorite(search_name)
     reset_icon_class = 'hidden style="display: none"'
     set_icon_and_url_if_current_page_is_favorite(search_name, search_type)
