@@ -690,11 +690,18 @@ build_data = () ->
         if location.search != ''
           urlParams = new URLSearchParams(location.search);
           search_name = urlParams.get('f')
-        else if webcat_search_name?
-          search_name = webcat_search_name.split('=').pop()
         else
-          # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
-          search_name = "MY OPEN TICKETS"
+          if webcat_search_name?
+            search_name = webcat_search_name.split('=').pop()
+          else
+            # this is our default if there is no fav
+            search_name = "MY OPEN TICKETS"
+            webcat_search_name = "?f=" + search_name
+
+          # add correct url to address bar & highlight active filter
+          window.history.pushState('', '', "/escalations/webcat/complaints#{webcat_search_name}")
+          loaded_filter = $('#filter-cases-list').find('[href="' + webcat_search_name + '"]').parent()
+          $(loaded_filter).addClass('selected')
 
         data = {
           search_type: webcat_search_type
@@ -742,6 +749,11 @@ build_data = () ->
         search_type: 'standard'
         search_name: 'MY OPEN COMPLAINTS'
       }
+      webcat_search_name = "?f=MY OPEN COMPLAINTS"
+      window.history.pushState('', '', "/escalations/webcat/complaints#{webcat_search_name}")
+      loaded_filter = $('#filter-cases-list').find('[href="' + webcat_search_name + '"]').parent()
+      $(loaded_filter).addClass('selected')
+
       build_header(data)
       return data
 
