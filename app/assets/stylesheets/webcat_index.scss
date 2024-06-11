@@ -507,6 +507,8 @@ table.dataTable tbody tr.submitting-entry {
 
 .sort-button {
   background-image: url(image_path('icon_sort_grey.svg'));
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .open .sort-button {
@@ -541,6 +543,9 @@ table.dataTable tbody tr.submitting-entry {
 
 #sort-btn-group {
   float: left;
+  .toolbar-button:focus {
+    outline: 1px #7ad2f5 solid;
+  }
 }
 .direct-sorter {
   padding-bottom: 0;
@@ -556,6 +561,9 @@ table.dataTable tbody tr.submitting-entry {
 }
 .sort-asc {
   background-image: url(image_path('icon_sort_asc_grey.svg'));
+}
+.active-sort {
+  background-color: #b0d7e7;
 }
 #webcat-index-table-sort-dropdown {
   min-width: 260px;

@@ -3,24 +3,19 @@
 $ ->
   # call below and related functions only if we're on webcat index
   if $('#complaints-index').length
-
     # Create index table
     url = $('#complaints-index').data('source')
     $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
 
 #### New complaints index table setup
-build_complaints_table = (url) ->
-
+window.build_complaints_table = (url) ->
   #get count of entries per page from localstorage, set to 25 if none found
   entries_per_page = localStorage.getItem 'webcat_entries_per_page'
   if entries_per_page == null then entries_per_page = 25
 
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
-      # Get display prefs
-      get_display_prefs()
-
       input = $('.dataTables_filter input').unbind()
       self = @api()
 
@@ -65,6 +60,18 @@ build_complaints_table = (url) ->
         webcat_refresh()
 
       complete: ->
+        # Keep this function at top of complete
+        $('#complaints-index tbody').removeClass('hide')
+
+        # enable the sort buttons
+        $('#webcat-index-table-sort-button').removeAttr('disabled')
+        $('#sort-btn-group button').removeAttr('disabled')
+
+        # Get display prefs
+        get_display_prefs()
+        # Set active sort, unless its already set
+        if $('.active-sort').length < 1
+          window.set_active_sort()
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
@@ -120,6 +127,7 @@ build_complaints_table = (url) ->
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
+
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
 
@@ -144,8 +152,8 @@ build_complaints_table = (url) ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
-    # default ordering - keep on hidden age column
-    order: [ 10, 'dec' ]
+    # default ordering - see below function if columns of dt change. Should default to user's last sort OR age integer if none exists
+    order: get_last_sort_order()
     columnDefs: [
       {
         targets: [10,11,12,13,14,15,16,17]
@@ -688,7 +696,7 @@ build_data = () ->
         else
           # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
           search_name = "MY TICKETS"
-        refresh_localStorage()
+        refresh_webcat_localStorage()
         data = {
           search_type: webcat_search_type
           search_name: search_name
@@ -707,7 +715,7 @@ build_data = () ->
     fav = $('.favorite-search-icon-active')
     if fav.length > 0
       search_name = $('#saved-searches-wrapper .active-link').text().trim()
-      refresh_localStorage()
+      refresh_webcat_localStorage()
       data = {
         search_type: 'named'
         search_name: search_name
@@ -723,7 +731,7 @@ build_data = () ->
       address = $(link).attr('href')
       filter = address.split('=').pop();
 
-      refresh_localStorage()
+      refresh_webcat_localStorage()
       data = {
         search_type: 'standard'
         search_name: filter
@@ -747,15 +755,37 @@ build_data = () ->
   # If the search_type is 'named' or 'advanced', a subheader with
   # search definitions will be made with the build_subheader function
 ###
-build_header = (data) ->
+window.build_header = (data) ->
   container = $('#webcat_searchref_container')
-  if data != undefined && container.length > 0
-    {search_type, search_name} = data
 
-    try
-      webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
-    catch e
-      webcat_search_conditions = {}
+  if container.length > 0
+    if data != undefined
+      {search_type, search_name} = data
+
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+    else
+      # check local storage - can hit here if we are updating table without refreshing page
+      # all the catches in case local storage doesn't have these values
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+
+      try
+        search_type = localStorage.webcat_search_type
+      catch e
+        search_type = ''
+
+      try
+        search_name = localStorage.webcat_search_name
+      catch e
+        search_name = ''
+
+      if search_name.includes('?f=')
+        search_name = search_name.replace('?f=', '')
 
     if search_type == 'standard'
 
@@ -894,3 +924,12 @@ set_icon_for_favorite_filter = (filter_name) ->
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
     saved_search.addClass 'active-link'
 
+
+window.get_last_sort_order = () ->
+  webcat_sort_order = localStorage.getItem 'webcat_sort_order'
+  if webcat_sort_order?
+    sort_arr = webcat_sort_order.split(',')
+    webcat_sort_order = [+sort_arr[0], sort_arr[1]]
+  else
+    webcat_sort_order = [10, 'desc']
+  return webcat_sort_order

@@ -43,6 +43,7 @@ Rails.application.routes.draw do
       end
       resources :complaint_entries, only: [:index, :show, :update] do
         collection do
+          get :datatable
           get :serve_image
         end
       end

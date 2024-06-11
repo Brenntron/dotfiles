@@ -54,13 +54,36 @@ $ ->
       $('#complaints-index').DataTable().state.clear()
       refresh_url()
 
+
   $('.webcat-filter-dropdown #filter-cases-list a').on 'click', (e)->
+    e.preventDefault()
     filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
     localStorage.setItem('webcat_search_type', 'standard')
     localStorage.setItem('webcat_search_name', filter_url)
     localStorage.removeItem('webcat_search_conditions')
     $('#complaints-index').DataTable().state.clear()
+    $('.search-condition').remove()
+
+    new_url = '/escalations/webcat/complaints' + filter_url
+    if $('#complaints-index').length
+      # manually change the selected filter
+      $('#filter-cases-list li').removeClass('selected')
+      selected = $(this).parent().addClass('selected')
+      # update address bar with new filter without refreshing the page
+      window.history.replaceState( {} , 'Web Categorization Complaints - Analyst Console', new_url )
+
+      # hiding loading tbody until data is fetched
+      # (prevent errant clicks while new filter is loading)
+      $('#complaints-index tbody').addClass('hide')
+      $('#complaints-index').DataTable().destroy()
+      $('#filter-complaints').dropdown('toggle')
+      window.build_complaints_table()
+
+    else
+      # need to go to index (useful if person was on show page, research page, etc)
+      window.location.assign(new_url)
+
 
 
   window.set_webcat_advanced = () ->
@@ -140,6 +163,7 @@ $ ->
   window.webcat_refresh = ()->
     refresh_webcat_localStorage()
     refresh_url()
+    # add 'selected' to default filter
 
 
   refresh_url = (href) ->
@@ -156,7 +180,6 @@ $ ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
-    $('#complaints-index').DataTable().state.clear()
 
 
 
@@ -187,6 +210,7 @@ $ ->
     )
 
 
+  # I don't see this being used anywhere
   window.use_user_preference_filter = () ->
     return if window.location.pathname != '/escalations/webcat/complaints'
 
@@ -264,9 +288,7 @@ $ ->
 
 
 
-  if $('#complaints-index').length
-
-
+  if window.location.href.includes('escalations/webcat') && !window.location.href.includes('clusters')
     ## WEBCAT ADVANCED SEARCH FUNCTIONS
 
     ## Note - this function is not currently used,
@@ -484,21 +506,15 @@ $ ->
 
 
 window.get_current_cats = (rows) ->
-  # Grab up-to-date list of categories ONE time for all entries
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-      all_categories = response
-      # Initialize category selectizes
-      $(rows).each ->
-        entry_id = $(this).attr('id')
-        entry_cats = $(this).attr('data-categories')
-        entry_status = $(this).attr('data-status')
-        load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
-        fetch_external_categories(entry_id)
+  AC.WebCat.getAUPCategories().then( (categories) =>
+    all_categories = categories
+    # Initialize category selectizes
+    $(rows).each ->
+      entry_id = $(this).attr('id')
+      entry_cats = $(this).attr('data-categories')
+      entry_status = $(this).attr('data-status')
+      load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
+      fetch_external_categories(entry_id)
   )
 
 # Compares the categories of an entry in AC to the full list of

@@ -154,7 +154,6 @@ window.categorize_clusters = (review_action) ->
           duplicate['categories'] = category_values
 
     clusters.push(selected_row)
-    clusters = clusters.concat(selected_row.duplicates) if selected_row.duplicates
 
   data["clusters"] = JSON.stringify(clusters)
 
@@ -184,6 +183,7 @@ window.categorize_clusters = (review_action) ->
       url: url
       method: 'POST'
       headers: window.headers()
+      data: data
       success: (response) ->
         loader.addClass('hidden')
         json = $.parseJSON(response)
@@ -443,7 +443,7 @@ window.populate_cat_select = ->
   setTimeout (->
     data = $("#clusters-index").DataTable().data()
     for cluster in data
-      if cluster.is_pending == 'true'
+      if cluster.is_pending == true
         escaped_domain = cluster.domain.replaceAll('.', '_')
         cat_select = $("##{escaped_domain}_#{cluster.platform}_categories")[0]
         if cat_select
@@ -1071,6 +1071,7 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    stateSave: true
     pagingType: 'full_numbers'
     order: [ [
       6
@@ -1124,7 +1125,7 @@ $ ->
         render: ( data )->
 
           { is_important } = data
-          if is_important == 'true'
+          if is_important == true
             '<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
       }
       {
@@ -1186,7 +1187,7 @@ $ ->
         className: 'category-column'
         render: (data, type, full, meta) ->
           escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
-          "<select id='#{escaped_domain}_#{full.platform}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending == 'true' then 'disabled'}>"
+          "<select id='#{escaped_domain}_#{full.platform}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending == true then 'disabled'}>"
       }
       {
         data: 'cluster_id'
@@ -1194,7 +1195,7 @@ $ ->
         width: '70px'
         defaultContent: '<span></span>'
         render: (data, type, full, meta) ->
-          if full.is_pending == 'true'
+          if full.is_pending == true
             return "<div class='cluster-btn-container'>
                       <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{meta.row})' type='button' title='Confirm Changes' />
                       <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{meta.row})' type='button' title='Decline Updates' />

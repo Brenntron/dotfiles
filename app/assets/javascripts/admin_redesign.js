@@ -8,6 +8,7 @@
 //= require jquery-ui
 //= require datatables
 //= require util
+//= require data_loaders
 //= require selectize
 //= require tooltipster.bundle.min
 //= require tooltipster-custom
