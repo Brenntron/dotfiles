@@ -694,8 +694,8 @@ build_data = () ->
           search_name = webcat_search_name.split('=').pop()
         else
           # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
-          search_name = "MY TICKETS"
-        refresh_webcat_localStorage()
+          search_name = "MY OPEN TICKETS"
+
         data = {
           search_type: webcat_search_type
           search_name: search_name
@@ -706,6 +706,7 @@ build_data = () ->
           search_name: webcat_search_name
         }
 
+
     build_header(data)
     return data
 
@@ -714,7 +715,6 @@ build_data = () ->
     fav = $('.favorite-search-icon-active')
     if fav.length > 0
       search_name = $('#saved-searches-wrapper .active-link').text().trim()
-      refresh_webcat_localStorage()
       data = {
         search_type: 'named'
         search_name: search_name
@@ -729,8 +729,6 @@ build_data = () ->
       link = $(fav[0]).prev()
       address = $(link).attr('href')
       filter = address.split('=').pop();
-
-      refresh_webcat_localStorage()
       data = {
         search_type: 'standard'
         search_name: filter
@@ -738,7 +736,7 @@ build_data = () ->
       build_header(data)
       return data
 
-    #no saved settings, no filter, currently loads All Tickets by default
+    #no saved settings, no filter, load My Open Complaints by default
     else
       data = {
         search_type: 'standard'
