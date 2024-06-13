@@ -199,11 +199,6 @@
                                                            placeholder: 'Internal note for choosing categories' }
             = @complaint_entry.internal_comment
 
-    .loader-div.hidden#reopen_loader
-      .gear-loader-wrapper
-        = inline_svg 'icon_gears_loader.svg'
-      %span.loader-msg Reopening entry...
-
     - if @complaint_entry.status == ComplaintEntry::PENDING
       .row
         .col-xs-6
@@ -227,14 +222,19 @@
               %input{ type: 'checkbox', id: 'self_review', checked: current_user.enabled_self_review }
               %label{ for: 'self_review' }
                 Allow Self Review
+    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && [ComplaintEntry::DUPLICATE, nil].exclude?(@complaint_entry.resolution)
+      .loader-div.hidden#reopen_loader
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg'
+        %span.loader-msg Reopening entry...
 
-
-    .row
-      .col-xs-12.text-center
-        - if @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
+      .row
+        .col-xs-12.text-center
           %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
             Reopen
-        - elsif [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
+    - else
+      .row
+        .col-xs-12.text-center
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
 
