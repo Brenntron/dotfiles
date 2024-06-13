@@ -181,6 +181,8 @@ window.build_complaints_table = (url) ->
                 complaint_channel = 'TI Webform'
               else if full.complaint_source == 'talos-intelligence-api'
                 complaint_channel = 'TI API'
+            else if full.channel == 'wbnp'
+              complaint_channel = 'WBNP'
             else
               complaint_channel = full.channel
           else
@@ -802,7 +804,7 @@ window.build_header = (data) ->
       if search_name == 'all'
         search_name = "MY OPEN COMPLAINTS"
 
-      search_name = search_name.toLowerCase().replace('complaints', 'tickets')
+      search_name = search_name.toLowerCase().replace('complaints', 'tickets').replace('wbnp', 'WBNP')
 
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
