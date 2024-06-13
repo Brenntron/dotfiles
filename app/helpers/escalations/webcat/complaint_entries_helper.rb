@@ -66,6 +66,11 @@ module Escalations::Webcat::ComplaintEntriesHelper
     end
   end
 
+  def resolution(complaint_entry)
+    resolution = complaint_entry.resolution.presence || 'Duplicate'
+    resolution.capitalize
+  end
+
   def render_tags(tags)
     if !tags.empty?
       content_tag :div, id: 'ce_tags' do

@@ -141,7 +141,7 @@
         %label.content-label-sm
           Resolution
         - if [ComplaintEntry::RESOLVED, ComplaintEntry::STATUS_COMPLETED].include?(@complaint_entry.status)
-          %p.resolution= @complaint_entry.resolution.capitalize
+          %p.resolution= resolution(@complaint_entry)
         - else
           .ce-radio-group-wrapper
             .ce-radio-group
