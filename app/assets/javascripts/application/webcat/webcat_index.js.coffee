@@ -673,7 +673,7 @@ build_data = () ->
     webcat_search_type = 'standard'
     urlParams = new URLSearchParams(location.search);
 
-  if webcat_search_type?
+  if webcat_search_type? && webcat_search_type != 'undefined'
     switch(webcat_search_type)
       when 'advanced'
         data = {
@@ -691,12 +691,19 @@ build_data = () ->
         if location.search != ''
           urlParams = new URLSearchParams(location.search);
           search_name = urlParams.get('f')
-        else if webcat_search_name?
-          search_name = webcat_search_name.split('=').pop()
         else
-          # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
-          search_name = "MY TICKETS"
-        refresh_webcat_localStorage()
+          if webcat_search_name?
+            search_name = webcat_search_name.split('=').pop()
+          else
+            # this is our default if there is no fav
+            search_name = "MY OPEN TICKETS"
+            webcat_search_name = "?f=" + search_name
+
+          # add correct url to address bar & highlight active filter
+          window.history.pushState('', '', "/escalations/webcat/complaints#{webcat_search_name}")
+          loaded_filter = $('#filter-cases-list').find('[href="' + webcat_search_name + '"]').parent()
+          $(loaded_filter).addClass('selected')
+
         data = {
           search_type: webcat_search_type
           search_name: search_name
@@ -707,6 +714,7 @@ build_data = () ->
           search_name: webcat_search_name
         }
     data.allow_self_review = $("#self_review").prop('checked')
+
     build_header(data)
     return data
 
@@ -715,7 +723,6 @@ build_data = () ->
     fav = $('.favorite-search-icon-active')
     if fav.length > 0
       search_name = $('#saved-searches-wrapper .active-link').text().trim()
-      refresh_webcat_localStorage()
       data = {
         search_type: 'named'
         search_name: search_name
@@ -730,8 +737,6 @@ build_data = () ->
       link = $(fav[0]).prev()
       address = $(link).attr('href')
       filter = address.split('=').pop();
-
-      refresh_webcat_localStorage()
       data = {
         search_type: 'standard'
         search_name: filter
@@ -739,12 +744,17 @@ build_data = () ->
       build_header(data)
       return data
 
-    #no saved settings, no filter, currently loads All Tickets by default
+    #no saved settings, no filter, load My Open Complaints by default
     else
       data = {
         search_type: 'standard'
-        search_name: 'all'
+        search_name: 'MY OPEN COMPLAINTS'
       }
+      webcat_search_name = "?f=MY OPEN COMPLAINTS"
+      window.history.pushState('', '', "/escalations/webcat/complaints#{webcat_search_name}")
+      loaded_filter = $('#filter-cases-list').find('[href="' + webcat_search_name + '"]').parent()
+      $(loaded_filter).addClass('selected')
+
       build_header(data)
       return data
 
@@ -798,6 +808,7 @@ window.build_header = (data) ->
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
       search_name = search_name.replace(/_|%20/g, " ")
+
       reset_icon = get_reset_icon(search_name, search_type)
       new_header =
         '<div>' +
@@ -882,12 +893,12 @@ set_icon_and_url_if_current_page_is_favorite = (search_name, search_type) ->
   #bug fix - set favorited link as selected in case filters were just cleared
   $('.favorite-search-icon-active').parent('li').addClass 'selected'
   #update url if favorite is a standard search
-  if search_type == 'standard'
+  if search_type == 'standard' && $('.favorite-search-icon-active').length > 0
     search_url = $('.favorite-search-icon-active').siblings('.active-link').attr('href')
     window.history.pushState('', '', "/escalations/webcat/complaints#{search_url}");
 
 #for filters and saved searches we need to check if currently on the favorite page since it's the index
-get_reset_icon = (search_name, search_type, webcat_search_name) ->
+get_reset_icon = (search_name, search_type) ->
   if current_page_is_favorite(search_name)
     reset_icon_class = 'hidden style="display: none"'
     set_icon_and_url_if_current_page_is_favorite(search_name, search_type)
