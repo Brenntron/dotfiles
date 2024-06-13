@@ -6,6 +6,7 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
     respond_to do |format|
       format.html
     end
+    @current_user_id = current_user[:id]
   end
 
   def show

@@ -49,7 +49,8 @@ window.build_complaints_table = (url) ->
     select: true
     ajax:
       url: url
-      data: build_data()
+      data: (d) ->
+        $.extend d, build_data()
       error: () ->
         ###
           If there is an error with the build_data call, the localstorage and url will be blown away
@@ -298,9 +299,9 @@ window.build_complaints_table = (url) ->
           users_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
-              '<tr class="assignee-row"><td>' + user + '</td></tr>' +
-              '<tr class="reviewer-row"><td>' + reviewer + '</td></tr>' +
-              '<tr class="second-reviewer-row"><td>' + second_reviewer + '</td></tr>' +
+              '<tr class="assignee-row" data-user-id="' + full.assigned_to_id + '"><td>' + user + '</td></tr>' +
+              '<tr class="reviewer-row" data-user-id="' + full.reviewer_id + '"><td>' + reviewer + '</td></tr>' +
+              '<tr class="second-reviewer-row" data-user-id="' + full.second_reviewer_id + '"><td>' + second_reviewer + '</td></tr>' +
               '</tbody>' +
               '</table>'
 
@@ -712,7 +713,7 @@ build_data = () ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
-
+    data.allow_self_review = $("#self_review").prop('checked')
 
     build_header(data)
     return data
