@@ -4,8 +4,8 @@ local maps = utils.empty_map_table()
 local sections = {
   b = { desc = "﬘ Buffer"},
   c = { desc = "  Copilot"},
-  db = { desc = "  Dadbod UI" },
-  dp = { desc = "  DAP" },
+  d = { desc = "  Dadbod UI" },
+  e = { desc = "  DAP" },
   f = { desc = "  Find" },
   g = { desc = "󰊢  Git" },
   l = { desc = "  LSP" },
@@ -15,6 +15,7 @@ local sections = {
   p = { desc = "  Pomodoro" },
   r = { desc = "🧪 Tests" },
   s = { desc = "󱙝  Spectre" },
+  u = { "<cmd>UndotreeToggle", desc = "󰕍  Undo History"},
   v = { desc = "  Vim"}
 }
 
@@ -97,7 +98,7 @@ maps.n["<leader>cst"] = { "<cmd>Copilot status<cr>", desc = "Display Copilot sta
 -- Dad Bod UI
 maps.n["<leader>db"] = sections.db
 maps.n["<leader>dbi"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
-maps.n["<leader>dba"] = { "<cmd>DBUIAddConnection<ce>", desc = "Add Dad Bod UI connection" }
+maps.n["<leader>dba"] = { "<cmd>DBUIAddConnection<cr>", desc = "Add Dad Bod UI connection" }
 
 -- NvimTree/Explorer
 maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer" }
@@ -199,5 +200,8 @@ maps.n["<leader>sw"] =
   { "<cmd>lua require('spectre').open_visual({select_word=true})<cr>", desc = "Search current word" }
 maps.n["<leader>sp"] =
   { "<cmd>lua require('spectre').open_file_search({select_word=true})<cr>", desc = "Search on current file" }
+
+-- Undo
+maps.n["<leader>u"] = sections.u
 
 utils.set_mappings(maps)
