@@ -6,7 +6,7 @@ erlang 24.0.2
 lua 5.4.6
 java adoptopenjdk-jre-21.0.1+12.0.LTS
 lua-language-server 3.6.18
-rust 1.75.0
+rust 1.78.0
 golang 1.20.3
 julia 1.9.3
 1password-cli 2.25.0

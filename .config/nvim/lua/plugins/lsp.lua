@@ -115,14 +115,14 @@ function M.config()
   lspconfig.coffeesense.setup(coffeesense_opts)
 
   -- Setup cucumber_language_server with a forked ls.
-  local cucumber_language_server_opts = opts
-  local cucumber_require_ok, cucumber_settings = pcall(require, "lspsettings.cucumber_language_server")
-
-  if cucumber_require_ok then
-    cucumber_language_server_opts = vim.tbl_deep_extend("force", cucumber_settings, cucumber_language_server_opts)
-  end
-
-  lspconfig.cucumber_language_server.setup(cucumber_language_server_opts)
+  -- local cucumber_language_server_opts = opts
+  -- local cucumber_require_ok, cucumber_settings = pcall(require, "lspsettings.cucumber_language_server")
+  --
+  -- if cucumber_require_ok then
+  --   cucumber_language_server_opts = vim.tbl_deep_extend("force", cucumber_settings, cucumber_language_server_opts)
+  -- end
+  --
+  -- lspconfig.cucumber_language_server.setup(cucumber_language_server_opts)
 
   -- gramarly setup require nodejs 16
   -- local grammarly_opts = opts
