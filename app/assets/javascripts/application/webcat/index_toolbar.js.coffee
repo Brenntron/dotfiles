@@ -19,6 +19,7 @@ $ ->
       data: {data, name: "SelfReview"}
       dataType: "json"
       success: (response) ->
+        toggle_self_review(self_review)
     )
 
 window.get_display_prefs = () ->
@@ -658,3 +659,6 @@ webcat_new_internal_tickets_column_filter = {
   "view-sugg-col-cb": "false",
   "view-tools-col-cb": "false"
 }
+
+window.toggle_self_review = (self_review) ->
+  $('#complaints-index').DataTable().ajax.reload()

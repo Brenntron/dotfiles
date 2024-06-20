@@ -84,6 +84,25 @@ $ ->
       # update address bar with new filter without refreshing the page
       window.history.replaceState( {} , 'Web Categorization Complaints - Analyst Console', new_url )
 
+      # check the toolbar to make sure correct options are visible
+      if filter_url.includes("REVIEW") || filter_url.includes("MY PENDING TICKETS")
+        $('#review-bulk-submit').removeClass('hidden')
+        $('#review-bulk-submit').removeClass('hidden')
+        $('#index_update_resolution').addClass('hidden')
+        $('#master-submit').addClass('hidden')
+
+        if filter_url.includes("REVIEW")
+          $('#self-review-wrapper').removeClass('hidden')
+        else
+          $('#self-review-wrapper').addClass('hidden')
+      else
+        $('#review-bulk-submit').addClass('hidden')
+        $('#review-bulk-submit').addClass('hidden')
+        $('#index_update_resolution').removeClass('hidden')
+        $('#master-submit').removeClass('hidden')
+        $('#self-review-wrapper').addClass('hidden')
+
+
       # hiding loading tbody until data is fetched
       # (prevent errant clicks while new filter is loading)
       $('#complaints-index tbody').addClass('hide')
