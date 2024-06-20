@@ -94,9 +94,8 @@ class ComplaintEntry < ApplicationRecord
     distance_of_time_in_words(value)
   end
 
-  def self.is_ip?(ip)
-    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
-    !!IPAddr.new(ip) rescue false
+  def self.is_ip?(ip_url)
+    (ip_url =~ Resolv::IPv4::Regex) || (ip_url =~ Resolv::IPv6::Regex) ? true : false
   end
 
   def self.manipulate_changeset(changeset)
