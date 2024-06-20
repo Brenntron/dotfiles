@@ -88,6 +88,20 @@ maps.v[">"] = { ">gv", desc = "Indent to the right" }
 -- Plugins --
 -- GitHub Copilot
 maps.n["<leader>c"] = sections.c
+maps.n["<leader>cc"] = { desc = "Copilot Chat" }
+maps.n["<leader>ccc"] = { "<cmd>CopilotChatClose<cr>", desc = "Close Copilot Chat Window" }
+maps.n["<leader>ccd"] = { "<cmd>CopilotChatDebugInfo<cr>", desc = "Show debug information" }
+maps.n["<leader>cco"] = { "<cmd>CopilotChatOpen<cr>", desc = "Open Copilot Chat Window"}
+maps.n["<leader>ccr"] = { "<cmd>CopilotChatReset<cr>", desc = "Reset Copilot Chat" }
+maps.n["<leader>ccs"] = { "<cmd>CopilotChatStop<cr>", desc = "Stop Copilot Chat" }
+maps.n["<leader>ccp"] = { desc = "Commands coming from default prompts" }
+maps.n["<leader>ccpc"] = { "<cmd>CopilotChatCommit<cr>", desc = "Write commit message for the change" }
+maps.n["<leader>ccpd"] = { "<cmd>CopilotChatDocs<cr>", desc = "Document the active select" }
+maps.n["<leader>ccpe"] = { "<cmd>CopilotChatExplain<cr>", desc = "Explain the active select" }
+maps.n["<leader>ccpf"] = { "<cmd>CopilotChatFix<cr>", desc = "Fix the active select" }
+maps.n["<leader>ccpo"] = { "<cmd>CopilotChatOptimize<cr>", desc = "Optimize the active select" }
+maps.n["<leader>ccpr"] = { "<cmd>CopilotChatReview<cr>", desc = "Review the selected code" }
+maps.n["<leader>ccpt"] = { "<cmd>CopilotChatTests<cr>", desc = "Generate tests" }
 maps.n["<leader>cd"] = { "<cmd>Copilot disable<cr>", desc = "Disable Copilot" }
 maps.n["<leader>ce"] = { "<cmd>Copilot enable<cr>", desc = "Enable Copilot" }
 maps.n["<leader>ch"] = { "<cmd>Copilot help<cr>", desc = "Display Copilot help page" }
@@ -123,8 +137,6 @@ maps.n["<leader>dapv"] = { "<cmd>Telescope dap variables<cr>", desc = "Variables
 -- Git
 maps.n["<leader>g"] = sections.g
 maps.n["<leader>gg"] = { "<cmd>LazyGit<cr>", desc = "Lazygit" }
-maps.n["<leader>gl"] = { "<cmd>lua require('gitsigns').blame_line()<cr>", desc = "View Git blame" }
-maps.n["<leader>gL"] = { "<cmd>lua require('gitsigns').blame_line { full = true }<cr>", desc = "View full Git blame" }
 maps.n["<leader>gp"] = { "<cmd>lua require('gitsigns').preview_hunk()<cr>", desc = "Preview Git hunk" }
 maps.n["<leader>gh"] = { "<cmd>lua require('gitsigns').reset_hunk()<cr>", desc = "Reset Git hunk" }
 maps.n["<leader>gr"] = { "<cmd>lua require('gitsigns').reset_buffer()<cr>", desc = "Reset Git buffer" }

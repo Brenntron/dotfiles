@@ -1,6 +1,7 @@
 local M = {
   "zbirenbaum/copilot.lua",
-  event = {"LspAttach", "VimEnter" },
+  cmd = 'Copilot',
+  event = {"InsertEnter", "LspAttach" },
 }
 
 function M.config()

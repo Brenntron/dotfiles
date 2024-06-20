@@ -1,0 +1,15 @@
+exclude:
+  - 'vendor/**/*'
+  - 'node_modules/'
+linters:
+  IdNames:
+    enabled: true
+    style: snake_case
+  LineLength:
+    enabled: false
+  RuboCop:
+    enabled: true
+    ignored_cops:
+      - Layout/LineLength
+  ViewLength:
+    enabled: false

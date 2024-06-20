@@ -14,8 +14,7 @@ local M = {
       event = { "InsertEnter", "LspAttach" },
       config = function()
         require("copilot_cmp").setup({
-          -- copilot_cmp shouldn't be accoungint for every languages's matchers.
-          fix_pairs = false,
+          fix_pairs = true,
         })
       end,
     },
@@ -80,10 +79,6 @@ function M.config()
   local icons = require "utils.icons"
   local lspkind = require "lspkind"
 
-  vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
-  vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#F64D00" })
-  vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#FDE030" })
-
   local check_backspace = function()
     local col = vim.fn.col "." - 1
     return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
@@ -111,10 +106,10 @@ function M.config()
       fields = { "kind", "abbr", "menu" },
       format = lspkind.cmp_format({
         mod = 'symbol',
-        maxwidth = 10,
+        maxwidth = 50,
         ellipsis_char = '...',
         showlabelDetails = true,
-        symbol_map = { Copilot = "" },
+        symbol_map = { Copilot = " " },
 
         function(entry, vim_item)
           vim_item.kind = icons.kind[vim_item.kind]
