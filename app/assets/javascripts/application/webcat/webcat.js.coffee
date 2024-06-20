@@ -55,7 +55,7 @@ $ ->
       refresh_url()
 
 
-  $('.webcat-filter-dropdown #filter-cases-list a').on 'click', (e)->
+  $('.webcat-index-filter-dropdown #filter-cases-list a').on 'click', (e)->
     e.preventDefault()
     filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
