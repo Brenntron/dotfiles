@@ -222,7 +222,7 @@
               %input{ type: 'checkbox', id: 'self_review', checked: current_user.enabled_self_review }
               %label{ for: 'self_review' }
                 Allow Self Review
-    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && [ComplaintEntry::DUPLICATE, nil].exclude?(@complaint_entry.resolution)
+    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && [ComplaintEntry::STATUS_WEBCAT_DUPLICATE, nil].exclude?(@complaint_entry.resolution)
       .loader-div.hidden#reopen_loader
         .gear-loader-wrapper
           = inline_svg 'icon_gears_loader.svg'

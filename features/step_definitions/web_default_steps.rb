@@ -297,6 +297,7 @@ When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   end
   select(option, :from => select)
 end
+
 When(/^I can not select "(.*?)" from "(.*?)"$/) do |option, select|
   this_is_true = false
   begin
@@ -404,6 +405,14 @@ Then(/^I should not see button with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
 
+Then(/^I should see button with id "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//button[contains(@id, '#{element}')]")
+end
+
+Then(/^I should not see button with id "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//button[contains(@id, '#{element}')]")
+end
+
 Then(/^I should see link with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//a[contains(@class, '#{element}')]")
 end
@@ -454,6 +463,10 @@ end
 
 And(/^"(.*?)" should be in the "(.*?)" dropdown list$/) do |value, field|
   find_field(field).all('option').collect(&:text).include?(value).should == true
+end
+
+And(/^I select "(.*?)" from the "(.*?)" dropdown list$/) do |value, field|
+  find_field(field).find("option[value='#{value}']").click
 end
 
 And(/^"(.*?)" should not be in the "(.*?)" dropdown list$/) do |value, field|
