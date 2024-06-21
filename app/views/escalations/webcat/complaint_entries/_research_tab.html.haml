@@ -119,7 +119,7 @@
             %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
                                                        disabled: @complaint_entry.subdomain.blank? ||
                                                         @complaint_entry.status == ComplaintEntry::PENDING ||
-                                                        @complaint_entry.subdomain == @input_ip_uri,
+                                                        "#{@complaint_entry.subdomain}.#{@complaint_entry.domain}" == @input_ip_uri,
                                                        onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
               subdomain
             %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.uri },
@@ -222,6 +222,10 @@
               %input{ type: 'checkbox', id: 'self_review', checked: current_user.enabled_self_review }
               %label{ for: 'self_review' }
                 Allow Self Review
+      .row
+        .col-xs-12.text-center
+          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+            Submit
     - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && [ComplaintEntry::STATUS_WEBCAT_DUPLICATE, nil].exclude?(@complaint_entry.resolution)
       .loader-div.hidden#reopen_loader
         .gear-loader-wrapper
@@ -237,8 +241,6 @@
         .col-xs-12.text-center
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
-
-
 
   .col-xs-4.ce-research-column.whois-column
     %h2 Whois
