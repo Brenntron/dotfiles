@@ -37,7 +37,7 @@
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
-    .dropdown-menu.nav-tools-dropdown#filter-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown.webcat-index-filter-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
         - Complaint::FILTER_VIEW_OPTIONS.each_with_index do |filter, index|
           - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager? || filter[:label] != 'Manager Queue'

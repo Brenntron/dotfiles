@@ -293,8 +293,8 @@ class DisputeEntry < ApplicationRecord
   end
 
 
-  def self.is_ip?(ip)
-    !!IPAddr.new(ip) rescue false
+  def self.is_ip?(ip_url)
+    (ip_url =~ Resolv::IPv4::Regex) || (ip_url =~ Resolv::IPv6::Regex) ? true : false
   end
 
   def self.new_from_wlbl(wlbl)
