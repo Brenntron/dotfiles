@@ -14,11 +14,17 @@ FactoryBot.define do
       status               { 'PENDING' }
       url_primary_category { 'Arts' }
     end
+
     trait :important do
       is_important  { true }
     end
+
     trait :not_important do
       is_important  { false }
+    end
+
+    trait :was_dismissed do
+      was_dismissed { true }
     end
 
     trait :new_entry do

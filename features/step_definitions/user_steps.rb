@@ -10,6 +10,14 @@ Given(/^the following users exist$/) do |users|
   end
 end
 
+Given(/^the following webcat users exist$/) do |users|
+  @role = FactoryBot.create(:role, role: 'webcat user')
+  users.hashes.each do |user|
+    @user = FactoryBot.create(:user, user)
+    @user.roles << @role
+  end
+end
+
 Given(/^a user with commit permission exists and is logged in$/) do
   @user = FactoryBot.create(:current_user, confirmed: true)
   @role = FactoryBot.create(:role, role: 'committer')
@@ -174,6 +182,24 @@ Given(/^I should not see my username$/) do
   username  = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
   if page.has_content?(username)
     raise "content found when it should not have been found"
+  end
+end
+
+Given(/^I should see my display name in "(.*?)"$/) do |target|
+  user_attrs = FactoryBot.attributes_for(:current_user)
+  display_name = User.where(display_name: user_attrs[:display_name]).first.display_name
+
+  within(target) do
+    raise "Display name not found when it should have been found." unless page.has_content?(display_name)
+  end
+end
+
+Given(/^I should not see my display name in "(.*?)"$/) do |target|
+  user_attrs = FactoryBot.attributes_for(:current_user)
+  display_name = User.where(display_name: user_attrs[:display_name]).first.display_name
+
+  within(target) do
+    raise "Display name found when it should not have been found." if page.has_content?(display_name)
   end
 end
 

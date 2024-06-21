@@ -4,7 +4,7 @@
       - if @complaint_entry.is_important || @complaint_entry.was_dismissed
         .webcat-complaint-important-reviewed-wrapper
           - if @complaint_entry.is_important
-            %span.esc-tooltipped.is-important.highlight-second-review{ title: 'Imporant' }
+            %span.esc-tooltipped.is-important.highlight-second-review{ title: 'Important' }
           - if @complaint_entry.was_dismissed
             %span.esc-tooltipped.was-reviewed.highlight-was-dismissed{ title: 'Reviewed' }
 
@@ -38,27 +38,29 @@
               %button.return-ticket-button.esc-tooltipped#webcat_return_ticket_assignee{ class: ('hidden' if @complaint_entry.status == ComplaintEntry::PENDING || @complaint_entry.user_id != current_user.id),
                                                                                          onclick: 'return_single_webcat_complaint("assignee");',
                                                                                          title: 'Return ticket to open queue' }
-              %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat_take_ticket_assignee{ class: ('hidden' unless @complaint_entry.status != ComplaintEntry::PENDING && no_user?(@complaint_entry.user)),
-                                                                                                            onclick: "take_single_webcat_complaint('assignee');",
-                                                                                                            title: 'Assign this ticket to me' }
-              %span.dropdown
-                .dropdown-menu#show_change_assignee_dropdown{ 'aria-labelledby': 'index_change_assign' }
-                  .change-assignee-dropdown-wrapper
-                    %h3 Change Assignee
-                    .inline-tool-content-wrapper
-                      .toolbar
-                        %div
-                          %label.toolbar-section-label Assignee
-                          = select_tag :change_target_assignee, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
-                        %button.primary{ id: 'button_reassign',
-                                         onclick: 'webcat_toolbar_show_change_assignee("assignee");',
-                                         type: 'button' }
-                          Assign
-                %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_assignee{ 'aria-expanded': 'false',
-                                                                                                                          'aria-haspopup': 'true',
-                                                                                                                          'data-toggle': 'dropdown',
-                                                                                                                          disabled: (@complaint_entry.status == ComplaintEntry::PENDING),
-                                                                                                                          title: 'Change Assignee' }
+              %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped{ class: ('hidden' unless @complaint_entry.status != ComplaintEntry::PENDING && no_user?(@complaint_entry.user)),
+                                                                                  id: "webcat_take_ticket_assignee",
+                                                                                  onclick: "take_single_webcat_complaint('assignee');",
+                                                                                  title: 'Assign this ticket to me' }
+              - if can?(:manage, ComplaintEntry) && can?(:manage, User)
+                %span.dropdown
+                  .dropdown-menu#show_change_assignee_dropdown{ 'aria-labelledby': 'index_change_assign' }
+                    .change-assignee-dropdown-wrapper
+                      %h3 Change Assignee
+                      .inline-tool-content-wrapper
+                        .toolbar
+                          %div
+                            %label.toolbar-section-label Assignee
+                            = select_tag :change_target_assignee, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
+                          %button.primary{ id: 'button_reassign',
+                                           onclick: 'webcat_toolbar_show_change_assignee("assignee");',
+                                           type: 'button' }
+                            Assign
+                  %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_assignee{ 'aria-expanded': 'false',
+                                                                                                                            'aria-haspopup': 'true',
+                                                                                                                            'data-toggle': 'dropdown',
+                                                                                                                            disabled: (@complaint_entry.status == ComplaintEntry::PENDING),
+                                                                                                                            title: 'Change Assignee' }
         .top-info-data.complaint-reviewer-wrapper
           .complaint-owner-wrapper
             %div
@@ -74,23 +76,24 @@
                                                                                   id: 'webcat_take_ticket_reviewer',
                                                                                   onclick: "take_single_webcat_complaint('reviewer');",
                                                                                   title: 'Assign me as reviewer' }
-              %span.dropdown
-                .dropdown-menu#show_change_reviewer_dropdown{ 'aria-labelledby': 'index_change_assign' }
-                  .change-assignee-dropdown-wrapper
-                    %h3 Change Reviewer
-                    .inline-tool-content-wrapper
-                      .toolbar
-                        %div
-                          %label.toolbar-section-label reviewer
-                          = select_tag :change_target_reviewer, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
-                        %button.primary{ id: 'button_reassign',
-                                         onclick: 'webcat_toolbar_show_change_assignee("reviewer");',
-                                         type: 'button' }
-                          Assign
-                %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_reviewer{ 'aria-expanded': 'false',
-                                                                                                                                  'aria-haspopup': 'true',
-                                                                                                                                  'data-toggle': 'dropdown',
-                                                                                                                                  title: 'Change Reviewer' }
+              - if can?(:manage, ComplaintEntry) && can?(:manage, User)
+                %span.dropdown
+                  .dropdown-menu#show_change_reviewer_dropdown{ 'aria-labelledby': 'index_change_assign' }
+                    .change-assignee-dropdown-wrapper
+                      %h3 Change Reviewer
+                      .inline-tool-content-wrapper
+                        .toolbar
+                          %div
+                            %label.toolbar-section-label reviewer
+                            = select_tag :change_target_reviewer, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
+                          %button.primary{ id: 'button_reassign',
+                                           onclick: 'webcat_toolbar_show_change_assignee("reviewer");',
+                                           type: 'button' }
+                            Assign
+                  %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_reviewer{ 'aria-expanded': 'false',
+                                                                                                                                    'aria-haspopup': 'true',
+                                                                                                                                    'data-toggle': 'dropdown',
+                                                                                                                                    title: 'Change Reviewer' }
         .top-info-data.complaint-second-reviewer-wrapper
           .complaint-owner-wrapper
             %div
@@ -105,23 +108,24 @@
               %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat_take_ticket_second_reviewer{ class: ('hidden' unless no_user?(@complaint_entry.second_reviewer)),
                                                                                                                      onclick: "take_single_webcat_complaint('second_reviewer');",
                                                                                                                      title: 'Assign me as second reviewer' }
-              %span.dropdown
-                .dropdown-menu#show_change_second_reviewer_dropdown{ 'aria-labelledby': 'index_change_assign' }
-                  .change-assignee-dropdown-wrapper
-                    %h3 Change Second Reviewer
-                    .inline-tool-content-wrapper
-                      .toolbar
-                        %div
-                          %label.toolbar-section-label Second Reviewer
-                          = select_tag :change_target_second_reviewer, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
-                        %button.primary{ id: 'button_reassign',
-                                         onclick: 'webcat_toolbar_show_change_assignee("second_reviewer");',
-                                         type: 'button' }
-                          Assign
-                %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_second_reviewer{ 'aria-expanded': 'false',
-                                                                                                                                         'aria-haspopup': 'true',
-                                                                                                                                         'data-toggle': 'dropdown',
-                                                                                                                                         title: 'Change Second Reviewer' }
+              - if can?(:manage, ComplaintEntry) && can?(:manage, User)
+                %span.dropdown
+                  .dropdown-menu#show_change_second_reviewer_dropdown{ 'aria-labelledby': 'index_change_assign' }
+                    .change-assignee-dropdown-wrapper
+                      %h3 Change Second Reviewer
+                      .inline-tool-content-wrapper
+                        .toolbar
+                          %div
+                            %label.toolbar-section-label Second Reviewer
+                            = select_tag :change_target_second_reviewer, options_from_collection_for_select(@webcat_users, :id, :display_name), class: 'toolbar-select'
+                          %button.primary{ id: 'button_reassign',
+                                           onclick: 'webcat_toolbar_show_change_assignee("second_reviewer");',
+                                           type: 'button' }
+                            Assign
+                  %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_second_reviewer{ 'aria-expanded': 'false',
+                                                                                                                                           'aria-haspopup': 'true',
+                                                                                                                                           'data-toggle': 'dropdown',
+                                                                                                                                           title: 'Change Second Reviewer' }
     .col-xs-2.col-with-divider
       .top-info-wrapper
         %label.content-label-sm Submitted At
