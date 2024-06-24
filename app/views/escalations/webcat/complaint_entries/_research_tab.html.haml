@@ -140,7 +140,7 @@
       .col-xs-12
         %label.content-label-sm
           Resolution
-        - if [ComplaintEntry::RESOLVED, ComplaintEntry::STATUS_COMPLETED].include?(@complaint_entry.status)
+        - if [ComplaintEntry::RESOLVED, ComplaintEntry::STATUS_COMPLETED].include?(@complaint_entry.status) || duplicate?(@complaint_entry)
           %p.resolution= resolution(@complaint_entry)
         - else
           .ce-radio-group-wrapper
@@ -226,7 +226,7 @@
         .col-xs-12.text-center
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
-    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && [ComplaintEntry::STATUS_WEBCAT_DUPLICATE, nil].exclude?(@complaint_entry.resolution)
+    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && !duplicate?(@complaint_entry) && @complaint_entry.resolution.present?
       .loader-div.hidden#reopen_loader
         .gear-loader-wrapper
           = inline_svg 'icon_gears_loader.svg'
@@ -236,7 +236,7 @@
         .col-xs-12.text-center
           %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
             Reopen
-    - else
+    - elsif !duplicate?(@complaint_entry)
       .row
         .col-xs-12.text-center
           %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }

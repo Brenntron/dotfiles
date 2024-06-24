@@ -16,20 +16,20 @@
 
         .status-wrapper.top-info-wrapper
           %label.content-label-sm Status
-          - if @complaint_entry.resolution == ComplaintEntry::STATUS_RESOLVED_DUPLICATE
-            .top-info-data.duplicate-status-notice
+          .top-info-wrapper#complaint_entry_status{ class: ('duplicate-status-notice' if duplicate?(@complaint_entry)) }
+            - if duplicate?(@complaint_entry) && @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED
               = @complaint_entry.resolution
-          - elsif @complaint_entry.status.nil?
-            .top-info-data NEW
-          - else
-            .top-info-data= @complaint_entry.status
+            - elsif @complaint_entry.status.nil?
+              NEW
+            - else
+              = @complaint_entry.status
 
     .col-xs-2.col-with-divider
       .top-info-wrapper
         %label.content-label-sm Users
 
         .top-info-data.complaint-assignee-wrapper
-          %input{type: 'hidden', name: 'current_user_id', value: "#{current_user.id}"}
+          %input{ type: 'hidden', name: 'current_user_id', value: current_user.id.to_s }
           .complaint-owner-wrapper
             %div
               %span.user-image#complaint_assignee{ class: ('missing-data' if no_user?(@complaint_entry.user) ) }= no_user?(@complaint_entry.user) ? 'Unassigned' : @complaint_entry.user.display_name
@@ -123,13 +123,13 @@
                                            type: 'button' }
                             Assign
                   %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#show_change_second_reviewer{ 'aria-expanded': 'false',
-                                                                                                                                           'aria-haspopup': 'true',
-                                                                                                                                           'data-toggle': 'dropdown',
-                                                                                                                                           title: 'Change Second Reviewer' }
+                                                                                                                                   'aria-haspopup': 'true',
+                                                                                                                                   'data-toggle': 'dropdown',
+                                                                                                                                   title: 'Change Second Reviewer' }
     .col-xs-2.col-with-divider
       .top-info-wrapper
         %label.content-label-sm Submitted At
-        .top-info-data= @complaint_entry.created_at
+        .top-info-data#complaint_entry_submitted_at= @complaint_entry.created_at
       .top-info-wrapper
         %label.content-label-sm Age
         .top-info-data{ class: complaint_entry_age_class(@complaint_entry).to_s }
@@ -170,23 +170,22 @@
         %label.content-label-sm Contact Email
         .top-info-data= @complaint.customer&.email || 'None'
 
-
-
 %ul.nav.nav-tabs#ce_tabs{ role: 'tablist' }
   %li.nav-item.active{ role: 'presentation' }
-    %a.nav-link#research-tab-link{ 'aria-controls': 'research',
-                                    'data-toggle': 'tab',
-                                    href: '#research-tab',
-                                    role: 'tab' }
+    %a.nav-link#research_tab_link{ 'aria-controls': 'research',
+                                   'data-toggle': 'tab',
+                                   href: '#research-tab',
+                                   role: 'tab' }
       research
   %li.nav-item{ role: 'presentation' }
-    %a.nav-link#history-tab-link{ 'aria-controls': 'history',
-                                   'data-toggle': 'tab', href: '#history-tab',
-                                   role: 'tab' }
+    %a.nav-link#history_tab_link{ 'aria-controls': 'history',
+                                  'data-toggle': 'tab',
+                                  href: '#history-tab',
+                                  role: 'tab' }
       history
 -# Bootstrap tabs: https://getbootstrap.com/docs/3.4/javascript/#tabs
 .tab-content.content-wrapper#ce_tab_content
-  .tab-pane.active#research-tab{ role: 'tabpanel' }
+  .tab-pane.active#research_tab{ role: 'tabpanel' }
     = render 'escalations/webcat/complaint_entries/research_tab'
-  .tab-pane#history-tab{ role: 'tabpanel' }
+  .tab-pane#history_tab{ role: 'tabpanel' }
     = render 'escalations/webcat/complaint_entries/history_tab'

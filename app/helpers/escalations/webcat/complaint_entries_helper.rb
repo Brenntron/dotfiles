@@ -28,6 +28,10 @@ module Escalations::Webcat::ComplaintEntriesHelper
     named_search.named_search_criteria.pluck(:field_name, :value).to_h.to_json
   end
 
+  def duplicate?(complaint_entry)
+    [complaint_entry.resolution, complaint_entry.status].any? { |string| string.include? 'DUPLICATE' }
+  end
+
   def wbrs_score_icon(score)
     if score.nil?
       'icon-unknown'
@@ -72,14 +76,14 @@ module Escalations::Webcat::ComplaintEntriesHelper
   end
 
   def render_tags(tags)
-    if !tags.empty?
+    if tags.empty?
+      content_tag :p, 'No tags', id: 'ce_tags', class: 'missing-data'
+    else
       content_tag :div, id: 'ce_tags' do
         tags.collect do |tag|
-         concat(content_tag(:span, tag, class: 'tag-capsule'))
+          concat(content_tag(:span, tag, class: 'tag-capsule'))
         end
       end
-    else
-      content_tag :p, 'No tags', id: 'ce_tags', class: 'missing-data'
     end
   end
 end
