@@ -234,12 +234,14 @@
 
       .row
         .col-xs-12.text-center
-          %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+          %button.tertiary.ce-submit-button{ id: 'ce_reopen_button', onclick: "reopen_complaint(#{@complaint_entry.id})" }
             Reopen
     - elsif !duplicate?(@complaint_entry)
       .row
         .col-xs-12.text-center
-          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+          %button.tertiary.ce-submit-button{ disabled: true,
+                                             id: 'ce_submit_button',
+                                             onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
 
   .col-xs-4.ce-research-column.whois-column

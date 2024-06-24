@@ -29,7 +29,7 @@ module Escalations::Webcat::ComplaintEntriesHelper
   end
 
   def duplicate?(complaint_entry)
-    [complaint_entry.resolution, complaint_entry.status].any? { |string| string.include? 'DUPLICATE' }
+    [complaint_entry.resolution, complaint_entry.status].any? { |string| string&.include? 'DUPLICATE' }
   end
 
   def wbrs_score_icon(score)
