@@ -346,7 +346,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     AC.WebCat.Whois.get_whois_data(domain, whois_callback, error_callback)
 
-  get_current_categories = () ->
+  get_current_categories = (entry_type) ->
+    return if entry_type == 'IP'
+
     error_callback = (errorResponse) ->
       std_api_error(errorResponse, "Current Categories for this Entry could not be retrieved.", reload: false)
 
@@ -624,7 +626,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
         unless ip_address?
           path = "http://#{uri}"
-        else if ipv4_regex.test(selected_row.ip_address)
+        else if ipv4_regex.test(ip_address)
           # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
           path = "http://#{ip_address}"
         else
@@ -665,7 +667,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     disable_submit = !verifySubmit()
 
     $('.ce-submit-button').prop('disabled', disable_submit)
-    check_ip_uri_input(value)
 
   check_ip_uri_input = (text) ->
     $domain = $('#ce_ip_uri_domain')
@@ -674,9 +675,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     domain_text = $domain.data('val')
     subdomain_text = $subdomain.data('val')
     original_uri_text = $original_uri.data('val')
-    disable_domain = text == domain_text
+    disable_domain = text == domain_text || domain_text == ''
     disable_subdomain = text == "#{subdomain_text}.#{domain_text}" || subdomain_text == ''
-    disable_original_uri = text == original_uri_text
+    disable_original_uri = text == original_uri_text || original_uri_text == ''
 
     $domain.prop('disabled', disable_domain)
     $subdomain.prop('disabled', disable_subdomain)
@@ -821,8 +822,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     resolution_option = $('.resolution-radio-button:checked').val()
     resolution_comment = $('.ce-customer-comment-textarea').val()
     review_option = $('.review-radio-button:checked').val()
+    entry_type = $('#entry_type').text().trim()
 
-    get_current_categories()
+    get_current_categories(entry_type)
     get_ce_show_entry_history()
 
     $(document).on 'change', '.ce-ip-uri-input', ->

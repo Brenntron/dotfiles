@@ -30,6 +30,7 @@
 
         .top-info-data.complaint-assignee-wrapper
           %input{ type: 'hidden', name: 'current_user_id', value: current_user.id.to_s }
+          %input{ type: 'hidden', id: 'entry_type', name: 'entry_type', value: @complaint_entry.entry_type }
           .complaint-owner-wrapper
             %div
               %span.user-image#complaint_assignee{ class: ('missing-data' if no_user?(@complaint_entry.user) ) }= no_user?(@complaint_entry.user) ? 'Unassigned' : @complaint_entry.user.display_name

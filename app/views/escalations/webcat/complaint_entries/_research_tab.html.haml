@@ -74,7 +74,7 @@
           %p.ce-submitted-ip-uri= @submitted_ip_uri
 
           %label.content-label-sm Suggested Categories
-          %p= suggested_categories(@complaint_entry.suggested_disposition)
+          %p#ce_suggested_categories= suggested_categories(@complaint_entry.suggested_disposition)
 
           %label.content-label-sm Description
           %p#ce_description= @complaint.description
@@ -107,7 +107,8 @@
           %p.ce-submitted-ip-uri
             = @input_ip_uri
         - else
-          %input.ce-input.ce-ip-uri-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING, value: @input_ip_uri }
+          %input.ce-input.ce-ip-uri-input#ce_ip_uri_input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                           value: @input_ip_uri }
           .ce-resolved-ip-uri-button-wrapper
             %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
                                                     # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.

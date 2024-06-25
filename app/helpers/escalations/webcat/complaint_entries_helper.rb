@@ -49,7 +49,7 @@ module Escalations::Webcat::ComplaintEntriesHelper
   end
 
   def suggested_categories(categories)
-    if categories.nil?
+    if categories.blank?
       return content_tag :p, class: 'missing-data', id: 'ce_suggested_categories' do
         'No suggested categories available.'
       end

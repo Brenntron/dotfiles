@@ -1,45 +1,146 @@
 Feature: Complaint Entries Show Page
   Let users see a page with all relevant information for a Complaint Entry.
 
-  Rule: Important Complaint Entries display the 'Important' icon for the analyst.
+  @javascript
+  Scenario:  A WebCat user navigates to a new important complaint entry.
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "important" exists
+    When I goto "/escalations/webcat/complaint_entries/1"
+    And I wait for "5" seconds
+    Then I should see element ".is-important"
 
-    @javascript
-    Scenario:  A WebCat user navigates to a complaint entry that a reviewer declined.
-      Given a user with role "webcat user" exists and is logged in
-      And a complaint entry with trait "was_dismissed" exists
-      When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see element ".highlight-was-dismissed"
+  @javascript
+  Scenario:  A WebCat user navigates to a complaint entry that is not important.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    And I wait for "5" seconds
+    Then I should not see element ".is-important"
 
-    @javascript
-    Scenario:  A WebCat user navigates to a complaint entry that was not declined by a reviewer.
-      Given a user with role "webcat user" exists and is logged in
-      And the following complaint entries exist:
-        | id | uri     | domain  | entry_type | status |
-        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
-      When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should not see element ".highlight-was-dismissed"
+  @javascript
+  Scenario:  A WebCat user navigates to a complaint entry that a reviewer declined.
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "was_dismissed" exists
+    When I goto "/escalations/webcat/complaint_entries/1"
+    And I wait for "5" seconds
+    Then I should see element ".highlight-was-dismissed"
 
-  Rule: Tickets declined in review should display the 'Reviewed' icon for the analyst.
+  @javascript
+  Scenario:  A WebCat user navigates to a complaint entry that was not declined by a reviewer.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    And I wait for "5" seconds
+    Then I should not see element ".highlight-was-dismissed"
 
-    @javascript
-    Scenario:  A WebCat user navigates to a new important complaint entry.
-      Given a user with role "webcat user" exists and is logged in
-      And a complaint entry with trait "important" exists
-      When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see element ".is-important"
+  @javascript
+  Scenario: A user should see suggested categories
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | suggested_disposition   |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | Animals and Pets, Games |
+      | 2  | def.com | def.com | URI/DOMAIN | NEW    |                         |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    Then I should see content "Animals and Pets, Games" within "#ce_suggested_categories"
+    When I goto "/escalations/webcat/complaint_entries/2"
+    Then I should see content "No suggested categories available." within "#ce_suggested_categories"
 
-    @javascript
-    Scenario:  A WebCat user navigates to a complaint entry that is not important.
-      Given a user with role "webcat user" exists and is logged in
-      And the following complaint entries exist:
-        | id | uri     | domain  | entry_type | status |
-        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
-      When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should not see element ".is-important"
+  @javascript
+  Scenario: URI buttons should be disabled for IP entries.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri           | domain  | subdomain | path | ip_address | entry_type | status |
+      | 1  |               |         |           |      | 1.1.1.1    | IP         | NEW    |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    Then button with id "ce_ip_uri_domain" should be disabled
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    And button with id "ce_ip_uri_original" should be disabled
+    When I type content "5" within input with id "ce_ip_uri_input"
+    And I hit enter within "#ce_ip_uri_input"
+    Then button with id "ce_ip_uri_domain" should be disabled
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    And button with id "ce_ip_uri_original" should be disabled
+
+  @javascript
+  Scenario: The domain and subdomain uri buttons should enable for Complaint Entries with a subdomain and a path.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri                  | domain  | subdomain | path | entry_type | status | ip_address |
+      | 1  | alphabet.abc.com/zyx | abc.com | alphabet  | /zyx | URI/DOMAIN | NEW    |            |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    Then I should see content "alphabet.abc.com/zyx" within "#ce_ip_uri_input"
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be enabled
+    And button with id "ce_ip_uri_original" should be disabled
+    When I type content "new" within input with id "ce_ip_uri_input"
+    And I hit enter within "#ce_ip_uri_input"
+    And I wait for "2" seconds
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be enabled
+    And button with id "ce_ip_uri_original" should be enabled
+    When I click "#ce_ip_uri_subdomain"
+    Then I should see content "alphabet.abc.com" within "#ce_ip_uri_input"
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    When I click "#ce_ip_uri_domain"
+    Then I should see content "abc.com" within "#ce_ip_uri_input"
+    And button with id "ce_ip_uri_domain" should be disabled
+    And button with id "ce_ip_uri_subdomain" should be enabled
+    When I click "#ce_ip_uri_original"
+    Then I should see content "alpha.abc.com" within "#ce_ip_uri_input"
+    And button with id "ce_ip_uri_original" should be disabled
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be enabled
+
+  @javascript
+  Scenario: The domain uri button should enable for Complaint Entries with a subdomain but no path.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri           | domain  | subdomain | path | ip_address | entry_type | status |
+      | 1  | alpha.def.com | def.com | alpha     |      |            | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    Then I should see content "alpha.abc.com" within "#ce_ip_uri_input"
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    And button with id "ce_ip_uri_original" should be disabled
+    When I type content "new" within input with id "ce_ip_uri_input"
+    And I hit enter within "#ce_ip_uri_input"
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be enabled
+    And button with id "ce_ip_uri_original" should be enabled
+    When I click "#ce_ip_uri_subdomain"
+    Then I should see content "alphabet.abc.com" within "#ce_ip_uri_input"
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_original" should be disabled
+    When I click "ce_ip_uri_domain"
+    Then I should see content "abc.com" within "#ce_ip_uri_input"
+    And button with id "ce_ip_uri_domain" should be disabled
+    And button with id "ce_ip_uri_subdomain" should be enabled
+    When I click "#ce_ip_uri_original"
+    Then I should see content "alpha.abc.com" within "#ce_ip_uri_input"
+    And button with id "ce_ip_uri_original" should be disabled
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be disabled
+
+  @javascript
+  Scenario: All uri buttons should be disabled for uri/domain Complaint Entries without a path and subdomain.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri           | domain  | subdomain | path | ip_address | entry_type | status |
+      | 1  | ghi.com       | ghi.com |           |      |            | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    Then button with id "ce_ip_uri_domain" should be disabled
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    And button with id "ce_ip_uri_original" should be disabled
+    When I type content "change" within input with id "ce_ip_uri_input"
+    And I hit enter within "#ce_ip_uri_input"
+    Then button with id "ce_ip_uri_domain" should be enabled
+    And button with id "ce_ip_uri_subdomain" should be disabled
+    And button with id "ce_ip_uri_original" should be enabled
 
   Rule: Users can take unassigned tickets
 
@@ -347,6 +448,44 @@ Feature: Complaint Entries Show Page
       When I click "#show_change_second_reviewer"
       Then "User Two" should not be in the "change_target_second_reviewer" dropdown list
 
+  Rule: Analysts cannot open the url for untrusted Complaint Entries
+
+    @javascript
+    Scenario: Should not open Complaint Entry url in a new tab if the WBRS Score is -6 or lower.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | -6         | true     |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      And I click ".open-all"
+      And I wait for "2" seconds
+      Then I should see content "abc.com could not open due to low WBRS Scores." within ".alert-danger"
+
+    @javascript
+    Scenario: Should open Complaint Entry url in a new tab if the WBRS Score is lower than -6.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | 6          | true     |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      And I click ".open-all"
+      And I wait for "5" seconds
+      Then a new window should be opened
+
+    @javascript
+    Scenario: Should not open Complaint Entry url in a new tab that are not viewable.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | 6          | false     |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      And I click ".open-all"
+      And I wait for "2" seconds
+      Then I should see content "Complaint Address is not viewable." within ".alert-danger"
+
   Rule: Complaint Entries should only submit as Fixed when the requisite changes are present.
 
     @javascript
@@ -469,3 +608,5 @@ Feature: Complaint Entries Show Page
       And I fill in selectized of element "#ce_categories_select" with "107"
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be disabled
+
+  Rule: Tickets declined in review should display the 'Reviewed' icon for the analyst.
