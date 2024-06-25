@@ -619,6 +619,10 @@ Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, val
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
 end
 
+When(/^I remove item "(.*?)" from the selectized of element "(.*?)"$/) do |item, element|
+  page.execute_script("$('#{element}')[0].selectize.removeItem(#{item}, false)")
+end
+
 Then(/^I should see at least these selectized item "(.*?)" within "(.*?)"$/) do |content, element|
   page.has_select?(element, with_selected: content)
 end

@@ -347,47 +347,125 @@ Feature: Complaint Entries Show Page
       When I click "#show_change_second_reviewer"
       Then "User Two" should not be in the "change_target_second_reviewer" dropdown list
 
-  # Rule: Complaint Entries should only submit as Fixed when the requisite changes are present.
-  #
-  #   @javascript
-  #   Scenario: A WebCat user submits a complaint entry as Fixed with all required fields filled out and has a resolution template.
-  #     Given a user with role "webcat user" exists and is logged in
-  #     And the following complaint entries exist:
-  #     | id | uri     | domain  | entry_type | status | user_id |
-  #     | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
-  #     And the following resolution message templates exist:
-  #     | body                              | resolution_type | ticket_type        | name     | description |
-  #     | This is the first Fixed comment   | Fixed           | WebCategoryDispute | Fixed 01 | first       |
-  #     | This is the second Fixed comment  | Fixed           | WebCategoryDispute | Fixed 02 | second      |
-  #     When I goto "/escalations/webcat/complaint_entries/1"
-  #     And I wait for "5" seconds
-  #     Then I should see the radio with id "res-fixed-radio" checked
-  #     And button with id "ce_submit_button" should be disabled
-  #     When I wait for "2" seconds
-  #     And I fill in selectized of element "#ce_categories_select" with "107"
-  #     And I wait for "2" seconds
-  #     Then button with id "ce_submit_button" should be disabled
-  #     When I select "Fixed 02" from "response-template-select"
-  #     Then button with id "ce_submit_button" should be enabled
-  #     When I click "#ce_submit_button"
-  #     Then I should see content "COMPLETED" within "#complaint_entry_status"
-  #
-  #   @javascript
-  #   Scenario: A WebCat user submits a complaint entry as Fixed with all required fields filled out without a resolution template.
-  #     Given a user with role "webcat user" exists and is logged in
-  #     And the following complaint entries exist:
-  #     | id | uri     | domain  | entry_type | status | user_id |
-  #     | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
-  #     When I goto "/escalations/webcat/complaint_entries/1"
-  #     And I wait for "5" seconds
-  #     Then I should see the radio with id "res-fixed-radio" checked
-  #     And button with id "ce_submit_button" should be disabled
-  #     When I wait for "2" seconds
-  #     And I fill in selectized of element "#ce_categories_select" with "107"
-  #     Then button with id "ce_submit_button" should be enabled
-  #     When I click "#ce_submit_button"
-  #     And I wait for "2" seconds
-  #     Then I should see content "must have a message to the customer" within ".error-msg"
-  #     When I accept the user prompt
-  #     And I type content "Customer comment" within input with id "#entry-email-response-to-customers_1"
-  #     Then I should see content "COMPLETED" within "#complaint_entry_status"
+  Rule: Complaint Entries should only submit as Fixed when the requisite changes are present.
+
+    @javascript
+    Scenario: A WebCat user submits a complaint entry as Fixed with all required fields filled out and has a resolution template.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      And the following webcat resolution message templates exist:
+      | name     | body                              | resolution_type | description |
+      | Fixed 01 | This is the first Fixed comment   | Fixed           | first       |
+      | Fixed 02 | This is the second Fixed comment  | Fixed           | second      |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      And I fill in selectized of element "#ce_categories_select" with "107"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be enabled
+      When I select "Fixed 02" from "entry-email-response-to-customers-select_1"
+      When I click "#ce_submit_button"
+      Then I should see content "COMPLETED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario: A WebCat user submits a complaint entry as Fixed with all required fields filled out without a resolution template.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I wait for "2" seconds
+      And I fill in selectized of element "#ce_categories_select" with "107"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "2" seconds
+      Then I should see content "must have a message to the customer" within ".error-msg"
+
+    @javascript
+    Scenario: The submit button should disable when the requisite changes for submission are removed.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      And I fill in selectized of element "#ce_categories_select" with "107"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be enabled
+      When I remove item "107" from the selectized of element "#ce_categories_select"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be disabled
+
+  Rule: Submit button should only enable for unchanged when there are no present changes
+
+    @javascript
+    Scenario:  A user submits an unchanged Complaint Entry with no changes
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#res-unchanged-radio"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      Then I should see content "COMPLETED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario:  A user attempts to submit an unchanged Complaint Entry with changes present
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#res-unchanged-radio"
+      And I fill in selectized of element "#ce_categories_select" with "107"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be disabled
+
+  Rule: Submit button should only enable for invalid when there are no present changes
+
+    @javascript
+    Scenario:  A user submits an invalid Complaint Entry with no changes
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#res-invalid-radio"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      Then I should see content "COMPLETED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario:  A user attempts to submit an invalid Complaint Entry with changes present
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "5" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#res-invalid-radio"
+      And I fill in selectized of element "#ce_categories_select" with "107"
+      And I wait for "2" seconds
+      Then button with id "ce_submit_button" should be disabled

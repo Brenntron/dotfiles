@@ -32,27 +32,28 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     }
 
   verifySubmit = () ->
-    if initial_status == 'PENDING'
-      return true if ['commit', 'decline'].includes(review_option) && canReview()
-    else
-      submitted_ip_uri = $('.ce-ip-uri-input').val()
+    can_submit = if is_pending() && ['commit', 'decline'].includes(review_option) && can_review()
+                   true
+                 else if !$('.ce-ip-uri-input').val()
+                   # All resolution options, as well as the commit review option, requite a user comment
+                   # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
+                   # then it can only be declined.
+                   false
+                 else if !is_pending() && resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
+                   # The fixed resolution requires a change to the category list and at least one category.
+                   true
+                 else if !is_pending() && ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
+                   true
+                 else
+                   false
 
-      # All resolution options, as well as the commit review option, requite a user comment
-      # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
-      # then it can only be declined.
-      return false unless submitted_ip_uri
+    window.prevent_close(can_submit)
+    return can_submit
 
-      # The fixed resolution requires a change to the category list and at least one category.
-      can_submit = if resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
-                     true
-                   else if ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
-                     true
-                   else
-                     false
+  is_pending = () ->
+    initial_status == 'PENDING'
 
-      return can_submit
-
-  canReview = () ->
+  can_review = () ->
     allow_self_review = $('#self_review')
 
     # #self_review only appears if the current user is the assignee.
@@ -95,14 +96,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         can_submit = verifySubmit()
 
         $('.ce-submit-button').prop('disabled', !can_submit)
-        window.prevent_close(can_submit.toString())
       onItemRemove: (value) ->
         change_store.remove("tags: #{value}")
 
         can_submit = verifySubmit()
 
         $('.ce-submit-button').prop('disabled', !can_submit)
-        window.prevent_close(can_submit.toString())
     }
 
     # $('#edit_tags').on 'click', () ->
@@ -172,7 +171,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               can_submit = verifySubmit()
 
               $('.ce-submit-button').prop('disabled', !can_submit)
-              window.prevent_close(can_submit.toString())
           onItemRemove: (value) ->
             unless entry_status == 'PENDING'
               # Track adding categories and removing existing categories
@@ -184,7 +182,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               can_submit = verifySubmit()
 
               $('.ce-submit-button').prop('disabled', !can_submit)
-              window.prevent_close(can_submit.toString())
           score: (input) ->
             #  Adding some customization for autofill
             #  restricting on certain cats to avoid accidental categorization
@@ -660,36 +657,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         window.open("https://www.google.com/search?q=#{path}", '_blank')
     )
 
-  window.update_uri_input = (value, type) ->
-    $input = $('.ce-ip-uri-input')
-    $domain = $('#ce_ip_uri_domain')
-    $subdomain = $('#ce_ip_uri_subdomain')
-    $original = $('#ce_ip_uri_original')
+  window.update_uri_input = (value) ->
+    $('.ce-ip-uri-input').val(value)
 
-    $input.val(value)
-
-    if ['original uri', 'subdomain'].includes(type)
-      $domain.prop('disabled', false)
-
-      switch type
-        when 'original uri'
-          $original.prop('disabled', true)
-
-          unless $subdomain.attr('data-val') == '' || $subdomain.attr('data-val') == ''
-            $subdomain.prop('disabled', false)
-
-          break
-        when 'subdomain'
-          $subdomain.prop('disabled', true)
-
-          unless $original.attr('data-val') == '' || $original.attr('data-val') == '/'
-            $original.prop('disabled', false)
-
-          break
-    else
-      $domain.prop('disabled', true)
-      $subdomain.prop('disabled', ($subdomain.attr('data-val') != ''))
-      $original.prop('disabled', ($original.data('path') != '' || $original.data('path') != '/'))
+    check_ip_uri_input(value)
 
     disable_submit = !verifySubmit()
 
@@ -699,14 +670,17 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   check_ip_uri_input = (text) ->
     $domain = $('#ce_ip_uri_domain')
     $subdomain = $('#ce_ip_uri_subdomain')
-    $original = $('#ce_ip_uri_original')
+    $original_uri = $('#ce_ip_uri_original')
     domain_text = $domain.data('val')
     subdomain_text = $subdomain.data('val')
-    original_text = $original.data('val')
+    original_uri_text = $original_uri.data('val')
+    disable_domain = text == domain_text
+    disable_subdomain = text == "#{subdomain_text}.#{domain_text}" || subdomain_text == ''
+    disable_original_uri = text == original_uri_text
 
-    $domain.prop('disabled', text == domain_text)
-    $subdomain.prop('disabled', text == "#{subdomain_text}.#{domain_text}")
-    $original.prop('disabled', text == original_text)
+    $domain.prop('disabled', disable_domain)
+    $subdomain.prop('disabled', disable_subdomain)
+    $original_uri.prop('disabled', disable_original_uri)
 
   window.submit_show_page_changes = (entry_id) ->
     std_msg_ajax(
@@ -843,7 +817,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     current_user_id = Number($('input[name="current_user_id"]').val())
     entry_id = Number($('#complaint_entry_id')[0].innerText)
     headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-    initial_status = $('.status-wrapper > .top-info-data').text()
+    initial_status = $('#complaint_entry_status').text().trim()
     resolution_option = $('.resolution-radio-button:checked').val()
     resolution_comment = $('.ce-customer-comment-textarea').val()
     review_option = $('.review-radio-button:checked').val()
