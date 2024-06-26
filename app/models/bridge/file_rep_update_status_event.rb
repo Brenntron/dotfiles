@@ -5,7 +5,9 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
     Delayed::Worker.logger.info("FileRep update init")
   end
 
-  def post(dispute, source_authority: @source_authority, source_key: @source_key)
+  def post(dispute, options = {})
+    source_authority = options.fetch(:source_authority) rescue @source_authority
+    source_key = options.fetch(:source_key) rescue @source_key 
     Delayed::Worker.logger.info("FileRep update send to bridge")
     return_payload = {}
     return_payload[dispute.sha256_hash] = {
