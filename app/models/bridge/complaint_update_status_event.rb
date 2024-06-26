@@ -4,7 +4,9 @@ class Bridge::ComplaintUpdateStatusEvent < Bridge::BaseMessage
           addressee: 'talos-intelligence')
   end
 
-  def post_entries(entries, source_key: nil, ac_id: nil)
+  def post_entries(entries, options = {})
+    source_key = options.fetch(:source_key) rescue @source_key 
+    ac_id = options.fetch(:ac_id) rescue @ac_id
     complaint = entries.first.complaint
     payload = entries.inject({}) do |message_data, entry|
       message_data[entry.hostlookup] = {
