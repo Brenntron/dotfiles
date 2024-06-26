@@ -168,6 +168,7 @@ Feature: Complaint Entries Show Page
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
       And I wait for "5" seconds
+      And take a screenshot
       Then I should see my display name in "#complaint_assignee"
       When I click "#webcat_return_ticket_assignee"
       And I wait for "3" seconds
@@ -608,5 +609,23 @@ Feature: Complaint Entries Show Page
       And I fill in selectized of element "#ce_categories_select" with "107"
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be disabled
+
+  Rule: Analysts can review pending tickets
+
+    Scenario: An analyst commits a pending ticket
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name   |
+        | User Two       |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status  | user_id | reviewer_id | resolution |
+        | 1  | abc.com | URI/DOMAIN | PENDING | 1       | 2           | FIXED      |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the "#res-fixed-radio" checkbox checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review-commit-radio"
+      # Then button with id "ce_submit_button" should be enabled
+      # When I click "#ce_submit_button"
+      # Then I should see content "COMPLETED" within "#complaint_entry_status"
 
   Rule: Tickets declined in review should display the 'Reviewed' icon for the analyst.

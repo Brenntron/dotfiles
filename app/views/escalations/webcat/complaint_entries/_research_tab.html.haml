@@ -225,7 +225,9 @@
                 Allow Self Review
       .row
         .col-xs-12.text-center
-          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+          %button.tertiary.ce-submit-button{ disabled: true,
+                                             id: 'ce_submit_button',
+                                             onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
             Submit
     - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && !duplicate?(@complaint_entry) && @complaint_entry.resolution.present?
       .loader-div.hidden#reopen_loader
