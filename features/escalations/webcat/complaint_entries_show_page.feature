@@ -168,7 +168,6 @@ Feature: Complaint Entries Show Page
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
       And I wait for "5" seconds
-      And take a screenshot
       Then I should see my display name in "#complaint_assignee"
       When I click "#webcat_return_ticket_assignee"
       And I wait for "3" seconds

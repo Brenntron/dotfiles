@@ -494,9 +494,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               }
             ]
           $('#ce_entry_history_table')
-      error: (response) ->
-        std_msg_error(response.error, [])
-        console.error(response)
+      error: (error) ->
+        console.error(error)
+        std_msg_error(error.statusText, [error.responseText.split('\n')])
         $('#ce_entry_history_loader').hide()
     )
 
@@ -567,7 +567,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           })
       error: (error) ->
         console.error(error)
-        std_msg_error(error, [])
+        std_msg_error(error.statusText, [error.responseText.split('\n')])
         $('#ce_xbrs_history_loader').hide()
     )
 
