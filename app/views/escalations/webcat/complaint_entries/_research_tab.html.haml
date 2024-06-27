@@ -207,15 +207,15 @@
             Review
           .ce-radio-group-wrapper
             .ce-radio-group
-              %input.review-radio-button#review-commit-radio{ name: 'resolution',
+              %input.review-radio-button#review_commit_radio{ name: 'review',
                                                               type: 'radio',
                                                               value: 'commit' }
               %label.radio-label{ for: 'review-commit-radio' } Commit
             .ce-radio-group
-              %input.review-radio-button#review-decline-radio{ name: 'resolution',
+              %input.review-radio-button#review_decline_radio{ name: 'review',
                                                                type: 'radio',
                                                                value: 'decline' }
-              %label.radio-label{ for: 'review-decline-radio' } Decline
+              %label.radio-label{ for: 'review_decline_radio' } Decline
 
         - if @complaint_entry.user_id == current_user.id
           .col-xs-6

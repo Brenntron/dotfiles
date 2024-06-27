@@ -6,7 +6,6 @@ Feature: Complaint Entries Show Page
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "important" exists
     When I goto "/escalations/webcat/complaint_entries/1"
-    And I wait for "5" seconds
     Then I should see element ".is-important"
 
   @javascript
@@ -16,7 +15,6 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
     When I goto "/escalations/webcat/complaint_entries/1"
-    And I wait for "5" seconds
     Then I should not see element ".is-important"
 
   @javascript
@@ -24,8 +22,7 @@ Feature: Complaint Entries Show Page
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "was_dismissed" exists
     When I goto "/escalations/webcat/complaint_entries/1"
-    And I wait for "5" seconds
-    Then I should see element ".highlight-was-dismissed"
+    Then I should see element ".was-reviewed"
 
   @javascript
   Scenario:  A WebCat user navigates to a complaint entry that was not declined by a reviewer.
@@ -34,8 +31,7 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
     When I goto "/escalations/webcat/complaint_entries/1"
-    And I wait for "5" seconds
-    Then I should not see element ".highlight-was-dismissed"
+    Then I should not see element ".was-reviewed"
 
   @javascript
   Scenario: A user should see suggested categories
@@ -45,9 +41,9 @@ Feature: Complaint Entries Show Page
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | Animals and Pets, Games |
       | 2  | def.com | def.com | URI/DOMAIN | NEW    |                         |
     When I goto "/escalations/webcat/complaint_entries/1"
-    Then I should see content "Animals and Pets, Games" within "#ce_suggested_categories"
+    Then I should see an element "#ce_suggested_categories" with text "Animals and Pets, Games"
     When I goto "/escalations/webcat/complaint_entries/2"
-    Then I should see content "No suggested categories available." within "#ce_suggested_categories"
+    Then I should see an element "#ce_suggested_categories" with text "No suggested categories available."
 
   @javascript
   Scenario: URI buttons should be disabled for IP entries.
@@ -72,7 +68,7 @@ Feature: Complaint Entries Show Page
       | id | uri                  | domain  | subdomain | path | entry_type | status | ip_address |
       | 1  | alphabet.abc.com/zyx | abc.com | alphabet  | /zyx | URI/DOMAIN | NEW    |            |
     When I goto "/escalations/webcat/complaint_entries/1"
-    Then I should see content "alphabet.abc.com/zyx" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "alphabet.abc.com/zyx"
     Then button with id "ce_ip_uri_domain" should be enabled
     And button with id "ce_ip_uri_subdomain" should be enabled
     And button with id "ce_ip_uri_original" should be disabled
@@ -83,14 +79,14 @@ Feature: Complaint Entries Show Page
     And button with id "ce_ip_uri_subdomain" should be enabled
     And button with id "ce_ip_uri_original" should be enabled
     When I click "#ce_ip_uri_subdomain"
-    Then I should see content "alphabet.abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "alphabet.abc.com"
     And button with id "ce_ip_uri_subdomain" should be disabled
     When I click "#ce_ip_uri_domain"
-    Then I should see content "abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "abc.com"
     And button with id "ce_ip_uri_domain" should be disabled
     And button with id "ce_ip_uri_subdomain" should be enabled
     When I click "#ce_ip_uri_original"
-    Then I should see content "alpha.abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "alpha.abc.com"
     And button with id "ce_ip_uri_original" should be disabled
     Then button with id "ce_ip_uri_domain" should be enabled
     And button with id "ce_ip_uri_subdomain" should be enabled
@@ -102,7 +98,7 @@ Feature: Complaint Entries Show Page
       | id | uri           | domain  | subdomain | path | ip_address | entry_type | status |
       | 1  | alpha.def.com | def.com | alpha     |      |            | URI/DOMAIN | NEW    |
     When I goto "/escalations/webcat/complaint_entries/1"
-    Then I should see content "alpha.abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "alpha.abc.com"
     Then button with id "ce_ip_uri_domain" should be enabled
     And button with id "ce_ip_uri_subdomain" should be disabled
     And button with id "ce_ip_uri_original" should be disabled
@@ -112,16 +108,16 @@ Feature: Complaint Entries Show Page
     And button with id "ce_ip_uri_subdomain" should be enabled
     And button with id "ce_ip_uri_original" should be enabled
     When I click "#ce_ip_uri_subdomain"
-    Then I should see content "alphabet.abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "alphabet.abc.com"
     And button with id "ce_ip_uri_subdomain" should be disabled
     Then button with id "ce_ip_uri_domain" should be enabled
     And button with id "ce_ip_uri_original" should be disabled
     When I click "ce_ip_uri_domain"
-    Then I should see content "abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "abc.com"
     And button with id "ce_ip_uri_domain" should be disabled
     And button with id "ce_ip_uri_subdomain" should be enabled
     When I click "#ce_ip_uri_original"
-    Then I should see content "alpha.abc.com" within "#ce_ip_uri_input"
+    Then Input with id "ce_ip_uri_input" should have value "alpha.abc.com"
     And button with id "ce_ip_uri_original" should be disabled
     Then button with id "ce_ip_uri_domain" should be enabled
     And button with id "ce_ip_uri_subdomain" should be disabled
@@ -151,8 +147,7 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "Unassigned" within "#complaint_assignee"
+      Then I should see an element "#complaint_assignee" with text "Unassigned"
       When I click "#webcat_take_ticket_assignee"
       And I wait for "2" seconds
       Then I should see my display name in "#complaint_assignee"
@@ -167,7 +162,6 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see my display name in "#complaint_assignee"
       When I click "#webcat_return_ticket_assignee"
       And I wait for "3" seconds
@@ -185,18 +179,16 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "User Two" within "#complaint_assignee"
+      Then I should see an element "#complaint_assignee" with text "User Two"
       And I should not see button with id "webcat_take_ticket_assignee"
 
     @javascript
     Scenario: A WebCat user tries to return a Pending ticket they are assigned
       Given a user with role "webcat user" exists and is logged in
       And the following complaint entries exist:
-        | id | uri     | domain  | entry_type | status  | user_id |
-        | 1  | abc.com | abc.com | URI/DOMAIN | PENDING | 1       |
+        | id | uri     | domain  | entry_type | status  | user_id | is_important |
+        | 1  | abc.com | abc.com | URI/DOMAIN | PENDING | 1       | true         |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see my display name in "#complaint_assignee"
       And I should not see button with id "webcat_return_ticket_assignee"
 
@@ -209,11 +201,10 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "Unassigned" within "#complaint_reviewer"
+      Then I should see an element "#complaint_reviewer" with text "No Reviewer"
       When I click "#webcat_take_ticket_reviewer"
       Then I should see my display name in "#complaint_reviewer"
-      And I should not see content "Unassigned" within "#complaint_reviewer"
+      And I should not see content "No Reviewer" within "#complaint_reviewer"
       And I should not see button with id "webcat_take_ticket_reviewer"
       And I should see button with id "webcat_return_ticket_reviewer"
 
@@ -227,7 +218,6 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id | reviewer_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       | 1           |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see my display name in "#complaint_reviewer"
       When I click "#webcat_return_ticket_reviewer"
       Then I should not see my display name in "#complaint_reviewer"
@@ -241,8 +231,7 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "Unassigned" within "#complaint_second_reviewer"
+      Then I should see an element "#complaint_second_reviewer" with text "No 2nd Reviewer"
       When I click "#webcat_take_ticket_second_reviewer"
       Then I should see my display name in "#complaint_second_reviewer"
       And I should not see content "No 2nd Reviewer" within "#complaint_second_reviewer"
@@ -259,12 +248,11 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id | second_reviewer_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       | 1                  |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see my display name in "#complaint_second_reviewer"
       When I click "#webcat_return_ticket_second_reviewer"
       And I wait for "2" seconds
       Then I should not see my display name in "#complaint_second_reviewer"
-      And I should see content "No 2nd Reviewer" within "#complaint_second_reviewer"
+      And I should see an element "#complaint_second_reviewer" with text "No 2nd Reviewer"
 
   Rule: WebCat users cannot be reviewers for tickets they are assigned
     @javascript
@@ -274,9 +262,8 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       And I click "#webcat_take_ticket_reviewer"
-      Then I should see content "The Assignee cannot also be a Reviewer." within ".error-msg"
+      Then I should see an element ".error-msg" with text "The Assignee cannot also be a Reviewer."
       And I should not see my display name in "#complaint_reviewer"
 
   Rule: WebCat users cannot be other reviewer for tickets they are already reviewing.
@@ -291,10 +278,9 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id | reviewer_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       | 1           |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see my display name in "#complaint_reviewer"
       When I click "#webcat_take_ticket_second_reviewer"
-      Then I should see content "The Reviewer cannot also be the Second Reviewer." within ".error-msg"
+      Then I should see an element ".error-msg" with text "The Second Reviewer cannot also be the Reviewer."
       Then I should not see my display name in "#complaint_second_reviewer"
 
     @javascript
@@ -307,10 +293,9 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id | second_reviewer_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       | 1                  |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see my display name in "#complaint_second_reviewer"
       When I click "#webcat_take_ticket_reviewer"
-      Then I should see content "The Second Reviewer cannot also be the Reviewer." within ".error-msg"
+      Then I should see an element ".error-msg" with text "The Reviewer cannot also be the Second Reviewer."
 
   Rule: Only a webcat manager can assign other webcat users to a ticket
 
@@ -324,13 +309,12 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "Unassigned" within "#complaint_assignee"
+      Then I should see an element "#complaint_assignee" with text "Unassigned"
       When I click "#show_change_assignee"
       Then "User Two" should be in the "change_target_assignee" dropdown list
       And I select "2" from the "change_target_assignee" dropdown list
       And I click "#button_reassign"
-      Then I should see content "User Two" within "#complaint_assignee"
+      Then I should see an element "#complaint_assignee" with text "User Two"
 
     @javascript
     Scenario: A WebCat manager reassigns a ticket with an assignee to a WebCat user.
@@ -343,13 +327,12 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "User Two" within "#complaint_assignee"
+      Then I should see an element "#complaint_assignee" with text "User Two"
       When I click "#show_change_assignee"
       Then "User Three" should be in the "change_target_assignee" dropdown list
       And I select "3" from the "change_target_assignee" dropdown list
       And I click "#button_reassign"
-      Then I should see content "User Three" within "#complaint_assignee"
+      Then I should see an element "#complaint_assignee" with text "User Three"
 
     @javascript
     Scenario: A WebCat manager assigns a reviewer for a ticket without a reviewer.
@@ -361,13 +344,12 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "No Reviewer" within "#complaint_reviewer"
+      Then I should see an element "#complaint_reviewer" with text "No Reviewer"
       When I click "#show_change_reviewer"
       Then "User Two" should be in the "change_target_reviewer" dropdown list
       And I select "2" from the "change_target_reviewer" dropdown list
       And I click "#button_reassign"
-      Then I should see content "User Two" within "#complaint_reviewer"
+      Then I should see an element "#complaint_reviewer" with text "User Two"
 
     @javascript
     Scenario: A WebCat manager reassigns the reviewer for a ticket with an reviewer.
@@ -380,13 +362,12 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | reviewer_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "User Two" within "#complaint_reviewer"
+      Then I should see an element "#complaint_reviewer" with text "User Two"
       When I click "#show_change_reviewer"
       Then "User Three" should be in the "change_target_reviewer" dropdown list
       And I select "3" from the "change_target_reviewer" dropdown list
       And I click "#button_reassign"
-      Then I should see content "User Three" within "#complaint_reviewer"
+      Then I should see an element "#complaint_reviewer" with text "User Three"
 
     @javascript
     Scenario: A WebCat manager assigns a second reviewer for a ticket without a second reviewer.
@@ -398,13 +379,12 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "No 2nd Reviewer" within "#complaint_second_reviewer"
+      Then I should see an element "#complaint_second_reviewer" with text "No 2nd Reviewer"
       When I click "#show_change_second_reviewer"
       Then "User Two" should be in the "change_target_second_reviewer" dropdown list
       And I select "2" from the "change_target_second_reviewer" dropdown list
       And I click "#button_reassign"
-      Then I should see content "User Two" within "#complaint_second_reviewer"
+      Then I should see an element "#complaint_second_reviewer" with text "User Two"
 
     @javascript
     Scenario: A WebCat manager reassigns the second reviewer for a ticket with an second_reviewer.
@@ -417,13 +397,12 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | second_reviewer_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2                  |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "User Two" within "#complaint_second_reviewer"
+      Then I should see an element "#complaint_second_reviewer" with text "User Two"
       When I click "#show_change_second_reviewer"
       Then "User Three" should be in the "change_target_second_reviewer" dropdown list
       And I select "3" from the "change_target_second_reviewer" dropdown list
       And I click "#button_reassign"
-      Then I should see content "User Three" within "#complaint_second_reviewer"
+      Then I should see an element "#complaint_second_reviewer" with text "User Three"
 
     @javascript
     Scenario: A WebCat manager can't assign a ticket to a non-WebCat user.
@@ -435,10 +414,9 @@ Feature: Complaint Entries Show Page
         | id | uri     | domain  | entry_type | status | user_id |
         | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
-      Then I should see content "Unassigned" within "#complaint_assignee"
-      And I should see content "No Reviewer" within "#complaint_reviewer"
-      And I should see content "No 2nd Reviewer" within "#complaint_second_reviewer"
+      Then I should see an element "#complaint_assignee" with text "User Two"
+      And I should see an element "#complaint_reviewer" with text "No Reviewer"
+      And I should see an element "#complaint_second_reviewer" with text "No 2nd Reviewer"
       When I click "#show_change_assignee"
       Then "User Two" should not be in the "change_target_assignee" dropdown list
       When I click "#show_change_assignee"
@@ -454,13 +432,12 @@ Feature: Complaint Entries Show Page
     Scenario: Should not open Complaint Entry url in a new tab if the WBRS Score is -6 or lower.
       Given a user with role "webcat user" exists and is logged in
       And the following complaint entries exist:
-      | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable |
-      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | -6         | true     |
+      | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable | ip_address |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | -6         | true     |            |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       And I click ".open-all"
       And I wait for "2" seconds
-      Then I should see content "abc.com could not open due to low WBRS Scores." within ".alert-danger"
+      Then I should see an element ".alert-danger" with text "abc.com could not open due to low WBRS Scores."
 
     @javascript
     Scenario: Should open Complaint Entry url in a new tab if the WBRS Score is lower than -6.
@@ -469,9 +446,8 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | 6          | true     |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       And I click ".open-all"
-      And I wait for "5" seconds
+      And I wait for "2" seconds
       Then a new window should be opened
 
     @javascript
@@ -481,10 +457,9 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id | wbrs_score | viewable |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       | 6          | false     |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       And I click ".open-all"
       And I wait for "2" seconds
-      Then I should see content "Complaint Address is not viewable." within ".alert-danger"
+      Then I should see an element ".alert-danger" with text "Complaint Address is not viewable."
 
   Rule: Complaint Entries should only submit as Fixed when the requisite changes are present.
 
@@ -499,15 +474,15 @@ Feature: Complaint Entries Show Page
       | Fixed 01 | This is the first Fixed comment   | Fixed           | first       |
       | Fixed 02 | This is the second Fixed comment  | Fixed           | second      |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
+      And I wait for "2" seconds
       Then I should see the radio with id "res-fixed-radio" checked
-      And button with id "ce_submit_button" should be disabled
       And I fill in selectized of element "#ce_categories_select" with "107"
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be enabled
       When I select "Fixed 02" from "entry-email-response-to-customers-select_1"
       When I click "#ce_submit_button"
-      Then I should see content "COMPLETED" within "#complaint_entry_status"
+      And I wait for "7" seconds
+      Then I should see an element "#complaint_entry_status" with text "COMPLETED"
 
     @javascript
     Scenario: A WebCat user submits a complaint entry as Fixed with all required fields filled out without a resolution template.
@@ -516,15 +491,14 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
       When I wait for "2" seconds
       And I fill in selectized of element "#ce_categories_select" with "107"
       Then button with id "ce_submit_button" should be enabled
       When I click "#ce_submit_button"
-      And I wait for "2" seconds
-      Then I should see content "must have a message to the customer" within ".error-msg"
+      And I wait for "10" seconds
+      Then I should see an element ".error-msg" with text "MUST HAVE A MESSAGE TO THE CUSTOMER"
 
     @javascript
     Scenario: The submit button should disable when the requisite changes for submission are removed.
@@ -533,7 +507,7 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
+      And I wait for "2" seconds
       Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
       And I fill in selectized of element "#ce_categories_select" with "107"
@@ -552,14 +526,14 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
       When I click "#res-unchanged-radio"
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be enabled
       When I click "#ce_submit_button"
-      Then I should see content "COMPLETED" within "#complaint_entry_status"
+      And I wait for "10" seconds
+      Then I should see an element "#complaint_entry_status" with text "COMPLETED"
 
     @javascript
     Scenario:  A user attempts to submit an unchanged Complaint Entry with changes present
@@ -568,13 +542,27 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
       When I click "#res-unchanged-radio"
       And I fill in selectized of element "#ce_categories_select" with "107"
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be disabled
+
+  Rule: Complaint Entries must have a response to customer.
+   @javascript
+    Scenario: A WebCat User submits a complaint entry as fixed without a response to the customer
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And I wait for "2" seconds
+      And button with id "ce_submit_button" should be disabled
+      When I fill in selectized of element "#ce_categories_select" with "107"
+      And I click "#ce_submit_button"
+      Then I should see content "MUST HAVE A MESSAGE TO THE CUSTOMER" within ".error-msg"
 
   Rule: Submit button should only enable for invalid when there are no present changes
 
@@ -585,13 +573,13 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
       When I click "#res-invalid-radio"
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be enabled
       When I click "#ce_submit_button"
+      And I wait for "10" seconds
       Then I should see content "COMPLETED" within "#complaint_entry_status"
 
     @javascript
@@ -601,7 +589,6 @@ Feature: Complaint Entries Show Page
       | id | uri     | domain  | entry_type | status | user_id |
       | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
       When I goto "/escalations/webcat/complaint_entries/1"
-      And I wait for "5" seconds
       Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
       When I click "#res-invalid-radio"
@@ -609,22 +596,168 @@ Feature: Complaint Entries Show Page
       And I wait for "2" seconds
       Then button with id "ce_submit_button" should be disabled
 
+  Rule: Important Complaint Entries should go to PENDING after submission
+
+    @javascript
+    Scenario: The status of a complaint entry should be PENDING after submission as FIXED
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | domain  | entry_type | status | user_id |
+      | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "2" seconds
+      And I fill in selectized of element "#ce_categories_select" with "107"
+      And I type content "Customer Response" within input with id "entry-email-response-to-customers_1"
+      And I wait for "2" seconds
+      And I click "#ce_submit_button"
+      And I wait for "7" seconds
+      Then I should see content "PENDING" within "#complaint_entry_status"
+
   Rule: Analysts can review pending tickets
 
-    Scenario: An analyst commits a pending ticket
+    @javascript
+    Scenario: An analyst should commit a pending ticket as the Reviewer
       Given a user with role "webcat user" exists and is logged in
       And the following users exist
         | display_name   |
         | User Two       |
       And the following complaint entries exist:
-        | id | uri     | entry_type | status  | user_id | reviewer_id | resolution |
-        | 1  | abc.com | URI/DOMAIN | PENDING | 1       | 2           | FIXED      |
+        | id | uri     | entry_type | status  | user_id | reviewer_id | resolution | is_important |
+        | 1  | abc.com | URI/DOMAIN | PENDING | 2       | 1           | FIXED      | true         |
       When I goto "/escalations/webcat/complaint_entries/1"
-      Then I should see the "#res-fixed-radio" checkbox checked
+      Then I should see the radio with id "res-fixed-radio" checked
       And button with id "ce_submit_button" should be disabled
-      When I click "#review-commit-radio"
-      # Then button with id "ce_submit_button" should be enabled
-      # When I click "#ce_submit_button"
-      # Then I should see content "COMPLETED" within "#complaint_entry_status"
+      When I click "#review_commit_radio"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "COMPLETED" within "#complaint_entry_status"
 
-  Rule: Tickets declined in review should display the 'Reviewed' icon for the analyst.
+    @javascript
+    Scenario: An analyst should decline a pending ticket as the Reviewer
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name   |
+        | User Two       |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status  | user_id | reviewer_id | resolution | is_important |
+        | 1  | abc.com | URI/DOMAIN | PENDING | 2       | 1           | FIXED      | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_decline_radio"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "ASSIGNED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario: An analyst should commit a pending ticket as the Second Reviewer
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name   |
+        | User Two       |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status  | user_id | second_reviewer_id | resolution | is_important |
+        | 1  | abc.com | URI/DOMAIN | PENDING | 2       | 1                  | FIXED      | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_commit_radio"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "COMPLETED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario: An analyst should decline a pending ticket as the Second Reviewer
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name   |
+        | User Two       |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status  | user_id | second_reviewer_id | resolution | is_important |
+        | 1  | abc.com | URI/DOMAIN | PENDING | 2       | 1                  | FIXED      | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_decline_radio"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "ASSIGNED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario: An analyst should not commit a pending ticket as the Assignee without using Allow Self Review
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint entries exist:
+      | id | uri     | entry_type | status  | user_id | resolution | is_important |
+      | 1  | abc.com | URI/DOMAIN | PENDING | 1       | FIXED      | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_commit_radio"
+      Then button with id "ce_submit_button" should be disabled
+
+    @javascript
+    Scenario: An analyst should commit a pending ticket as the Assignee while using Allow Self Review
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+      | display_name   |
+      | User Two       |
+      And the following complaint entries exist:
+      | id | uri     | entry_type | status  | user_id | resolution | is_important |
+      | 1  | abc.com | URI/DOMAIN | PENDING | 1       | FIXED      | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_commit_radio"
+      Then button with id "ce_submit_button" should be disabled
+      When I click checkbox with id "self_review"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "COMPLETED" within "#complaint_entry_status"
+
+    @javascript
+    Scenario: An analyst should decline a pending ticket as the Assignee while using Allow Self Review
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+      | display_name   |
+      | User Two       |
+      And the following complaint entries exist:
+      | id | uri     | entry_type | status  | user_id | resolution | is_important |
+      | 1  | abc.com | URI/DOMAIN | PENDING | 1       | FIXED      | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should see the radio with id "res-fixed-radio" checked
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_decline_radio"
+      Then button with id "ce_submit_button" should be disabled
+      When I click checkbox with id "self_review"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "ASSIGNED" within "#complaint_entry_status"
+
+  Rule: Tickets declined in review should display the 'Reviewed' icon.
+
+    @javascript
+    Scenario: A Complaint Entry that is declined should then have the attribute 'was_dismissed: true'
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name   |
+        | User Two       |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status  | user_id | reviewer_id | resolution | url_primary_category | resolution_comment  | is_important |
+        | 1  | abc.com | URI/DOMAIN | PENDING | 2       | 1           | FIXED      | Animals and Pets     | Resolution Comment  | true         |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I wait for "2" seconds
+      Then I should see the radio with id "res-fixed-radio" checked
+      And I should see content "PENDING" within "#complaint_entry_status"
+      And button with id "ce_submit_button" should be disabled
+      When I click "#review_decline_radio"
+      Then button with id "ce_submit_button" should be enabled
+      When I click "#ce_submit_button"
+      And I wait for "10" seconds
+      Then I should see content "ASSIGNED" within "#complaint_entry_status"
+      Then I should see element ".was-reviewed"

@@ -624,7 +624,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
         path = ''
 
-        unless ip_address?
+        unless ip_address
           path = "http://#{uri}"
         else if ipv4_regex.test(ip_address)
           # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
@@ -684,73 +684,58 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     $original_uri.prop('disabled', disable_original_uri)
 
   window.submit_show_page_changes = (entry_id) ->
-    std_msg_ajax(
-      method: 'POST'
-      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
-      data:
-        complaint_entry_id: entry_id
-      success: (response) ->
-        data = $.parseJSON(response).data
-        { status: curr_status } = data.complaint
-        cat_ids = null
-        # slight differences in data sent
-        uri = $('.ce-ip-uri-input').val()
-        category_names = []
-        internal_comment = $('.ce-internal-comment-textarea').val()
-        commit = ''
-        customer_comment = $('.ce-customer-comment-textarea').val()
+    cat_ids = null
+    # slight differences in data sent
+    uri = $('.ce-ip-uri-input').val()
+    category_names = []
+    internal_comment = $('.ce-internal-comment-textarea').val()
+    commit = if initial_status == 'PENDING' then $('input[name=review]:checked').val() else ''
+    customer_comment = $('.ce-customer-comment-textarea').val()
+    resolution = if initial_status != 'PENDING' then $('input[name=resolution]:checked').val() else ''
+    categories_selectize = $('#ce_categories_select')[0].selectize
 
-        # slight differences in data sent
-        if status == 'PENDING'
-          status = ''
-          commit = $('input[name=resolution]:checked').val()
-        else
-          status = $('input[name=resolution]:checked').val()
+    if categories_selectize.items.length > 0
+      cat_ids = categories_selectize.items.join(',')
 
-        categories_selectize = $('#ce_categories_select')[0].selectize
+    $('#ce_categories_select').next('.selectize-control').find('.item').each ->
+      category_names.push($(this).text())
 
-        if categories_selectize.items.length > 0
-          cat_ids = categories_selectize.items.join(',')
+    entry_data = {
+      'id': entry_id,
+      'prefix': uri,
+      'categories': cat_ids,
+      'category_names': category_names.toString(),
+      'status': resolution,
+      'commit': commit,
+      'comment': internal_comment,
+      'resolution_comment': customer_comment,
+      'uri_as_categorized': uri
+    }
 
-        $('#ce_categories_select').next('.selectize-control').find('.item').each ->
-          category_names.push($(this).text())
+    # check data here before submitting
+    # If resolution is set to fixed, make sure it has categories applied
+    if entry_data.categories == null && entry_data.status == 'FIXED'
+      std_msg_error('Must include at least one category.','', reload: false)
+      return
+    else if entry_data.resolution_comment == '' && entry_data.status == 'FIXED'
+      std_msg_error('Must have a message to the customer.','', reload: false)
+      return
+    else if entry_data.uri_as_categorized == '' && entry_data.status == 'FIXED'
+      std_msg_error('Must have an IP/URI.','', reload: false)
+      return
+    else if entry_data.status == 'INVALID' && entry_data.categories != null
+      std_msg_error('Cannot include categories with an INVALID resolution.', '', reload: false)
+      return
 
-        entry_data = {
-          'id': entry_id,
-          'prefix': uri,
-          'categories': cat_ids,
-          'category_names': category_names.toString(),
-          'status': status,
-          'commit': commit,
-          'comment': internal_comment,
-          'resolution_comment': customer_comment,
-          'uri_as_categorized': uri
-        }
+    # need number of cols for replacement temp col
+    visible_cols = $('#complaints-index thead th').length
 
-        # check data here before submitting
-        # If resolution is set to fixed, make sure it has categories applied
-        if entry_data.categories == null && entry_data.status == 'FIXED'
-          std_msg_error('Must include at least one category.','', reload: false)
-          return
-        else if entry_data.resolution_comment == '' && entry_data.status == 'FIXED'
-          std_msg_error('Must have a message to the customer.','', reload: false)
-          return
-        else if entry_data.uri_as_categorized == '' && entry_data.status == 'FIXED'
-          std_msg_error('Must have an IP/URI.','', reload: false)
-          return
-        else if entry_data.status == 'INVALID' && entry_data.categories != null
-          std_msg_error('Cannot include categories with an INVALID resolution.', '', reload: false)
-          return
-
-        # need number of cols for replacement temp col
-        visible_cols = $('#complaints-index thead th').length
-
-        if curr_status == 'PENDING'
-          process_review(entry_data)
-        else
-          process_entry(entry_data)
-          # submit for real
-    )
+    console.log('initial_status: ', initial_status)
+    if initial_status == 'PENDING'
+      process_review(entry_data)
+    else
+      process_entry(entry_data)
+      # submit for real
 
   # Sending individual entry info to the backend
   process_entry = (entry_data) ->
@@ -771,7 +756,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           , 5000
 
       error: (response) ->
-        msg = response.resonseJSON.error
+        msg = response.responseJSON.error
 
         std_msg_error("Error submitting entry", msg, reload: false)
         console.error(msg)
@@ -779,6 +764,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   # Sending individual reviewed (PENDING) entry info to the backend
   process_review = (entry_data) ->
+    console.log('process review entry data: ', entry_data)
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
       method: 'POST'
@@ -792,7 +778,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           location.reload()
         , 5000
       error: (response) ->
-        msg = response.resonseJSON.error
+        msg = response.responseJSON.error
         console.error(msg)
         std_msg_error("Error submitting reviewed entries", msg, reload: false)
     , this)
@@ -815,10 +801,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     )
 
   $ ->
+    complaint_data = {}
     current_user_id = Number($('input[name="current_user_id"]').val())
+    initial_status = $('#complaint_entry_status').text().trim()
     entry_id = Number($('#complaint_entry_id')[0].innerText)
     headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-    initial_status = $('#complaint_entry_status').text().trim()
     resolution_option = $('.resolution-radio-button:checked').val()
     resolution_comment = $('.ce-customer-comment-textarea').val()
     review_option = $('.review-radio-button:checked').val()

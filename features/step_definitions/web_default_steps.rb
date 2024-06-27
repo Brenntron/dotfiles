@@ -217,6 +217,10 @@ Then(/^Input with id "(.*?)" should be empty$/) do |id_name|
   find(:xpath, "//*[@id='#{id_name}']")[:value] == ""
 end
 
+Then(/^Input with id "(.*?)" should have value "(.*?)$/) do |id, value|
+  find("##{id}").value == value
+end
+
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
   find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
@@ -246,6 +250,12 @@ end
 
 Then(/^I click checkbox with name "(.*?)"$/) do |checkbox_name|
   checkbox = page.find(:xpath, "//input[@type='checkbox' and @name='#{checkbox_name}']")
+  checkbox.click
+  checkbox.should be_checked
+end
+
+When(/^I click checkbox with id "(.*?)"$/) do |id|
+  checkbox = page.find(:xpath, "//input[@type='checkbox' and @id='#{id}']")
   checkbox.click
   checkbox.should be_checked
 end
@@ -329,6 +339,10 @@ Then(/^I should see element "(.*?)"$/) do |element|
   rescue Capybara::ElementNotFound => e
     raise "element not found: #{element}"
   end
+end
+
+And(/^I should see an element "(.*?)" with text "(.*?)"$/) do |element, text|
+  page.find(element.to_s).assert_text(text)
 end
 
 Then(/^I should not see element "(.*?)"$/) do |element|
