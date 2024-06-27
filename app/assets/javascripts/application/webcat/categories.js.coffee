@@ -1,22 +1,31 @@
 namespace 'AC.WebCat', (exports) ->
 
-  ## I think we fetch this entirely too many times per page, there must be a simpler way ##
+  oneDayInMiliseconds = 86400000
+
+  ## Fetches AUP categories, using cache if available ##
   exports.getAUPCategories = ->
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-      method: 'GET'
-      headers: headers
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
-    )
+    catogory_list = getItemWithExpiry('catogory_list')
+    if catogory_list
+      return Promise.resolve(catogory_list)
+    else
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
+        method: 'GET'
+        headers: headers
+        success: (response) ->
+          setItemWithExpiry('catogory_list', response, oneDayInMiliseconds)
+          return response
+        error: (response) ->
+          return response
+      )
 
 
   exports.createSelectOptions = (id) ->
+    
     if $(id)[0] != undefined
       AC.WebCat.getAUPCategories().then( (categories) =>
+
         webcat_options = []
         for key, value of categories
           cat_code = key.split(' - ')[1]

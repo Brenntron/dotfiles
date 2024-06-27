@@ -30,10 +30,19 @@ window.remove_entry_from_changes = (entry_id, type) ->
 
   changes = (sessionStorage.getItem(changed) || "")
   if changes.includes(entry_id)
-    entries = changes.split(",").filter((item) -> return item)
-    submitted_entry = entries.indexOf(entry_id)
-    new_changes = entries.splice(submitted_entry, 1)
+    entries = changes.split(',')
+    new_changes = []
+
+    $(entries).each ->
+      entry = this.toString()
+      if entry != entry_id.toString()
+        new_changes.push(entry)
+
+    new_changes.join(',')
+    if new_changes.length == 0 #remove changes popup if no changes in table
+      window.prevent_close()
     sessionStorage.setItem(changed, new_changes)
+
 
 window.getTouchedFormCount = () ->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
@@ -346,6 +355,14 @@ window.reopenComplaint = (entry_id) ->
       $(entry_row).find('.resolution_radio_button').each ->
         $(this).prop('disabled', false)
       $('#edit_uri_input_' + entry_id).removeAttr('disabled')
+
+      quick_disabled = 'disabled'
+      $('#quick_edit_dropdown_' + entry_id + ' ul li').each ->
+        unless $(this).hasClass('disabled')
+          quick_disabled = ''
+
+      if quick_disabled == ''
+        $('#quick_edit_uri_' + entry_id).removeAttr('disabled')
 
       # res comment when avail
       cat_input = $('#input_cat_' + entry_id)

@@ -1,4 +1,5 @@
 class Escalations::Webcat::ReportsController < Escalations::WebcatController
+  before_action :report_mentrics, only: [:index]
   before_action { authorize!(:read, Complaint) }
 
   def index

@@ -36,31 +36,34 @@
             %span#dispute-assignee{class:"#{'missing-data' if @is_unassigned}"}= @dispute.assignee || "None"
           - if can? :update, Dispute
             .dispute-owner-buttons-wrapper
+
               - if @is_assignee
-                - if !@is_duplicate && !@is_resolved
-                  %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();', :disabled=> @entry_disabled}
+                %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();', :disabled=> @entry_disabled}
               - else
-                - if !@is_duplicate && !@is_resolved && (@dispute.user.cvs_username == 'vrtincom')
-                  %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});", :disabled=> @entry_disabled}
+                %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();', :disabled=> 'true'}
 
-                %span.dropdown
-                  - if !@is_duplicate && !@is_resolved
-                    %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', :disabled=> @disabled_when_processing}
-                  .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-                    .change-assignee-dropdown-wrapper
-                      %h3 Change Assignee
-                      .inline-tool-content-wrapper
-                        .toolbar
-                          %div
-                            %label.toolbar-section-label Assignee
-                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();', :disabled=> @entry_disabled}
-                            Assign
+              - if @dispute.user.cvs_username == 'vrtincom'
+                %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});", :disabled=> @entry_disabled}
+              - else
+                %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});", :disabled=> 'true'}
 
-              - if !@is_unassigned
-                .container_unassign
-                  %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();', :disabled=> @entry_disabled}
-                    Unassign
+              %span.dropdown
+                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', :disabled=> @entry_disabled}
+                .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                  .change-assignee-dropdown-wrapper
+                    %h3 Change Assignee
+                    .inline-tool-content-wrapper
+                      .toolbar
+                        %div
+                          %label.toolbar-section-label Assignee
+                          =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                        %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();', :disabled=> @entry_disabled}
+                          Assign
+
+
+              .container_unassign
+                %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();', :disabled=> ((@entry_disabled || @is_unassigned) ? true : false) }
+                  Unassign
 
 
         .dispute-status-col-wrapper

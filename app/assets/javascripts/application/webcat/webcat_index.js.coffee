@@ -3,24 +3,19 @@
 $ ->
   # call below and related functions only if we're on webcat index
   if $('#complaints-index').length
-
     # Create index table
     url = $('#complaints-index').data('source')
-    $.when(pull_user_preference_filter()).done ->
+    $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
 
 #### New complaints index table setup
-build_complaints_table = (url) ->
-
+window.build_complaints_table = (url) ->
   #get count of entries per page from localstorage, set to 25 if none found
   entries_per_page = localStorage.getItem 'webcat_entries_per_page'
   if entries_per_page == null then entries_per_page = 25
 
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
-      # Get display prefs
-      get_display_prefs()
-
       input = $('.dataTables_filter input').unbind()
       self = @api()
 
@@ -54,7 +49,8 @@ build_complaints_table = (url) ->
     select: true
     ajax:
       url: url
-      data: build_data()
+      data: (d) ->
+        $.extend d, build_data()
       error: () ->
         ###
           If there is an error with the build_data call, the localstorage and url will be blown away
@@ -64,6 +60,18 @@ build_complaints_table = (url) ->
         webcat_refresh()
 
       complete: ->
+        # Keep this function at top of complete
+        $('#complaints-index tbody').removeClass('hide')
+
+        # enable the sort buttons
+        $('#webcat-index-table-sort-button').removeAttr('disabled')
+        $('#sort-btn-group button').removeAttr('disabled')
+
+        # Get display prefs
+        get_display_prefs()
+        # Set active sort, unless its already set
+        if $('.active-sort').length < 1
+          window.set_active_sort()
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
@@ -99,6 +107,20 @@ build_complaints_table = (url) ->
           localStorage.setItem 'webcat_entries_per_page', len
         )
 
+        # for longer descriptions let user toggle full vs truncated
+        $('.truncated-description').on 'click', () ->
+          short = $(this).attr('data-truncated')
+          full = $(this).attr('data-full')
+          wrapper = $(this).prev()
+
+          if $(wrapper).text() == short
+            $(wrapper).text(full)
+            $(this).html('&larr;')
+          else
+            $(wrapper).text(short)
+            $(this).html('&hellip;')
+
+
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
       $(row).attr('data-categories', data.category)
@@ -114,7 +136,6 @@ build_complaints_table = (url) ->
         ### check variables below
             text_check makes sure that the table doesn't have the named search with the same name being saved now
             search_name_check makes sure that the search is being saved as a named search
-            Not super complicated, but that if statement was looking gross and confusing
         ###
         text_check = !window.find_saved_search_by_name(webcat_search_name)
         search_name_check = webcat_search_name != ''
@@ -122,14 +143,17 @@ build_complaints_table = (url) ->
         if webcat_search_type == 'advanced' && search_name_check && text_check
           temporary_search_link(webcat_search_name, webcat_search_conditions)
 
+        ## Make sure we are showing correct cols - this is needed here for if user changes page length & other dt actions
+        get_display_prefs()
+
     pagingType: 'full_numbers'
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
-    # default ordering - keep on hidden age column
-    order: [ 10, 'dec' ]
+    # default ordering - see below function if columns of dt change. Should default to user's last sort OR age integer if none exists
+    order: get_last_sort_order()
     columnDefs: [
       {
         targets: [10,11,12,13,14,15,16,17]
@@ -259,17 +283,25 @@ build_complaints_table = (url) ->
         data: 'assigned_to'
         className: 'users-col'
         render: (data, type, full, meta) ->
-          if data == ''
+          if data == '' || data == 'Vrt Incoming'
             user = '<span class="missing-data">No assignee</span>'
           else
             user = data
 
+          reviewer = full.reviewer
+          if full.reviewer == ''
+            reviewer = '<span class="missing-data">No reviewer</span>'
+
+          second_reviewer = full.second_reviewer
+          if full.second_reviewer == ''
+            second_reviewer = '<span class="missing-data">No 2nd reviewer</span>'
+
           users_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
-              '<tr class="assignee-row"><td>' + user + '</td></tr>' +
-              '<tr class="reviewer-row"><td>' + full.reviewer + '</td></tr>' +
-              '<tr class="second-reviewer-row"><td>' + full.second_reviewer + '</td></tr>' +
+              '<tr class="assignee-row" data-user-id="' + full.assigned_to_id + '"><td>' + user + '</td></tr>' +
+              '<tr class="reviewer-row" data-user-id="' + full.reviewer_id + '"><td>' + reviewer + '</td></tr>' +
+              '<tr class="second-reviewer-row" data-user-id="' + full.second_reviewer_id + '"><td>' + second_reviewer + '</td></tr>' +
               '</tbody>' +
               '</table>'
 
@@ -280,7 +312,12 @@ build_complaints_table = (url) ->
         className: 'description-col'
         render: (data) ->
           if data?
-            description = '<span onclick="copy_description(this)">' + data + '</span>'
+            if data.length > 500
+              truncated_desc = data.substring(0, 500)
+              description = '<span class="description-wrapper">' + truncated_desc + '</span><span class="truncated-description" data-truncated="' + truncated_desc + '" data-full="' + data + '">&hellip;</span>'
+            else
+              description = '<span class="description-wrapper">' + data + '</span>'
+
           return description
       }
       {
@@ -303,11 +340,7 @@ build_complaints_table = (url) ->
         data: 'uri'
         className: 'uri-col'
         render: (data, type, full, meta) ->
-          if full.status == 'PENDING'
-            disabled = "disabled=true"
-          else
-            disabled = ''
-
+          # wbrs score section
           rep = wbrs_display(full.wbrs_score)
           wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
           if rep == undefined then rep = 'unknown'
@@ -317,17 +350,14 @@ build_complaints_table = (url) ->
           entry = data || full.ip_address
           domain = full.domain || full.ip_address
 
-          # disabling domain status since it is the default
-          domain_status = 'disabled'
-
-          if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.subdomain == '' && full.path == '')
-            edit_button_status = 'disabled="disabled"'
-            if (full.status == 'COMPLETED') || (full.status == 'PENDING')
-              input_status = 'disabled="disabled"'
-            else
-              input_status = ''
+          # quick edit button status & individual selections statuses
+          if full.uri_as_categorized? && full.uri_as_categorized != domain
+            domain_status = ''
+            domain_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + domain + '\', \'domain\');"'
           else
-            edit_button_status = ''
+            domain_status = 'disabled'
+            domain_function = ''
+
           if full.subdomain == ''
             sub_status = 'disabled'
             sub_function = ''
@@ -336,6 +366,7 @@ build_complaints_table = (url) ->
             sub_status = ''
             sub_val = full.subdomain + '.' + domain
             sub_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.subdomain + '.' + domain + '\', \'subdomain\');"'
+
           if full.path == ''
             path_status = 'disabled'
             path_function = ''
@@ -345,10 +376,27 @@ build_complaints_table = (url) ->
             path_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.uri + '\', \'uri\');"'
             path_val = full.uri
 
-          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
-            input_uri = full.uri_as_categorized
+          if (domain_status == 'disabled' && sub_status == 'disabled' && path_status == 'disabled') || (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            edit_button_status = 'disabled'
           else
+            edit_button_status = ''
+
+          # value of the actual text input
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.status == 'REOPENED')
+            if full.uri_as_categorized? && full.uri_as_categorized != ''
+              input_uri = full.uri_as_categorized
+            else
+              input_uri = domain
+          else if domain? && domain != ''
             input_uri = domain
+          else
+            input_uri = entry
+
+          # status of the input textbox
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            input_status = 'disabled'
+          else
+            input_status = ''
 
           domain_col =
             '<table class="nested-col-table">' +
@@ -363,7 +411,7 @@ build_complaints_table = (url) ->
               '<button class="edit-button" id="quick_edit_uri_' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"' + edit_button_status + '></button>' +
               '<div id="quick_edit_dropdown_' + full.entry_id + '" class="dropdown-menu quick-edit-uri-dropdown" aria-labelledby="quick_edit_uri_' + full.entry_id + '">' +
               '<ul>' +
-              '<li class="quick-domain ' + domain_status + '" data-val="' + domain + '">domain</li>' +
+              '<li class="quick-domain ' + domain_status + '" data-val="' + domain + '" ' + domain_function + '>domain</li>' +
               '<li class="quick-subdomain ' + sub_status + '" data-val="' + sub_val + '" ' + sub_function + '>subdomain</li>' +
               '<li class="quick-uri ' + path_status + '" data-val="' + path_val + '" ' + path_function + '>original uri</li>' +
               '</ul>' +
@@ -625,7 +673,7 @@ build_data = () ->
     webcat_search_type = 'standard'
     urlParams = new URLSearchParams(location.search);
 
-  if webcat_search_type?
+  if webcat_search_type? && webcat_search_type != 'undefined'
     switch(webcat_search_type)
       when 'advanced'
         data = {
@@ -639,17 +687,33 @@ build_data = () ->
           search_conditions: webcat_search_conditions
         }
       when 'standard'
-        urlParams = new URLSearchParams(location.search);
-        refresh_localStorage()
+        # check address bar, then local storage
+        if location.search != ''
+          urlParams = new URLSearchParams(location.search);
+          search_name = urlParams.get('f')
+        else
+          if webcat_search_name?
+            search_name = webcat_search_name.split('=').pop()
+          else
+            # this is our default if there is no fav
+            search_name = "MY OPEN TICKETS"
+            webcat_search_name = "?f=" + search_name
+
+          # add correct url to address bar & highlight active filter
+          window.history.pushState('', '', "/escalations/webcat/complaints#{webcat_search_name}")
+          loaded_filter = $('#filter-cases-list').find('[href="' + webcat_search_name + '"]').parent()
+          $(loaded_filter).addClass('selected')
+
         data = {
           search_type: webcat_search_type
-          search_name: urlParams.get('f')
+          search_name: search_name
         }
       when 'named'
         data = {
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
+    data.allow_self_review = $("#self_review").prop('checked')
 
     build_header(data)
     return data
@@ -659,7 +723,6 @@ build_data = () ->
     fav = $('.favorite-search-icon-active')
     if fav.length > 0
       search_name = $('#saved-searches-wrapper .active-link').text().trim()
-      refresh_localStorage()
       data = {
         search_type: 'named'
         search_name: search_name
@@ -674,8 +737,6 @@ build_data = () ->
       link = $(fav[0]).prev()
       address = $(link).attr('href')
       filter = address.split('=').pop();
-
-      refresh_localStorage()
       data = {
         search_type: 'standard'
         search_name: filter
@@ -683,12 +744,17 @@ build_data = () ->
       build_header(data)
       return data
 
-    #no saved settings, no filter, currently loads All Tickets by default
+    #no saved settings, no filter, load My Open Complaints by default
     else
       data = {
         search_type: 'standard'
-        search_name: 'all'
+        search_name: 'MY OPEN COMPLAINTS'
       }
+      webcat_search_name = "?f=MY OPEN COMPLAINTS"
+      window.history.pushState('', '', "/escalations/webcat/complaints#{webcat_search_name}")
+      loaded_filter = $('#filter-cases-list').find('[href="' + webcat_search_name + '"]').parent()
+      $(loaded_filter).addClass('selected')
+
       build_header(data)
       return data
 
@@ -699,23 +765,51 @@ build_data = () ->
   # If the search_type is 'named' or 'advanced', a subheader with
   # search definitions will be made with the build_subheader function
 ###
-build_header = (data) ->
+window.build_header = (data) ->
   container = $('#webcat_searchref_container')
-  if data != undefined && container.length > 0
-    {search_type, search_name} = data
 
-    try
-      webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
-    catch e
-      webcat_search_conditions = {}
+  if container.length > 0
+    if data != undefined
+      {search_type, search_name} = data
+
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+    else
+      # check local storage - can hit here if we are updating table without refreshing page
+      # all the catches in case local storage doesn't have these values
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+
+      try
+        search_type = localStorage.webcat_search_type
+      catch e
+        search_type = ''
+
+      try
+        search_name = localStorage.webcat_search_name
+      catch e
+        search_name = ''
+
+      if search_name.includes('?f=')
+        search_name = search_name.replace('?f=', '')
 
     if search_type == 'standard'
+
+      #'My Open Tickets' filter is now default, so load that instead of any 'all' filters that load whole table
+      if search_name == 'all'
+        search_name = "MY OPEN COMPLAINTS"
+
       search_name = search_name.toLowerCase().replace('complaints', 'tickets')
 
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
       search_name = search_name.replace(/_|%20/g, " ")
-      reset_icon = get_reset_icon(search_name)
+
+      reset_icon = get_reset_icon(search_name, search_type)
       new_header =
         '<div>' +
           '<span class="text-capitalize">' + search_name + ' </span>' +
@@ -731,7 +825,7 @@ build_header = (data) ->
       build_subheader(webcat_search_conditions)
 
     else if search_type == 'named'
-      reset_icon = get_reset_icon(search_name)
+      reset_icon = get_reset_icon(search_name, search_type)
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
           reset_icon +
@@ -752,10 +846,10 @@ build_header = (data) ->
           reset_icon +
           '</div>'
     else
-      new_header = 'All Tickets'
+      new_header = ''
     $('#webcat-index-title')[0].innerHTML = new_header
   else
-    $('#webcat-index-title')[0].innerHTML = 'All Tickets'
+    $('#webcat-index-title')[0].innerHTML = ''
 
 
 
@@ -795,10 +889,19 @@ get_visible_reset_icon = ->
     class='reset-filter esc-tooltipped'
     title='Clear Search Results' onclick='webcat_refresh()'></span>"
 
+set_icon_and_url_if_current_page_is_favorite = (search_name, search_type) ->
+  #bug fix - set favorited link as selected in case filters were just cleared
+  $('.favorite-search-icon-active').parent('li').addClass 'selected'
+  #update url if favorite is a standard search
+  if search_type == 'standard' && $('.favorite-search-icon-active').length > 0
+    search_url = $('.favorite-search-icon-active').siblings('.active-link').attr('href')
+    window.history.pushState('', '', "/escalations/webcat/complaints#{search_url}");
+
 #for filters and saved searches we need to check if currently on the favorite page since it's the index
-get_reset_icon = (search_name) ->
-  if current_page_is_favourite(search_name)
+get_reset_icon = (search_name, search_type) ->
+  if current_page_is_favorite(search_name)
     reset_icon_class = 'hidden style="display: none"'
+    set_icon_and_url_if_current_page_is_favorite(search_name, search_type)
   else
     reset_icon_class = ''
   reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
@@ -831,3 +934,13 @@ set_icon_for_favorite_filter = (filter_name) ->
   else if saved_search
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
     saved_search.addClass 'active-link'
+
+
+window.get_last_sort_order = () ->
+  webcat_sort_order = localStorage.getItem 'webcat_sort_order'
+  if webcat_sort_order?
+    sort_arr = webcat_sort_order.split(',')
+    webcat_sort_order = [+sort_arr[0], sort_arr[1]]
+  else
+    webcat_sort_order = [10, 'desc']
+  return webcat_sort_order

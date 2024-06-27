@@ -54,13 +54,55 @@ $ ->
       $('#complaints-index').DataTable().state.clear()
       refresh_url()
 
-  $('#filter-cases-list a').on 'click', (e)->
+
+  $('.webcat-index-filter-dropdown #filter-cases-list a').on 'click', (e)->
+    e.preventDefault()
     filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
     localStorage.setItem('webcat_search_type', 'standard')
     localStorage.setItem('webcat_search_name', filter_url)
     localStorage.removeItem('webcat_search_conditions')
     $('#complaints-index').DataTable().state.clear()
+    $('.search-condition').remove()
+
+    new_url = '/escalations/webcat/complaints' + filter_url
+    if $('#complaints-index').length
+      # manually change the selected filter
+      $('#filter-cases-list li').removeClass('selected')
+      selected = $(this).parent().addClass('selected')
+      # update address bar with new filter without refreshing the page
+      window.history.replaceState( {} , 'Web Categorization Complaints - Analyst Console', new_url )
+
+      # check the toolbar to make sure correct options are visible
+      if filter_url.includes("REVIEW") || filter_url.includes("MY PENDING TICKETS")
+        $('#review-bulk-submit').removeClass('hidden')
+        $('#review-bulk-submit').removeClass('hidden')
+        $('#index_update_resolution').addClass('hidden')
+        $('#master-submit').addClass('hidden')
+
+        if filter_url.includes("REVIEW")
+          $('#self-review-wrapper').removeClass('hidden')
+        else
+          $('#self-review-wrapper').addClass('hidden')
+      else
+        $('#review-bulk-submit').addClass('hidden')
+        $('#review-bulk-submit').addClass('hidden')
+        $('#index_update_resolution').removeClass('hidden')
+        $('#master-submit').removeClass('hidden')
+        $('#self-review-wrapper').addClass('hidden')
+
+
+      # hiding loading tbody until data is fetched
+      # (prevent errant clicks while new filter is loading)
+      $('#complaints-index tbody').addClass('hide')
+      $('#complaints-index').DataTable().destroy()
+      $('#filter-complaints').dropdown('toggle')
+      window.build_complaints_table()
+
+    else
+      # need to go to index (useful if person was on show page, research page, etc)
+      window.location.assign(new_url)
+
 
 
   window.set_webcat_advanced = () ->
@@ -140,6 +182,7 @@ $ ->
   window.webcat_refresh = ()->
     refresh_webcat_localStorage()
     refresh_url()
+    # add 'selected' to default filter
 
 
   refresh_url = (href) ->
@@ -156,7 +199,6 @@ $ ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
-    $('#complaints-index').DataTable().state.clear()
 
 
 
@@ -187,6 +229,7 @@ $ ->
     )
 
 
+  # I don't see this being used anywhere
   window.use_user_preference_filter = () ->
     return if window.location.pathname != '/escalations/webcat/complaints'
 
@@ -201,6 +244,9 @@ $ ->
     if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
 
 
+  is_default_saved_search = (chosen_icon) ->
+    chosen_icon.closest('#saved-search > #saved-search-tbody').length > 0
+
   is_default_filter = (chosen_icon) ->
     chosen_icon.closest('#filter-dropdown > #filter-cases-list').length > 0
 
@@ -210,7 +256,7 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     { icon: fav_icon, link: link, name: name }
 
-  window.current_page_is_favourite = (search_name) ->
+  window.current_page_is_favorite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
       filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
@@ -224,17 +270,34 @@ $ ->
           if link_text == search_name
             return true
 
+    else if is_default_saved_search(icon)
+      saved_search_dropdown = $("#saved-search > span.favorite-search-icon-active")
+      if saved_search_dropdown
+        #Check if saved search link matches current url path
+        if name == decodeURIComponent(window.location.search)
+          return true
+        #If no url path check if active link matches current filter name
+        else
+          link_text = $("#saved-search > #saved-search-tbody a.active-link").text().trim()
+          if link_text == search_name
+            return true
+
     #check if on current saved search
     if name == localStorage.webcat_search_name
       return true
 
-    #catch for when no favorites are set - currently loads All Tickets page, will need to be adjusted if that changes
-    else if $('.favorite-search-icon-active').length == 0 && search_name == 'all tickets'
-      return true
+    #catch for when no favorites are set
+    else if $('.favorite-search-icon-active').length == 0
+
+      #'My Open Tickets' filter is now default - if no favorites set, do not include clear filter button
+      if search_name == 'my open tickets'
+        return true
+      else
+        return false
 
     #check if saved search favorite is set but there's no local storage saved
     else
-      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      saved_search_dropdown = $("#saved-searches-wrapper span.favorite-search-icon-active")
       if saved_search_dropdown.length > 0
         saved_name = $('#saved-searches-wrapper .active-link').text().trim()
         if search_name == saved_name
@@ -244,9 +307,7 @@ $ ->
 
 
 
-  if $('#complaints-index').length
-
-
+  if window.location.href.includes('escalations/webcat') && !window.location.href.includes('clusters')
     ## WEBCAT ADVANCED SEARCH FUNCTIONS
 
     ## Note - this function is not currently used,
@@ -299,7 +360,6 @@ $ ->
     category_input = $('#category-input').selectize {
       persist: true,
       create: false,
-      maxItems: 5,
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
@@ -323,7 +383,6 @@ $ ->
     $('#status-input').selectize {
       persist: false,
       create: false,
-      maxItems: 6,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -337,7 +396,6 @@ $ ->
     $('#resolution-input').selectize {
       persist: false,
       create: false,
-      maxItems: 3,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -376,7 +434,6 @@ $ ->
     $('#channel-input').selectize {
       persist: false,
       create: false,
-      maxItems: 2,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -468,21 +525,15 @@ $ ->
 
 
 window.get_current_cats = (rows) ->
-  # Grab up-to-date list of categories ONE time for all entries
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-      all_categories = response
-      # Initialize category selectizes
-      $(rows).each ->
-        entry_id = $(this).attr('id')
-        entry_cats = $(this).attr('data-categories')
-        entry_status = $(this).attr('data-status')
-        load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
-        fetch_external_categories(entry_id)
+  AC.WebCat.getAUPCategories().then( (categories) =>
+    all_categories = categories
+    # Initialize category selectizes
+    $(rows).each ->
+      entry_id = $(this).attr('id')
+      entry_cats = $(this).attr('data-categories')
+      entry_status = $(this).attr('data-status')
+      load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
+      fetch_external_categories(entry_id)
   )
 
 # Compares the categories of an entry in AC to the full list of
@@ -718,7 +769,6 @@ process_review = (entry_data) ->
       data: [entry_data]
     }
     success: (response) ->
-#      debugger
       data = $.parseJSON(response)
       msg = $('#' + data.entry_id + ' .temp-msg')
       $(msg).text('Submitted. Refresh to see new results.')
@@ -845,9 +895,13 @@ $ ->
     temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
     $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
 
+    # remove from changes must be done before submission in case user clicks
+    # bulk submission before ind submission is finished processing
     if curr_status == 'PENDING'
+      remove_entry_from_changes(entry_id, 'review')
       process_review(entry_data)
     else
+      remove_entry_from_changes(entry_id, 'submit')
       process_entry(entry_data)
       # submit for real
 
@@ -885,27 +939,6 @@ window.toggle_selectize_layer = (input, focus) ->
   else
     $(select_parent).css('z-index', '2')
 
-
-# Let users copy the customer description
-window.copy_description = (item) ->
-  description = $(item).text()
-  dummy = document.createElement('input')
-  document.body.appendChild dummy
-  dummy.setAttribute 'value', description
-  dummy.select()
-  document.execCommand 'copy'
-  document.body.removeChild dummy
-
-  html = "<div class='copied-container'>" +
-            "<span class='copied-check'></span>" +
-            "<p id='copiedAlert'>Copied to clipboard</p>" +
-          "</div>"
-
-  $(item).after( html )
-  $('.copied-container').delay(1000).fadeOut(1000);
-  setTimeout (->
-    $(".copied-container").remove()
-  ), 2000
 
 
 ## SAVED (NAMED) SEARCH FUNCTIONS

@@ -35,7 +35,7 @@ class Wbrs::HistoryRecord < Wbrs::Base
     response = post_request(path: '/v1/cat/rules/audit', body: params)
 
     response_body = JSON.parse(response.body) rescue {}
-    
+
     records = response_body['data'].map {|datum| new_from_datum(datum)}
 
     if records.blank? && response.code >= 300
@@ -60,5 +60,7 @@ class Wbrs::HistoryRecord < Wbrs::Base
       service_status_data[:type] = "working"
       service_status.log(service_status_data)
     end
+
+    records
   end
 end

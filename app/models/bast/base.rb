@@ -45,9 +45,11 @@ class Bast::Base
     times_failed = 0
     is_healthy = false
 
+    last_bast_task = JiraImportTask.select(:bast_task).where.not(bast_task: nil).order(bast_task: :desc).first.bast_task
+
     (1..times_to_try).each do |i|
       begin
-        result = get_task_status(300)
+        result = get_task_status(last_bast_task)
         if result["status"].present?
           times_successful += 1
         else

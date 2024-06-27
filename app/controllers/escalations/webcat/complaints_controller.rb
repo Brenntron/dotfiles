@@ -1,10 +1,12 @@
 class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
+  before_action :dashboard_metrics, only: [:index, :show]
   load_and_authorize_resource class: 'Complaint'
 
   def index
     respond_to do |format|
       format.html
     end
+    @current_user_id = current_user[:id]
   end
 
   def show

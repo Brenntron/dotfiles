@@ -85,7 +85,7 @@ module API
                                          submitted_complaint[:status],
                                          submitted_complaint[:comment],
                                          submitted_complaint[:resolution_comment],
-                                         '',
+                                         submitted_complaint[:uri_as_categorized],
                                          current_user,
                                          submitted_complaint[:commit])
 
@@ -172,7 +172,7 @@ module API
                 error = e.message.to_s
                 return { error: error }.to_json
               end
-              {name: current_user.display_name}.to_json
+              {name: current_user.display_name, cvs_username: current_user.cvs_username}.to_json
             end
 
 

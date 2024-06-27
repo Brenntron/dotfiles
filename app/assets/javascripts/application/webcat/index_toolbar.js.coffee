@@ -19,6 +19,7 @@ $ ->
       data: {data, name: "SelfReview"}
       dataType: "json"
       success: (response) ->
+        toggle_self_review(self_review)
     )
 
 window.get_display_prefs = () ->
@@ -43,14 +44,14 @@ window.get_display_prefs = () ->
   )
 
 get_current_webcat_filter = ->
-  full_url = window.location.href
-  if full_url.includes('?f=NEW%20TALOS')
+  filter = localStorage.getItem 'webcat_search_name'
+  if filter == '?f=NEW TALOS'
     return 'WebcatNewTalosColumns'
-  else if full_url.includes('?f=NEW%20WBNP')
+  else if filter == '?f=NEW WBNP'
     return 'WebcatNewWbnpColumns'
-  else if full_url.includes('?f=NEW%20JIRA')
+  else if filter == '?f=NEW JIRA'
     return 'WebcatNewJiraColumns'
-  else if full_url.includes('?f=NEW%20INTERNAL')
+  else if filter == '?f=NEW INTERNAL'
     return 'WebcatNewInternalColumns'
   else
     return 'WebcatDefaultColumns'
@@ -109,33 +110,77 @@ save_display_prefs = () ->
   )
 
 
-
 # Sorting functions
 window.sort_webcat_index = () ->
-  order = $('#webcat-index-sort-order').attr('data-sort')
-  sort_by = $('#webcat-index-sort-select').val()
-  complaint_table = $('#complaints-index').DataTable()
-  complaint_table
-    .order( [ sort_by, order ] )
-    .draw();
+  # clear any previously set direct sort residue
+  window.unset_active_sort()
+
+  # set dropdown sort vals
+  dir = $('#webcat-index-sort-order').attr('data-sort')
+  col = $('#webcat-index-sort-select').val()
+
+  $('#webcat-index-table-sort-button').addClass('active-sort')
+  if dir == 'asc'
+    full_dir = 'ascending'
+  else
+    full_dir = 'descending'
+  field = $('#webcat-index-sort-select option[value=' + col + ']').text()
+  $('#webcat-index-table-sort-button').tooltipster('content', 'Sorted by ' + field + ' : ' + full_dir );
+
+  if $($('#webcat-index-table-sort-button').parent('.dropdown')[0]).hasClass('open')
+    $('#webcat-index-table-sort-button').dropdown('toggle')
+
+  # disable all sort buttons temporarily while the data loads
+  $('#webcat-index-table-sort-button').attr('disabled', true)
+  $('#sort-btn-group button').attr('disabled', true)
+  localStorage.setItem('webcat_sort_order', [col, dir])
+  $('#complaints-index').DataTable().order(col, dir).draw();
+  $('#complaints-index').DataTable().on 'draw', ->
+    get_display_prefs()
+
 
 window.toggle_direct_sort = (col, field, button) ->
-  order = $(button).attr('data-sort')
-  if order == 'asc'
-    $(button).attr('data-sort', 'desc')
-    $(button).removeClass('sort-asc').addClass('sort-desc')
-    title = 'Sort by ' + field + ': descending'
-    $(button).attr('title', title)
+
+  current_order = $(button).attr('data-sort')
+  if $(button).hasClass('active-sort')
+    active_button = true
+
+  window.unset_active_sort()
+
+  if active_button == true
+    # if button is currently active, then toggle to opposite direction on click
+    # otherwise the displayed order on the button is the desired order to change to
+    if current_order == 'asc'
+      desired_order = 'desc'
+    else
+      desired_order = 'asc'
   else
+    # employ currently visible sort & set to active
+    # clear current active direct sort
+    $('#sort-btn-group .active-sort').removeClass('active-sort')
+    $(button).addClass('active-sort')
+    desired_order = current_order
+
+  if desired_order == 'asc'
     $(button).attr('data-sort', 'asc')
     $(button).removeClass('sort-desc').addClass('sort-asc')
-    title = 'Sort by ' + field + ': ascending'
-    $(button).attr('title', title)
+    title = 'Sorted by ' + field + ': ascending | Click to reverse.'
+  else
+    $(button).attr('data-sort', 'desc')
+    $(button).removeClass('sort-asc').addClass('sort-desc')
+    title = 'Sorted by ' + field + ': descending | Click to reverse.'
 
-  complaint_table = $('#complaints-index').DataTable()
-  complaint_table
-    .order( [ col, order] )
-    .draw();
+  $(button).tooltipster('content', title);
+
+  # disable all sort buttons temporarily while the data loads
+  $('#webcat-index-table-sort-button').attr('disabled', true)
+  $('#sort-btn-group button').attr('disabled', true)
+  # save to localstorage in case of page refresh
+  localStorage.setItem('webcat_sort_order', [col, desired_order])
+  $('#complaints-index').DataTable().order(col, desired_order).draw();
+  $('#complaints-index').DataTable().on 'draw', ->
+    get_display_prefs()
+
 
 window.toggle_select_order = (button) ->
   order = $(button).attr('data-sort')
@@ -148,6 +193,77 @@ window.toggle_select_order = (button) ->
     $(button).removeClass('sort-desc').addClass('sort-asc')
     $(button).next().text('Ascending')
 
+
+window.set_active_sort = () ->
+  # clear any existing active sort settings
+  window.unset_active_sort()
+  # active sort settings on button are set *after* the dt is loaded
+  curr_sort = $('#complaints-index').DataTable().order()
+  col = curr_sort[0].toString()
+  direction = curr_sort[1]
+
+  # Somewhere 'dec' is getting sent instead of 'desc' - remove this line if we find the culprit
+  if direction == 'dec'
+    direction = 'desc'
+
+  if direction == 'desc'
+    full_dir = 'descending'
+  else
+    full_dir = 'ascending'
+
+  if col == '10' || col == '12'
+    # check if active direct sort button matches
+    $('#sort-btn-group button').each ->
+      field = $(this).text()
+      curr_dir = $(this).attr('data-sort')
+
+      if col == $(this).attr('data-column')
+        $(this).addClass('active-sort')
+        $(this).tooltipster('content', 'Sorted by ' + field + ': ' + full_dir + ' | Click to reverse.' );
+        if direction != $(this).attr('data-sort')
+          $(this).removeClass('sort-asc').removeClass('sort-desc').addClass('sort-' + direction)
+          $(this).attr('data-sort', direction)
+      else
+        $(this).removeClass('active-sort')
+        if curr_dir == 'desc'
+          full_dir = 'descending'
+        else
+          full_dir = 'ascending'
+        $(this).tooltipster('content', 'Sort by ' + field + ': ' + full_dir);
+
+    $('#webcat-index-table-sort-button').tooltipster('content', 'Sort by Data');
+
+  else
+    # sort is being implemented via the sort dropdown
+    # set active-sort on button, load selected option, direction arrow, and label in dropdown
+    if direction == 'asc'
+      label = 'Ascending'
+    else
+      label = 'Descending'
+    $('#webcat-index-table-sort-button').addClass('active-sort')
+    $('#webcat-index-sort-select').val(col)
+    $('#webcat-index-sort-order').removeClass('sort-asc').removeClass('sort-desc').addClass('sort-' + direction)
+    $('#webcat-index-sort-order').attr('data-sort', direction)
+    $('#webcat-index-sort-order').next('label').text(label)
+    field = $('#webcat-index-sort-select option[value=' + col + ']').text()
+    $('#webcat-index-table-sort-button').tooltipster('content', 'Sorted by ' + field + ': ' + full_dir );
+
+
+window.unset_active_sort = () ->
+  $('#sort-btn-group .active-sort').removeClass('active-sort')
+  # restore tooltips to non-active values
+  $('#sort-btn-group button').each ->
+    button_dir = $(this).attr('data-sort')
+    button_field = $(this).text()
+    if button_dir == 'asc'
+      button_dir = 'ascending'
+    else
+      button_dir = 'descending'
+    $(this).tooltipster('content', 'Sort by ' + button_field + ': ' + button_dir);
+
+  # clear active settings from dropdown sort
+  $('#webcat-index-table-sort-button').removeClass('active-sort')
+  $('#webcat-index-table-sort-button').tooltipster('content', 'Sort by Data');
 
 
 # Selecting rows / enabling / disabling buttons based on selections
@@ -328,14 +444,14 @@ window.return_selected = ()->
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text("Vrt Incoming")
+              $(row).find('.assignee-row td').html('<span class="missing-data">No assignee</span>')
               status = $(row).find('.state-row td')
               if $(status).text() == 'ASSIGNED'
                 $(status).text('NEW')
             else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text("")
+              $(row).find('.reviewer-row td').html('<span class="missing-data">No reviewer</span>')
             else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text("")
+              $(row).find('.second-reviewer-row td').html('<span class="missing-data">No 2nd reviewer</span>')
 
       error: (response) ->
         std_msg_error('Error Returning Entries', [response.responseText])
@@ -423,14 +539,14 @@ window.webcat_remove_assignee = () ->
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text("Vrt Incoming")
+              $(row).find('.assignee-row td').html('<span class="missing-data">No assignee</span>')
               status = $(row).find('.state-row td')
               if $(status).text() == 'ASSIGNED'
                 $(status).text('NEW')
             else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text("")
+              $(row).find('.reviewer-row td').html('<span class="missing-data">No reviewer</span>')
             else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text("")
+              $(row).find('.second-reviewer-row td').html('<span class="missing-data">No 2nd reviewer</span>')
 
       error: (response) ->
         std_msg_error('Error Removing Assignees', [response.responseText])
@@ -543,3 +659,6 @@ webcat_new_internal_tickets_column_filter = {
   "view-sugg-col-cb": "false",
   "view-tools-col-cb": "false"
 }
+
+window.toggle_self_review = (self_review) ->
+  $('#complaints-index').DataTable().ajax.reload()

@@ -75,13 +75,13 @@
                 %label{for: 'view-tools-col-cb'} Tools
   %div
     %div#sort-btn-group.btn-group.toolbar-btn-group
-      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-asc.concise-button.concise-button-first{title: 'Sort by age: ascending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'asc'} Age
-      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc'} IP/URI
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-desc.concise-button.concise-button-first{title: 'Sort by Age: descending', onclick: 'toggle_direct_sort("10", "Age", this);', 'data-sort': 'desc', 'data-column': '10'} Age
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc', 'data-column':'12'} IP/URI
 
     %span.dropdown
-      %button#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.btn#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort by Data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
-          Sort Data
+          Sort by Data
       .dropdown-menu.toolbar-dropdown#webcat-index-table-sort-dropdown{'aria-labelledby': 'webcat-index-table-sort-button'}
         %label.dropdown-label Sort results by
         .row
@@ -133,6 +133,8 @@
       %span.dropdown
         - if current_user.has_role?('webcat manager')
           %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'manager'}
+            %span.toolbar-button-text
+              Change Assignee
         - else
           %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'user'}
             %span.toolbar-button-text
@@ -203,21 +205,40 @@
       %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped-webcat-toolbar{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text WBNP Data
+
   .webcat-toolbar-push
-    - if params[:f] == "REVIEW"
+    - if params[:f] == "REVIEW" || params[:f] == "MY PENDING TICKETS"
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text-wider Confirm Review
+      %button.hidden#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
+        %span.toolbar-button-text-wider
+          Bulk Resolution Tool
+      %button.hidden.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
+        %span.toolbar-button-text-wider Bulk Submit
     - else
+      %button.hidden.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+        %span.toolbar-button-text-wider Confirm Review
       %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
         %span.toolbar-button-text-wider
           Bulk Resolution Tool
       %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
         %span.toolbar-button-text-wider Bulk Submit
-  .webcat-toolbar-tall-wrapper
-    - if current_user.enabled_self_review
-      %input{type: 'checkbox', id:'self_review', checked: true}
-    - else 
-      %input{type: 'checkbox', id:'self_review', checked: false}
-    %label{for: 'self_review'}
-      %span.toolbar-button-text-wider.no-float-no-pad Allow
-      %span.no-float-no-pad Self Review
+
+  - if params[:f] == "REVIEW"
+    #self-review-wrapper.webcat-toolbar-tall-wrapper
+      - if current_user.enabled_self_review
+        %input{type: 'checkbox', id:'self_review', checked: true, 'data-current-user': @current_user_id}
+      - else
+        %input{type: 'checkbox', id:'self_review', checked: false, 'data-current-user': @current_user_id}
+      %label#self_review_label.esc-tooltipped{for: 'self_review', title: 'Checking this will allow you to view entries you submitted and assign yourself as a reviewer.'}
+        %span.toolbar-button-text-wider.no-float-no-pad Allow
+        %span.no-float-no-pad Self Review
+  - else
+    #self-review-wrapper.webcat-toolbar-tall-wrapper.hidden
+      - if current_user.enabled_self_review
+        %input{type: 'checkbox', id:'self_review', checked: true, 'data-current-user': @current_user_id}
+      - else
+        %input{type: 'checkbox', id:'self_review', checked: false, 'data-current-user': @current_user_id}
+      %label#self_review_label.esc-tooltipped{for: 'self_review', title: 'Checking this will allow you to view entries you submitted and assign yourself as a reviewer.'}
+        %span.toolbar-button-text-wider.no-float-no-pad Allow
+        %span.no-float-no-pad Self Review

@@ -28,7 +28,7 @@ module API
 
             get "" do
 
-              customers = Customer.all.pluck(:name)
+              customers = Customer.all.pluck(:name).uniq
               {:data => customers}
 
             end
@@ -63,7 +63,7 @@ module API
 
             get "" do
 
-              customers = Customer.all.pluck(:email)
+              customers = Customer.all.pluck(:email).uniq
               {:data => customers}
 
             end

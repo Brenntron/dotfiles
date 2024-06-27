@@ -12,40 +12,21 @@ namespace 'AC.WebCat', (exports) ->
     )
 
   exports.createPlatformOptions = ->
-    std_msg_ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/webcat/platforms_names'
-      success_reload: false
-      success: (response) ->
-        for platform in response.data
-          $('#platform-input')[0].selectize.addOption(platform)
-      error : (response) ->
-        console.log response
+    AC.DataLoaders.load_plaforms().then( (platforms) =>
+      for platform in platforms
+        $('#platform-input')[0].selectize.addOption(platform.data)
     )
 
   exports.createCustomerNameOptions = ->
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/webcat/customers_names_selectize"
-      success_reload: false
-      success: (response) ->
-        for customer_name in JSON.parse(response)
-          $('#name-input')[0].selectize.addOption(customer_name)
-
-      error : (response) ->
-        console.log response
+    AC.DataLoaders.load_customer_names().then( (customer_names) =>
+      selectizeInput = $('#name-input')[0].selectize;
+      for customer_name in customer_names.data
+        selectizeInput.addOption({name: customer_name})
     )
-
   exports.createAssigneeOptions = ->
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/users/json"
-      success_reload: false
-      success: (response) ->
-        for assignee in JSON.parse(response)
-          $('#assignee-input')[0].selectize.addOption(assignee)
-      error : (response) ->
-        console.log response
+    AC.DataLoaders.load_users_list().then( (users) =>
+      for user in users
+        $('#assignee-input')[0].selectize.addOption(user)
     )
 
   exports.populateSearchCriteria = ->

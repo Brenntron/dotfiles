@@ -94,9 +94,8 @@ class ComplaintEntry < ApplicationRecord
     distance_of_time_in_words(value)
   end
 
-  def self.is_ip?(ip)
-    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
-    !!IPAddr.new(ip) rescue false
+  def self.is_ip?(ip_url)
+    (ip_url =~ Resolv::IPv4::Regex) || (ip_url =~ Resolv::IPv6::Regex) ? true : false
   end
 
   def self.manipulate_changeset(changeset)
@@ -157,13 +156,13 @@ class ComplaintEntry < ApplicationRecord
     elsif assignment_type == 'assignee' && (self.user.nil? || self.user.display_name == 'Vrt Incoming')
       update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
       complaint.set_status("ASSIGNED")
-    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id
+    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id && !self.user.enabled_self_review
       return('The Assignee cannot also be a Reviewer.')
-    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id
+    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id && !self.user.enabled_self_review
       return('The Reviewer cannot also be the Second Reviewer.')
     elsif assignment_type == 'reviewer' && reviewer.nil?
       update(reviewer: current_user)
-    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id
+    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id && !self.user.enabled_self_review
       return('The Second Reviewer cannot also be the Reviewer.')
     elsif assignment_type == 'second_reviewer' && second_reviewer.nil?
       update(second_reviewer: current_user)
@@ -422,11 +421,13 @@ class ComplaintEntry < ApplicationRecord
         return post_categorize(current_user)
       end
 
+      #commenting this out for now even though this represents how change_category was written before R-ACE project. looks like things might have
+      # been broken and wasn't caught, but this is causing behavior that SDO wasn't expecting.
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if current_user.enabled_self_review
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
-        return post_categorize(current_user)
-      end
+      #if current_user.enabled_self_review
+      #  categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
+      #  return post_categorize(current_user)
+      #end
 
       #################
 
@@ -464,19 +465,19 @@ class ComplaintEntry < ApplicationRecord
 
       ## call guardrails
 
-      #begin
+      begin
         category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
         verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
 
         verdict_pass = verdict_results[:verdict_pass]
         verdict_reasons = verdict_results[:verdict_reasons]
-        #binding.pry
-      #rescue Exception => e
-      #  Rails.logger.error(e.message)
-      #  verdict_pass = false
-      #  verdict_reasons << "there was an api call failure, erring to manager review"
-      #end
+
+      rescue Exception => e
+        Rails.logger.error(e.message)
+        verdict_pass = false
+        verdict_reasons << "there was an api call failure, erring to manager review"
+      end
 
       ## if verdict does not pass and is not a webcat manager then kickback to manager with why it failed
       if verdict_pass == false
@@ -883,7 +884,7 @@ class ComplaintEntry < ApplicationRecord
     when 'named'
       named_search(search_name, user: user)
     when 'standard'
-      standard_search(search_name, user: user)
+      standard_search(search_name, user: user, params: params)
     when 'contains'
       contains_search(params['value'])
     else
@@ -909,7 +910,7 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    complaint_entry_fields = %w{complaint_entries.complaint_id subdomain domain path url_primary_category
+    complaint_entry_fields = %w{complaint_entries.complaint_id subdomain domain path url_primary_category uri_as_categorized
                         complaint_entries.resolution complaint_entries.internal_comment complaint_entries.status uri ip_address category}
     complaint_entry_where = complaint_entry_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
@@ -923,7 +924,7 @@ class ComplaintEntry < ApplicationRecord
   # Searches specific to quick generic button filters.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name, user:)
+  def self.standard_search(search_name, user:, params: {})
     case search_name
     when "NEW"
       new_entries
@@ -932,11 +933,18 @@ class ComplaintEntry < ApplicationRecord
     when "ACTIVE"
       open.where.not(status:"NEW")
     when "REVIEW"
-      where(status: "PENDING")
+      if params[:allow_self_review]
+       where(status: "PENDING")
+      else
+        where(status: "PENDING").where.not(user_id: user.id)
+      end
+
     when "MY COMPLAINTS"
       where(user_id: user.id)
     when "MY OPEN COMPLAINTS"
       open.where(user_id: user.id)
+    when "MY PENDING TICKETS"
+      where(status: 'PENDING').where(reviewer_id: user.id).or(where(status: 'PENDING').where(second_reviewer_id: user.id))
     when "MY CLOSED COMPLAINTS"
       closed.where(user_id: user.id)
     when "MANAGER QUEUE"
@@ -977,10 +985,9 @@ class ComplaintEntry < ApplicationRecord
       where(status: 'PENDING')
     when "PENDING OVERDUE"
       where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
-    when "ALL"
-      all
     else
-      all
+      # defaulting to users open tix if nothing is set
+      open.where(user_id: user.id)
     end
   end
 
@@ -1124,6 +1131,7 @@ class ComplaintEntry < ApplicationRecord
       relation = relation.where("complaint_entries.domain in (#{vals})")
                      .or(where("complaint_entries.ip_address in (#{vals})"))
                      .or(where("complaint_entries.uri in (#{vals})"))
+                     .or(where("complaint_entries.uri_as_categorized in (#{vals})"))
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
