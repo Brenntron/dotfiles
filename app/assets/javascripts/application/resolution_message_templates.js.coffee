@@ -212,25 +212,6 @@ $ ->
           std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
       )
 
-    #Fetch resolutions by resolution, for use in template selects
-    window.get_resolution_templates_by_resolution = (route, resolution, ticket_type) ->
-
-      if route == 'webrep' #show if web or email ticket for webrep
-        data = {resolution: resolution, ticket_type: ticket_type}
-      else
-        data = {resolution: resolution}
-
-      std_msg_ajax(
-        method: 'GET'
-        url: "/escalations/api/v1/escalations/#{route}/resolution_message_templates"
-        data: data
-        dataType: 'json'
-        success_reload: false
-        success: (response) ->
-          response
-        error: (response) ->
-          std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
-      )
 
     # Change resolution template select - Tickets
     $('.resolution-message-template-select').on 'change', (i, e) ->
@@ -364,3 +345,24 @@ $ ->
       else
         $('#create-form_resolution_type_web').removeClass('hide')
         $('#create-form_resolution_type_email').addClass('hide')
+
+
+  # This needs to be used on pages other than the template mgmt so keep out of the top level 'if' clause
+  #Fetch resolutions by resolution, for use in template selects
+  window.get_resolution_templates_by_resolution = (route, resolution, ticket_type) ->
+    if route == 'webrep' #show if web or email ticket for webrep
+      data = {resolution: resolution, ticket_type: ticket_type}
+    else
+      data = {resolution: resolution}
+
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/#{route}/resolution_message_templates"
+      data: data
+      dataType: 'json'
+      success_reload: false
+      success: (response) ->
+        response
+      error: (response) ->
+        std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
+    )
