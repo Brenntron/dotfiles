@@ -138,6 +138,36 @@ Feature: Complaint Entries Show Page
     And button with id "ce_ip_uri_subdomain" should be disabled
     And button with id "ce_ip_uri_original" should be enabled
 
+  @javascript
+  Scenario: A WebCat user can reopen COMPLETED tickets
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description        |  submitter_type | ticket_source      | status    |
+      | 1  | weather            |  CUSTOMER       | talos-intelligence | COMPLETED |
+    And the following complaint entries exist:
+      | id | uri           | domain  | ip_address | entry_type | status    | resolution | complaint_id | resolution_comment  |
+      | 1  | ghi.com       | ghi.com |            | URI/DOMAIN | COMPLETED | FIXED      | 1            | 'Resolution Comment'|
+    When I goto "/escalations/webcat/complaint_entries/1"
+    And I click "#ce_reopen_button"
+    And I wait for "7" seconds
+    Then I should see an element "#complaint_entry_status" with text "REOPENED"
+
+  @javascript
+  Scenario: A WebCat user cannot reopen duplicates
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description        |  submitter_type | ticket_source      | status    |
+      | 1  | weather            |  CUSTOMER       | talos-intelligence | COMPLETED |
+      | 2  | not weather        |  CUSTOMER       | talos-intelligence | COMPLETED |
+    And the following complaint entries exist:
+      | id | uri           | domain  | ip_address | entry_type | status       | resolution | complaint_id | resolution_comment   |
+      | 1  | ghi.com       | ghi.com |            | URI/DOMAIN | COMPLETED    | DUPLICATE  | 1            | 'Resolution Comment' |
+      | 2  | abc.com       | abc.com |            | URI/DOMAIN | WC-DUPLICATE |            | 2            | 'Resolution Comment' |
+    When I goto "/escalations/webcat/complaint_entries/1"
+    Then I should not see element "#ce_reopen_button"
+    When I goto "/escalations/webcat/complaint_entries/2"
+    Then I should not see element "#ce_reopen_button"
+
   Rule: Users can take unassigned tickets
 
     @javascript
@@ -360,7 +390,7 @@ Feature: Complaint Entries Show Page
         | User Three   |
       And the following complaint entries exist:
         | id | uri     | domain  | entry_type | status | reviewer_id |
-        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       |
+        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2           |
       When I goto "/escalations/webcat/complaint_entries/1"
       Then I should see an element "#complaint_reviewer" with text "User Two"
       When I click "#show_change_reviewer"

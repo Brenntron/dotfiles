@@ -796,7 +796,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           location.reload()
         , 2000
       error: (response) ->
-        console.error(response)
+        show_message('error', 'Could not reopen.', false, '#alert_message')
         std_msg_error(response,"", reload: false)
     )
 

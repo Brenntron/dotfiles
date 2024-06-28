@@ -35,8 +35,8 @@ require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'
 
-Capybara.default_driver = :selenium
-Capybara.javascript_driver = :selenium
+Capybara.default_driver = :selenium_headless
+Capybara.javascript_driver = :selenium_headless
 Selenium::WebDriver.logger.level = :error
 
 # This setting is required for DataTables to be compatible with Selenium
