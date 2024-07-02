@@ -262,6 +262,22 @@ class JiraImportTask < ApplicationRecord
     count
   end
 
+  def self.opendns_ticket_count
+    filters = ['status != Resolved', "issuetype != 'Question / Assistance'", "cf[20425] = 'OpenDNS'"]
+    project_key = Rails.configuration.jira.project_key
+
+    stored_count = JSON.parse(Rails.cache.read("opendns_count") || "{}")
+    if stored_count.blank? || stored_count['last_queried'] < 15.minutes.ago
+      project = JiraRest::Project.new(project_key)
+      issues = project.issues(filters)
+      count = issues.count
+      Rails.cache.write("opendns_count", {'count' => count, 'last_queried' => Time.now}.to_json)
+    else
+      count = stored_count['count']
+    end
+    count
+  end
+
   def self.export_xlsx(issue_keys='')
     issue_keys = issue_keys.split(',')
 
