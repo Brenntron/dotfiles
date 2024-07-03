@@ -390,7 +390,7 @@ For future web and email reputation requests, please open a web and email reputa
       customer = Customer.process_and_get_customer(message_payload)
       new_complaint.customer_id = customer&.id
       new_complaint.status = NEW
-      new_complaint.channel = message_payload["payload"]["channel"] || TI_CHANNEL
+      new_complaint.channel = message_payload["payload"]["channel"].blank? ? TI_CHANNEL : message_payload["payload"]["channel"]
 
       new_complaint.platform_id = platform.id unless platform.blank?
       new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
@@ -398,6 +398,7 @@ For future web and email reputation requests, please open a web and email reputa
       new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
       new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
+      binding.pry
       new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
       if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
         new_complaint.submitter_type = SUBMITTER_TYPE_CUSTOMER
