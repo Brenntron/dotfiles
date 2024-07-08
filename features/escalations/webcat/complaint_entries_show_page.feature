@@ -168,6 +168,18 @@ Feature: Complaint Entries Show Page
     When I goto "/escalations/webcat/complaint_entries/2"
     Then I should not see element "#ce_reopen_button"
 
+  @javascript
+  Scenario: a WebCat user sees the whois information for a domain
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri                         | domain                | ip_address | entry_type | status |
+      | 1  | dungeonsanddoggos.com       | dungeonsanddoggos.com |            | URI/DOMAIN | NEW    |
+    And I can receive a whois lookup request
+    When I goto "/escalations/webcat/complaint_entries/1"
+    And I wait for "2" seconds
+    And take a screenshot
+    Then I should see content "DUNGEONSANDDOGGOS.COM" within "#whois_data_container"
+
   Rule: Users can take unassigned tickets
 
     @javascript

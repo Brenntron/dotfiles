@@ -694,6 +694,10 @@ And(/the table "(.*?)" should have "(.*?)" number of rows/) do | table, number_o
   page.all("table##{table} tbody tr").count.should == Integer(number_of_rows)
 end
 
+Then(/^I should see alert$/) do
+  page.is_alert_present.should be_true
+end
+
 Then(/^I accept the user prompt$/) do
   alert = page.driver.browser.switch_to.alert
   alert.accept
