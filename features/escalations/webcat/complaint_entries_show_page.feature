@@ -168,6 +168,23 @@ Feature: Complaint Entries Show Page
     When I goto "/escalations/webcat/complaint_entries/2"
     Then I should not see element "#ce_reopen_button"
 
+  # TODO - this does not work in testing env yet - the pop up does not prevent refresh, could be a ff setting
+  # since firefox disabled pop ups by default. We might need tweaks to testing browser
+  # @javascript
+  # Scenario: a user sees a pop-up window if they make changes to an entry but do not submit
+  #   Given a user with role "webcat user" exists and is logged in
+  #   And the following complaint entries exist:
+  #     | id | uri                         | domain                | ip_address | entry_type | status |
+  #     | 1  | dungeonsanddoggos.com       | dungeonsanddoggos.com |            | URI/DOMAIN | NEW    |
+  #   When I goto "/escalations/webcat/complaint_entries/1"
+  #   And I wait for "2" seconds
+  #   And I fill in selectized of element "#ce_categories_select" with "107"
+  #   And I click "#complaints"
+  #   And I wait for "2" seconds
+  #   Then I switch to the alert
+  #   And take a screenshot
+  #   And I should see alert
+
   @javascript
   Scenario: a WebCat user sees the whois information for a domain
     Given a user with role "webcat user" exists and is logged in
@@ -177,7 +194,6 @@ Feature: Complaint Entries Show Page
     And I can receive a whois lookup request
     When I goto "/escalations/webcat/complaint_entries/1"
     And I wait for "2" seconds
-    And take a screenshot
     Then I should see content "DUNGEONSANDDOGGOS.COM" within "#whois_data_container"
 
   Rule: Users can take unassigned tickets
@@ -803,3 +819,37 @@ Feature: Complaint Entries Show Page
       And I wait for "10" seconds
       Then I should see content "ASSIGNED" within "#complaint_entry_status"
       Then I should see element ".was-reviewed"
+
+ Rule: Only WebCat Complaints from Talos Intelligence can convert to WebRep Disputes
+
+    @javascript
+    Scenario: A Complaint from talos intelligence should convert to a Dispute.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaints exist:
+        | id | description        |  submitter_type | ticket_source      | status |
+        | 1  | weather            |  CUSTOMER       | talos-intelligence | NEW    |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status | user_id | complaint_id |
+        | 1  | abc.com | URI/DOMAIN | NEW    | 2       | 1            |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I click "#convert-ticket-button"
+      And I fill in element "#convert-ticket-summary" with "Test ticket summary."
+      And I click "#web-ticket-type"
+      And I wait for "2" seconds
+      And I click input with id "1-fp-radio"
+      And I click "#convert-to-webrep"
+      And I wait for "2" seconds
+      Then I should see an element ".success-msg" with text "Complaint converted to Reputation Dispute."
+
+    @javascript
+    Scenario: A Complaint not from talos intelligence should not convert to a Dispute.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaints exist:
+        | id | description        |  submitter_type | ticket_source          | status |
+        | 1  | weather            |  CUSTOMER       | not-talos-intelligence | NEW    |
+      And the following complaint entries exist:
+        | id | uri     | entry_type | status | user_id | complaint_id |
+        | 1  | abc.com | URI/DOMAIN | NEW    | 2       | 1            |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      And I click "#convert-ticket-button"
+      Then I should see an element ".error-msg" with text "The Complaint is not a customer ticket from talos-intelligence."

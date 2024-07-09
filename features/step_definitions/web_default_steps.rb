@@ -40,7 +40,7 @@ When(/^I click "(.*?)"$/) do |target|
     begin
       click_on(target)
     rescue Capybara::ElementNotFound => e
-      page.find("#{target}").click
+      page.find(target).click
     end
 end
 
@@ -131,7 +131,7 @@ end
 
 When(/^I click \(within\) "(.*?)" within "(.*?)"$/) do |target, context|
   within(context) do
-    page.click_link(target)
+    page.click(target)
   end
 end
 
