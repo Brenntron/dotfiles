@@ -13,7 +13,21 @@ class Customer < ApplicationRecord
   def self.thread_safe_find_or_create_by(attributes)
     begin
       with_advisory_lock("customer_create", timeout_seconds: 20) do
-        find_by(email: attributes[:email]) || create(attributes)
+        email = attributes[:email]
+        customer_exists = Customer.where(:email => email).first
+        if customer_exists
+          company = attributes[:company]
+          if customer_exists.company_id == company.id
+            find_by(email: attributes[:email])
+          else
+            # customer has changed company, update customer info:
+            customer_exists.update(:company_id => company.id)
+            find_by(email: attributes[:email])
+          end
+        else
+          # create new customer
+          create(attributes)
+        end
       end
     rescue Exception => e
       Rails.logger.error e
