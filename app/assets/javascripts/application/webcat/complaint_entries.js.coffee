@@ -375,6 +375,12 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           order: [[ 3, 'desc' ]]
           searching: false
           stateSave: false
+          columnDefs: [
+            {
+              targets: [ 3 ]
+              orderData: 6
+            }
+          ]
           pageLength: 10
           pagingType: 'simple_numbers'
           columns: [
@@ -389,12 +395,21 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             }
             {
               data: 'time_of_action'
+              render: (data) ->
+                console.log('time of action: ', data)
+                if !!data then moment(data).utc().format('MMMM D, YYYY [at] hh:mm:ss A Z') else data
             }
             {
               data: 'user'
             }
             {
               data: 'category'
+            }
+            {
+              data: 'time_of_action'
+              render: (data) ->
+                if !!data then moment(data).utc().format('x') else -1
+              visible: false
             }
           ]
       error: (errorResponse) ->
@@ -420,8 +435,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         else
           formatted_entry_history = parsed_response.entry_history.complaint_history.map((historical_data) ->
             formatted_history_data = {}
-            formatted_history_data['time'] = historical_data[0]
-            formatted_history_data['sortable_time'] = moment(historical_data[0], 'MMMM D, YYYY at HH:mm A')
+            formatted_history_data['time'] = moment(historical_data[0]).utc().format('MMMM D, YYYY [at] hh:mm:ss A Z')
+            console.log('time: ', formatted_history_data['time'])
+            formatted_history_data['sortable_time'] = moment(historical_data[0]).format('x')
             formatted_history_data['user'] = historical_data[1]['whodunnit']
 
             delete historical_data[1]['whodunnit']
@@ -437,7 +453,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             data: formatted_entry_history
             dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
             ordering: true
-            order: [[ 3, 'desc' ]]
+            order: [[ 0, 'desc' ]]
             drawCallback: () ->
               # for longer descriptions let user toggle full vs truncated
               $('.truncated-description').on 'click', () ->
@@ -537,8 +553,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               {
                 data: 'time'
                 render: (data) ->
+                  console.log('time: ', data)
                   date = moment(data)
-                  formatted = date.format('LLL')
+                  formatted = date.utc().format('MMMM D, YYYY [at] hh:mm:ss A Z')
                   return formatted
               }
               {

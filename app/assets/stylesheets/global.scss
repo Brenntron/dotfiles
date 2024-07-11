@@ -4109,9 +4109,9 @@ fieldset.top-content {
 }
 
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
-.nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
+.nav-tabs > li > a#research-tab-link, a#research_tab_link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
-.nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
+.nav-tabs > li > a#history-tab-link, a#history_tab_link {background-image: url(image_path('icon_history_tab.svg'));}
 .nav-tabs > li > a#context-tags-tab-link {background-image: url(image_path('icon_context_tag.svg'));}
 
 .email-msg-content {
