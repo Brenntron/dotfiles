@@ -396,7 +396,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             {
               data: 'time_of_action'
               render: (data) ->
-                console.log('time of action: ', data)
                 if !!data then moment(data).utc().format('MMMM D, YYYY [at] hh:mm:ss A Z') else data
             }
             {
@@ -436,7 +435,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           formatted_entry_history = parsed_response.entry_history.complaint_history.map((historical_data) ->
             formatted_history_data = {}
             formatted_history_data['time'] = moment(historical_data[0]).utc().format('MMMM D, YYYY [at] hh:mm:ss A Z')
-            console.log('time: ', formatted_history_data['time'])
             formatted_history_data['sortable_time'] = moment(historical_data[0]).format('x')
             formatted_history_data['user'] = historical_data[1]['whodunnit']
 
@@ -538,7 +536,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             data: data
             dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
             ordering: true
-            order: [[ 6, 'desc' ]]
+            order: [[ 0, 'desc' ]]
             pageLength: 10
             pagingType: 'simple_numbers'
             searching: false
@@ -553,7 +551,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               {
                 data: 'time'
                 render: (data) ->
-                  console.log('time: ', data)
                   date = moment(data)
                   formatted = date.utc().format('MMMM D, YYYY [at] hh:mm:ss A Z')
                   return formatted
@@ -747,7 +744,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     # need number of cols for replacement temp col
     visible_cols = $('#complaints-index thead th').length
 
-    console.log('initial_status: ', initial_status)
     if initial_status == 'PENDING'
       process_review(entry_data)
     else
@@ -781,7 +777,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   # Sending individual reviewed (PENDING) entry info to the backend
   process_review = (entry_data) ->
-    console.log('process review entry data: ', entry_data)
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
       method: 'POST'
