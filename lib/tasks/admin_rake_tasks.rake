@@ -65,7 +65,7 @@ namespace :escalations do
   ################AUTO RESOLVE##############################
 
   task :auto_resolve_tickets => :environment do
-    disputes_to_auto_resolve = Dispute.where(:id => 493057)#Dispute.where(:status => Dispute::PROCESSING)
+    disputes_to_auto_resolve = Dispute.where(:status => Dispute::PROCESSING)
 
     disputes_to_auto_resolve.each do |new_dispute|
 
