@@ -1145,7 +1145,7 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
 
-          if new_dispute_entry.suggested_threat_category.blank?
+          if new_dispute_entry.suggested_threat_category.blank? || (new_dispute_entry.suggested_threat_category.present? && new_dispute_entry.suggested_disposition.present?)
             new_dispute_entry.status = DisputeEntry::PROCESSING
           else
             new_dispute_entry.status = DisputeEntry::NEW
@@ -1225,7 +1225,7 @@ For future Web categorization requests, please open a Web categorization ticket 
             new_dispute_entry.wbrs_score = (urs_stuff.reputation_score_x10 / 10.0).to_f rescue nil
           end
 
-          if new_dispute_entry.suggested_threat_category.blank?
+          if new_dispute_entry.suggested_threat_category.blank? || (new_dispute_entry.suggested_threat_category.present? && new_dispute_entry.suggested_disposition.present?)
             new_dispute_entry.status = DisputeEntry::PROCESSING
           else
             new_dispute_entry.status = DisputeEntry::NEW
