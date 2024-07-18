@@ -276,9 +276,9 @@ window.toolbar_index_edit_status = () ->
     )
 
 
-window.show_page_edit_status = () ->
+window.show_page_edit_status = (current_status) ->
   statusName = $('input[name=dispute-status]:checked').val()
-  comment = $('.ticket-status-comment').val()
+  comment = $('#ticket-non-res-submit .ticket-status-comment').val()
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
@@ -298,13 +298,23 @@ window.show_page_edit_status = () ->
     data.resolution = resolution
     data.comment = $('.ticket-resolution-comment').val()
 
+  if current_status == 'PROCESSING'
+    std_msg_confirm('Proceed with changing the status from PROCESSING?', ['Note that this will disrupt the auto-resolve workflow.'])
+    $('.confirm').on 'click', ->
+      process_show_page_status_change(data)
+  else
+    process_show_page_status_change(data)
+
+
+window.process_show_page_status_change = (ticket_data) ->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
     method: 'POST'
-    data: data
+    data: ticket_data
     error_prefix: 'Unable to update dispute.'
     success_reload: true
   )
+
 
 window.toolbar_index_change_assignee = () ->
 
