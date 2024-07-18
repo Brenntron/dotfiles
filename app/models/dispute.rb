@@ -22,6 +22,7 @@ class Dispute < ApplicationRecord
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
   PROCESSING = 'PROCESSING'
+  HOLDING = "HOLDING"
 
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
@@ -1056,7 +1057,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
       new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
       new_dispute.channel = message_payload["payload"]["channel"]
-      new_dispute.status = PROCESSING
+      new_dispute.status = HOLDING
 
       new_dispute.customer_id = customer&.id
       new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
@@ -1360,7 +1361,8 @@ For future Web categorization requests, please open a Web categorization ticket 
         dispute_entry.save!
 
       end
-
+      new_dispute.status = PROCESSING
+      new_dispute.save!
       ######record creation completed######
 
       new_dispute.reload
