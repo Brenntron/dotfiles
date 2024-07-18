@@ -639,6 +639,7 @@ window.return_dispute = (dispute_id) ->
 window.save_dispute_entries = () ->
   data = {}
   changes_made = false
+  processing = false
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     $(this).find('.dual-edit-field').map(() ->
       {id, field} = this.dataset
@@ -655,6 +656,8 @@ window.save_dispute_entries = () ->
             new_value = $(this).find('.table-entry-input').val()
 
         old_value = $(this).find('.entry-data')[0].innerText.trim()
+        if old_value == 'PROCESSING'
+          processing = true
 
         if new_value == undefined then new_value = old_value
 
@@ -687,6 +690,7 @@ window.save_dispute_entries = () ->
               old: old_value
               new: new_value}
             data[id].push( new_data )
+
     )
   )
   if !changes_made
@@ -695,13 +699,24 @@ window.save_dispute_entries = () ->
     if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
       std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
     else
-      std_msg_ajax(
-        method: 'PATCH'
-        url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-        data: { 'field_data': data }
-        success_reload: true
-        error_prefix: 'Error updating data.'
-      )
+      if processing == true
+        std_msg_confirm('At least one entry has the current status PROCESSING, proceed with status change?', ['Note that this will disrupt the auto-resolve workflow.'])
+        $('.confirm').on 'click', ->
+          std_msg_ajax(
+            method: 'PATCH'
+            url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+            data: { 'field_data': data }
+            success_reload: true
+            error_prefix: 'Error updating data.'
+          )
+      else
+        std_msg_ajax(
+          method: 'PATCH'
+          url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+          data: { 'field_data': data }
+          success_reload: true
+          error_prefix: 'Error updating data.'
+        )
 
 
 
