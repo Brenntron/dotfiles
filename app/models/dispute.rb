@@ -1625,13 +1625,13 @@ For future Web categorization requests, please open a Web categorization ticket 
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where.not(status: [STATUS_RESOLVED, PROCESSING]).where(user_id: user.id)
+        where.not(status: [STATUS_RESOLVED, PROCESSING, PREPROCESSING]).where(user_id: user.id)
       when 'my_disputes'
-        where.not(status: PROCESSING).where(user_id: user.id)
+        where.not(status: [PROCESSING, PREPROCESSING]).where(user_id: user.id)
       when 'team_disputes'
-        where.not(status: PROCESSING).where(user_id: user.my_team)
+        where.not(status: [PROCESSING, PREPROCESSING]).where(user_id: user.my_team)
       when 'unassigned'
-        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED,PROCESSING])
+        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED, PROCESSING, PREPROCESSING])
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
@@ -1642,8 +1642,10 @@ For future Web categorization requests, please open a Web categorization ticket 
         where(status: [CLOSED, STATUS_RESOLVED])
       when 'autoresolved_processing'
         where(status: PROCESSING)
+      when 'preprocessing'
+        where(status: PREPROCESSING)
       when 'all'
-        where.not(status: PROCESSING)
+        where.not(status: [PROCESSING, PREPROCESSING])
     else
         raise "No search named '#{search_name}' known."
     end

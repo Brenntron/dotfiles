@@ -239,6 +239,7 @@ window.save_dispute = () ->
 
 
 window.toolbar_index_edit_status = () ->
+  debugger
   statusName = $('input[name=entry-status]:checked').val()
 
   data = {}
@@ -3002,7 +3003,7 @@ window.format_webrep_header = (data) ->
         if search_name == 'my_disputes'
           'My Tickets'
         else if search_name == 'team_disputes'
-          'My team Tickets'
+          'My Team Tickets'
         else
           search_name.replace(/_/g, ' ') + ' tickets'
       if search_name
