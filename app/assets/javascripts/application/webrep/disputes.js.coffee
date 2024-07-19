@@ -733,19 +733,22 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
-window.change_ticket_status = (event) ->
-#  event.preventDefault()
+window.change_ticket_status = () ->
   status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
   resolution = ""
   comment = ""
   checkboxes = $('#disputes-index').find('.dispute_check_box')
   checked_disputes = []
-  successfully_closed_disputes = []
+  processing_disputes = []
 
   $(checkboxes).each ->
     if $(this).is(':checked')
-      dispute_id = $(this).val()
-      checked_disputes.push(dispute_id)
+      dispute_id = parseInt($(this).val())
+      current_status = $(this).closest('tr').find('td.state-col .dispute_status').text().trim()
+      if current_status == "PROCESSING"
+        processing_disputes.push(dispute_id)
+      else
+        checked_disputes.push(dispute_id)
 
   if status == 'RESOLVED_CLOSED'
     if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
@@ -761,14 +764,14 @@ window.change_ticket_status = (event) ->
   data = {
     status: status,
     resolution: resolution,
-    comment: comment
+    comment: comment,
+    dispute_ids: checked_disputes
   }
+  total_disputes = checked_disputes.length
 
-  for dispute, dispute_index in checked_disputes
-#    event.preventDefault()
-    data.dispute_ids = [dispute]
-    top_index = checked_disputes.length - 1
-
+  if total_disputes == 0 && processing_disputes.length > 0
+    std_msg_error('Unable to update Status', ['Tickets in PROCESSING can only be edited on the ticket details page.'])
+  else
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'
@@ -777,35 +780,42 @@ window.change_ticket_status = (event) ->
       mimeType: 'application/json'
       async: false
       success: (response) ->
+        # close dropdown & update dt
+        $('#index_ticket_status').parent().removeClass('open')
+        $('#disputes-index').DataTable().draw()
+
+        if processing_disputes.length > 0
+          processing_msg = processing_disputes.length + ' tickets are in PROCESSING and can only be edited on the ticket details page.'
+        else
+          processing_msg = ''
 
         if status != 'RESOLVED_CLOSED'
-         window.location.reload()
+          std_msg_success('Status Updated', [total_disputes + ' tickets have been updated to ' + status + '.', processing_msg])
         else
-          #show Close Tickets modal when the last query is returned
-          successfully_closed_disputes.push dispute
-          if dispute_index == top_index
-            show_close_tickets_modal(successfully_closed_disputes)
+          # if any items were in processing add that to modal to say same msg as above
+          show_close_tickets_modal(checked_disputes, processing_disputes)
 
       error: (response) ->
         if response.status > 400
           popup_response_error(response, 'Error Updating Status')
-  )
+    )
 
-window.show_close_tickets_modal = (checked_disputes) ->
 
+window.show_close_tickets_modal = (checked_disputes, processing_disputes) ->
   $('#close-ticket-modal').modal('show')
   url = '/escalations/webrep/disputes/'
   list_wrapper = $('#close-ticket-modal').find('#closed-tickets-id-list')[0]
 
-  $(checked_disputes).each (i, dispute) ->
-    dispute_trimmed = dispute.replace(/^0+/, '')
-    full_link = url + dispute_trimmed
-    dispute_link = "<li><a target='_blank' href=#{full_link}>#{dispute}</a></li>"
+  $(checked_disputes).each () ->
+    id = this
+    full_link = url + id
+    dispute_link = "<li><a target='_blank' href=#{full_link}>#{id}</a></li>"
     $(list_wrapper).append dispute_link
 
-  $('#close-ticket-modal').on('hidden.bs.modal', ->
-    window.location.reload()
-  )
+  if processing_disputes.length > 0
+    processing_msg = '<li class="additional-modal-msg">' + processing_disputes.length + ' tickets are in PROCESSING and can only be edited on the ticket details page.</li>'
+    $(list_wrapper).append processing_msg
+
 
 window.set_relating_disputes = (form_tag) ->
   related_dispute_id = $(form_tag).find(".dispute-id").val()
