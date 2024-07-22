@@ -239,42 +239,71 @@ window.save_dispute = () ->
 
 
 window.toolbar_index_edit_status = () ->
-  debugger
-  statusName = $('input[name=entry-status]:checked').val()
+  entry_ids = $('.dispute-entry-checkbox:checked')
+  processing_entries = []
+  entries_to_update = []
 
-  data = {}
+  $(entry_ids).each ->
+    entry_id = $(this).attr('id')
+    current_status = $(this).closest('tr').find('td.entry-col-status').text().trim()
+    if current_status == 'PROCESSING'
+      processing_entries.push(entry_id)
+    else
+      entries_to_update.push(entry_id)
 
-  entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
-    data[this.id] = [{
-      id: this.id
-      field: "status"
-      new: statusName
-    }]
+  new_status = $('input[name=entry-status]:checked').val()
 
-    if statusName == "RESOLVED_CLOSED"
-      data[this.id].push({
-        id: this.id
-        field: "resolution"
-        new: $('input[name=entry-resolution]:checked').val()
-      })
-
-      data[this.id].push({
-        id: this.id
-        field: "resolution_comment"
-        new: $('#entry-status-comment').val()
-      })
-  )
-
-  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
-    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
+  if entries_to_update == 0 && processing_entries > 0
+    std_msg_error('Unable to update Status', ['Entries in PROCESSING can only be edited on the ticket details page.'])
   else
-    std_msg_ajax(
-      method: 'PATCH'
-      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-      data: { field_data: data }
-      success_reload: true
-      error_prefix: 'Error updating data.'
+
+    data = {}
+    $(entries_to_update).map(() ->
+      id = this.toString()
+      console.log this
+      data[this] = [{
+        id: id
+        field: "status"
+        new: new_status
+      }]
+
+      if new_status == "RESOLVED_CLOSED"
+        data[this].push({
+          id: id
+          field: "resolution"
+          new: $('input[name=entry-resolution]:checked').val()
+        })
+
+        data[this].push({
+          id: id
+          field: "resolution_comment"
+          new: $('#entry-status-comment').val()
+        })
     )
+
+    total_entries = entries_to_update.length
+    console.log data
+    if new_status == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+      std_msg_error('No resolution selected', ['Please select an entry resolution.'])
+    else
+      std_msg_ajax(
+        method: 'PATCH'
+        url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+        data: { field_data: data }
+        success: (response) ->
+          # close dropdown & update dt
+          $('#index_ticket_status').parent().removeClass('open')
+          $('#disputes-index').DataTable().draw()
+          if processing_entries.length > 0
+            processing_msg = processing_entries.length + ' entries are in PROCESSING and can only be edited on the ticket details page.'
+          else
+            processing_msg = ''
+
+          std_msg_success('Status Updated', [total_entries + ' entries have been updated to ' + new_status + '.', processing_msg])
+
+        error: (response) ->
+          std_msg_error('Unable to update entry status', [response])
+      )
 
 
 window.show_page_edit_status = (current_status) ->
@@ -746,7 +775,7 @@ window.change_ticket_status = () ->
     if $(this).is(':checked')
       dispute_id = parseInt($(this).val())
       current_status = $(this).closest('tr').find('td.state-col .dispute_status').text().trim()
-      if current_status == "PROCESSING"
+      if current_status == 'PROCESSING'
         processing_disputes.push(dispute_id)
       else
         checked_disputes.push(dispute_id)
