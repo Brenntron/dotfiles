@@ -291,6 +291,8 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     , this)
 
   window.webcat_toolbar_show_change_assignee = (assignment_type) ->
+    $assignee_type = $("#complaint_#{assignment_type}")
+    current_assignee = $assignee_type.text()
     user_id = Number($("#change_target_#{assignment_type}").val())
     is_current_user = user_id == current_user_id
     data = {
@@ -299,6 +301,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       'assignment_type': assignment_type
     }
 
+    $assignee_type.text('Loading...')
+    $("#show_change_#{assignment_type}").dropdown('toggle')
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
       method: 'POST'
@@ -306,7 +311,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       data: data
       dataType: 'json'
       success: (response) ->
-        $("#show_change_#{assignment_type}_dropdown").dropdown('toggle')
         json = $.parseJSON(response)
 
         if json.error
@@ -320,8 +324,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text())
             $status.text('ASSIGNED')
 
-          $assignee_type = $("#complaint_#{assignment_type}")
-
           $assignee_type.text(json.name)
           $assignee_type.removeClass('missing-data')
           $("#webcat_take_ticket_#{assignment_type}").addClass('hidden')
@@ -331,6 +333,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           else
             $("#webcat_return_ticket_#{assignment_type}").addClass('hidden')
         error: (response) ->
+          $assignee_type.text(current_assignee)
           std_msg_error('Error Assigning Entries', [response.responseText])
     )
 
