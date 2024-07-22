@@ -85,21 +85,27 @@ namespace :escalations do
             dispute_entry.build_claim(dispute_packet)
             dispute_entry.reload
           end
+          if dispute_entry.auto_resolve_log.blank?
+            initial_log = "--------Starting Data---------<br>"
+            initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
+            initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
+            initial_log += "-----------------------------<br>"
 
-          initial_log = "--------Starting Data---------<br>"
-          initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
-          initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
-          initial_log += "-----------------------------<br>"
-
-          dispute_entry.auto_resolve_log += initial_log
-          dispute_entry.save!
+            dispute_entry.auto_resolve_log += initial_log
+            dispute_entry.save!
+          end
           dispute_entry.reload
+          begin
+            auto_resolve_params = {}
+            auto_resolve_params[:entry_claim] = dispute_entry.claim
+            auto_resolve_params[:dispute_entry] = dispute_entry
 
-          auto_resolve_params = {}
-          auto_resolve_params[:entry_claim] = dispute_entry.claim
-          auto_resolve_params[:dispute_entry] = dispute_entry
+            AutoResolve.process_auto_resolution(auto_resolve_params)
+          rescue
+            dispute_entry.status = DisputeEntry::NEW
+            dispute_entry.save
+          end
 
-          AutoResolve.process_auto_resolution(auto_resolve_params)
 
         end
 
