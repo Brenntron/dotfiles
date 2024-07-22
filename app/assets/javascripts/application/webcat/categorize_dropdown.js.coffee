@@ -240,10 +240,14 @@ window.cat_new_url = ()->
   #remove this console log when ready
   console.log categorizations_to_submit
 
+  data = {data: categorizations_to_submit}
+  debugger
+  console.log data
+
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
     method: 'POST'
-    data: {data: categorizations_to_submit}
+    data: data
     success: (response) ->
       popular_entries = []
       message = ""
@@ -273,11 +277,7 @@ window.cat_new_url = ()->
         )
       )
     error: (response) ->
-      # TODO - Find out where this response text is generated and fix, it makes no sense
-      if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-        std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
-      else
-        std_api_error(response, "Unable to categorize url.", reload: false)
+      std_api_error(response, "Unable to categorize url.", reload: false)
   )
 
 
@@ -286,6 +286,7 @@ window.multiple_url_categorization = () ->
   loader = $('.lookup-drop-loader')
   loader.removeClass('hidden')
 
+  categorizations_to_submit = {}
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
@@ -294,18 +295,46 @@ window.multiple_url_categorization = () ->
       if category[i]
         category_names.push(category[i].text)
 
+  $(urls).each (i) ->
+    categorizations_to_submit[i] = {
+      'url': this,
+      'category_names': category_names,
+      'category_ids': category_ids
+    }
+
+  data = {data: categorizations_to_submit}
+  console.log data
   if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
     std_msg_ajax(
-      url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
+      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
-      data: {urls: urls, category_names: category_names, category_ids: category_ids}
+      data: data
       success: (response) ->
-        loader.addClass('hidden')
-        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: false)
+        popular_entries = []
+        message = ""
+        for key, val of response
+          if val.popular == true
+            popular_entries.push(val.url)
+
+        if popular_entries.length > 0
+          message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        else
+          message = "No pending complaint entries have been created"
+
+        reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
+        std_msg_success(
+          'URLs categorized successfully',
+          [message, "All other entries have been submitted directly to WBRS.", reload_message],
+          reload: false,
+          complete: (->
+            # clear form inputs
+            $('#categorize_urls').val('')
+            $('#multi_cat_url_cats')[0].selectize.clear()
+          )
+        )
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
-
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
