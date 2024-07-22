@@ -80,30 +80,41 @@ namespace :escalations do
           if dispute_entry.status != DisputeEntry::PROCESSING
             next
           end
-
-          if dispute_entry.claim.blank?
-            dispute_entry.build_claim(dispute_packet)
-            dispute_entry.reload
-          end
-          if dispute_entry.auto_resolve_log.blank?
-            initial_log = "--------Starting Data---------<br>"
-            initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
-            initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
-            initial_log += "-----------------------------<br>"
-
-            dispute_entry.auto_resolve_log += initial_log
-            dispute_entry.save!
-          end
-          dispute_entry.reload
           begin
+            if dispute_entry.claim.blank?
+              dispute_entry.build_claim(dispute_packet)
+              dispute_entry.reload
+            end
+            if dispute_entry.auto_resolve_log.blank?
+              running_verdict = dispute_entry.running_verdict.inspect.to_s rescue "ERROR: MOST LIKELY LOOKUP FAILURE IN BRIDGE PACKET"
+              initial_log = "--------Starting Data---------<br>"
+              initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
+              initial_log += "effective disposition info: #{running_verdict}<br>"
+              initial_log += "-----------------------------<br>"
+
+              dispute_entry.auto_resolve_log += initial_log
+              dispute_entry.save!
+            end
+            dispute_entry.reload
+
             auto_resolve_params = {}
             auto_resolve_params[:entry_claim] = dispute_entry.claim
             auto_resolve_params[:dispute_entry] = dispute_entry
 
             AutoResolve.process_auto_resolution(auto_resolve_params)
-          rescue
+          rescue Exception => e
             dispute_entry.status = DisputeEntry::NEW
             dispute_entry.save
+
+            morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+            morsel_output += e.message + "\n"
+            morsel_output += e.backtrace.join("\n")
+
+            morsel = Morsel.create(:output => morsel_output)
+            auto_resolve_output = " \n<br />" + morsel_output
+            dispute_entry.auto_resolve_log = (dispute_entry.auto_resolve_log + auto_resolve_output) rescue auto_resolve_output
+            dispute_entry.save
+            Rails.logger.error morsel_output
           end
 
 
