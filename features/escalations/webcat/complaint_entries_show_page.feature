@@ -283,6 +283,21 @@ Feature: Complaint Entries Show Page
       And I should not see button with id "webcat_return_ticket_assignee"
 
     @javascript
+    Scenario: A WebCat user cannot take the reviewer spot a ticket with a reviewer.
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name |
+        | User Two     |
+        | User Three   |
+      And the following complaint entries exist:
+        | id | uri     | domain  | entry_type | status | user_id | reviewer_id |
+        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       | 3           |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should not see my display name in "#complaint_reviewer"
+      And I should not see button with id "webcat_take_ticket_reviewer"
+      And I should not see button with id "webcat_return_ticket_reviewer"
+
+    @javascript
     Scenario: A WebCat user takes the second reviewer slot for a ticket without a second reviewer
       Given a user with role "webcat user" exists and is logged in
       And the following complaint entries exist:
@@ -295,6 +310,21 @@ Feature: Complaint Entries Show Page
       And I should not see content "No 2nd Reviewer" within "#complaint_second_reviewer"
       And I should see button with id "webcat_return_ticket_second_reviewer"
       And I should not see button with id "webcat_take_ticket_second_reviewer"
+
+    @javascript
+    Scenario: A WebCat user cannot take the second reviewer spot a ticket with a second reviewer.
+      Given a user with role "webcat user" exists and is logged in
+      And the following users exist
+        | display_name |
+        | User Two     |
+        | User Three   |
+      And the following complaint entries exist:
+        | id | uri     | domain  | entry_type | status | user_id | second_reviewer_id |
+        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 2       | 3                  |
+      When I goto "/escalations/webcat/complaint_entries/1"
+      Then I should not see my display name in "#complaint_reviewer"
+      And I should not see button with id "webcat_take_ticket_second_reviewer"
+      And I should not see button with id "webcat_return_ticket_second_reviewer"
 
     @javascript
     Scenario: A WebCat user returns a ticket they are reviewing as the second reviewer
@@ -311,18 +341,6 @@ Feature: Complaint Entries Show Page
       And I wait for "2" seconds
       Then I should not see my display name in "#complaint_second_reviewer"
       And I should see an element "#complaint_second_reviewer" with text "No 2nd Reviewer"
-
-  Rule: WebCat users cannot be reviewers for tickets they are assigned
-    @javascript
-    Scenario: A WebCat user tries to take a review spot for a ticket they are assigned.
-      Given a user with role "webcat user" exists and is logged in
-      And the following complaint entries exist:
-        | id | uri     | domain  | entry_type | status | user_id |
-        | 1  | abc.com | abc.com | URI/DOMAIN | NEW    | 1       |
-      When I goto "/escalations/webcat/complaint_entries/1"
-      And I click "#webcat_take_ticket_reviewer"
-      Then I should see an element ".error-msg" with text "The Assignee cannot also be a Reviewer."
-      And I should not see my display name in "#complaint_reviewer"
 
   Rule: WebCat users cannot be other reviewer for tickets they are already reviewing.
 

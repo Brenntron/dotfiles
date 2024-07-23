@@ -624,6 +624,18 @@ $selectize-border: #E5E5E5;
       margin: -1px 4px 0 0;
     }
   }
+
+  #self_review + label {
+    &::before {
+     margin-top: -4px;
+    }
+  }
+
+  #self_review:checked + label {
+    &::before {
+     margin-top: -7px;
+    }
+  }
 }
 
 .form-wrapper-column {

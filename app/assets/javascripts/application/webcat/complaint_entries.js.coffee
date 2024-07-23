@@ -229,6 +229,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     wrapper.addClass('selected')
 
   window.take_single_webcat_complaint = (assignment_type) ->
+    $assignee_type = $("#complaint_#{assignment_type}")
+    previous_assignee = $assignee_type.text()
+
+    $assignee_type.text('Loading...')
+
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
       method: 'POST'
@@ -247,8 +252,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text())
             $status.text('ASSIGNED')
 
-          $assignee_type = $("#complaint_#{assignment_type}")
-
           $assignee_type.text(json.name)
           $assignee_type.removeClass('missing-data')
           $("#webcat_take_ticket_#{assignment_type}").addClass('hidden')
@@ -258,6 +261,11 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     , this)
 
   window.return_single_webcat_complaint = (assignment_type) ->
+    $assignee_type = $("#complaint_#{assignment_type}")
+    previous_assignee = $assignee_type.text()
+
+    $assignee_type.text('Loading...')
+
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
@@ -276,7 +284,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           if assignment_type == 'assignee' && $status.text() == 'ASSIGNED'
             $status.text('NEW')
 
-          $assignee_type = $("#complaint_#{assignment_type}")
           assignment_text = switch assignment_type
             when 'assignee' then 'Unassigned'
             when 'reviewer' then 'No Reviewer'
