@@ -47,7 +47,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                  else
                    false
 
-    window.prevent_close(can_submit)
+    window.prevent_close(can_submit.toString())
     return can_submit
 
   is_pending = () ->
