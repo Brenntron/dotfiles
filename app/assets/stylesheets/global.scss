@@ -1688,6 +1688,12 @@ thead th.sorting.center {
   border-right: 1px solid $faint-neutral-color;
 }
 
+.additional-modal-msg {
+  border-top: 1px solid $faint-neutral-color;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
 /************ Forms ***************/
 
 .form-control {
@@ -2350,6 +2356,7 @@ a.static-nav-item {
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
 .icon-autoresolved-white{background-image: url(image_path('icon_autoresolved_white.svg'));}
+.icon-preprocessing-white{background-image: url(image_path('icon_preprocessing_white.svg'));}
 .icon-team-grey {background-image: url(image_path('icon_team_grey.svg'));}
 .icon-custom-user-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
 .icon-invalid-grey {background-image: url(image_path('icon_invalid_grey.svg'));}
@@ -2473,6 +2480,10 @@ a.static-nav-item {
   border-bottom-left-radius: 0;
   min-height: 407px;
   padding-top: 10px;
+}
+
+.escalations--webrep--disputes-controller #saved-searches-wrapper {
+  min-height: 443px;
 }
 
 #saved-searches-wrapper.webcat-named-search-list {

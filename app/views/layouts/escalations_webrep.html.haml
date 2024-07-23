@@ -71,6 +71,10 @@
           %a{href: "#{escalations_webrep_disputes_path}?f=autoresolved_processing"}
             %span.nav-dropdown-icon.icon-autoresolved-white
             Processing
+        %li{class: ("selected" if params[:f] == "preprocessing")}
+          %a{href: "#{escalations_webrep_disputes_path}?f=preprocessing"}
+            %span.nav-dropdown-icon.icon-preprocessing-white
+            Preprocessing
         %li{class: ("selected" if params[:f] == "all")}
           %a{href: "#{escalations_webrep_disputes_path}?f=all"}
             %span.nav-dropdown-icon.icon-all-tickets
