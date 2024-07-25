@@ -356,12 +356,31 @@ window.drop_multiple_url_categories = () ->
       method: 'POST'
       data: { 'urls': urls }
       success: (response) ->
+        popular_entries = []
+        successed_response = true
+        entries_dropped_category = []
         for key, value of response.json
-          if value && value.code == 200
-            loader.addClass('hidden')
-            std_msg_success('Success', ["URLs/IPs categories successfully dropped."], reload: true)
-          else
-            std_msg_error('Error', ['Unable to drop categories.'], reload: false)
+#          if value && value.code == 200
+#            loader.addClass('hidden')
+#            std_msg_success('Success', ["URLs/IPs categories successfully dropped."], reload: true)
+#          else
+#            std_msg_error('Error', ['Unable to drop categories.'], reload: false)
+          if value && value.popular == true
+            popular_entries.push(value.url)
+
+          if value && !(value.popular || value.code == 200)
+            successed_response = false
+
+        # TODO: wording and showing flash message with needed content
+        # TODO: the same thing for line 93 ajax call 
+        if successed_response
+          msg = 'success msg.'
+          if popular_entries.length > 0
+            msg += " Popular entries: #{popular_entries.join(', ')}"
+          console.log(msg)
+        else
+          console.log('error message [Categories were not dropped for some of the entries]')
+
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error("Error #{response.responseJSON.message}", '', reload: false)
