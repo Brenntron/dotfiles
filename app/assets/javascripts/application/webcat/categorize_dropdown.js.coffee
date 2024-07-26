@@ -95,9 +95,14 @@ window.drop_current_categories = () ->
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
+      message = ""
       for key, value of response.json
-        if value && value.code == 200
-          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
+        if value && (value.popular || value.code == 200)
+          if value.popular == true
+            message = "Pending complaint entry has been created."
+          else
+            message = "Categories successfully dropped."
+          $("#cat-url-success-message-#{key}").text(message)
           $("#cat-url-success-#{key}").show()
           select= $("#cat_new_url_#{key}").selectize()
           selectize = select[0].selectize
@@ -107,6 +112,7 @@ window.drop_current_categories = () ->
           $("#url_#{key}").css("border-color", "#E47433")
           $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
           $("#cat-url-#{key}").show()
+
       $('.lookup-drop-loader').addClass('hidden')
     error: (response) ->
       $('.lookup-drop-loader').addClass('hidden')
@@ -321,10 +327,9 @@ window.multiple_url_categorization = () ->
         else
           message = "No pending complaint entries have been created"
 
-        reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
         std_msg_success(
           'URLs categorized successfully',
-          [message, "All other entries have been submitted directly to WBRS.", reload_message],
+          [message, "All other entries have been submitted directly to WBRS."],
           reload: false,
           complete: (->
             # clear form inputs
@@ -337,7 +342,7 @@ window.multiple_url_categorization = () ->
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
   else
-    std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+    std_msg_error('Error', ['Please check that a URL/IP has been entered and that at least one category was selected.'], reload: false)
 
 
 window.drop_multiple_url_categories = () ->
@@ -357,34 +362,36 @@ window.drop_multiple_url_categories = () ->
       data: { 'urls': urls }
       success: (response) ->
         popular_entries = []
+        message = ""
         successed_response = true
-        entries_dropped_category = []
+
         for key, value of response.json
-#          if value && value.code == 200
-#            loader.addClass('hidden')
-#            std_msg_success('Success', ["URLs/IPs categories successfully dropped."], reload: true)
-#          else
-#            std_msg_error('Error', ['Unable to drop categories.'], reload: false)
           if value && value.popular == true
             popular_entries.push(value.url)
-
           if value && !(value.popular || value.code == 200)
             successed_response = false
 
-        # TODO: wording and showing flash message with needed content
-        # TODO: the same thing for line 93 ajax call 
         if successed_response
-          msg = 'success msg.'
           if popular_entries.length > 0
-            msg += " Popular entries: #{popular_entries.join(', ')}"
-          console.log(msg)
+            message = "Pending complaint entries have been created for #{popular_entries.join(', ')}"
         else
-          console.log('error message [Categories were not dropped for some of the entries]')
+          message = "No pending complaint entries have been created"
+
+        std_msg_success(
+          'URLs categories successfully dropped',
+          [message, "All other entries have been submitted directly to WBRS."],
+          reload: false,
+          complete: (->
+            # clear form inputs
+            $('#categorize_urls').val('')
+            $('#multi_cat_url_cats')[0].selectize.clear()
+          )
+        )
 
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error("Error #{response.responseJSON.message}", '', reload: false)
     )
   else
-    std_msg_error('Error', ['Please check that a URL/IP has been inputted.'], reload: false)
+    std_msg_error('Error', ['Please check that a URL/IP has been entered.'], reload: false)
 
