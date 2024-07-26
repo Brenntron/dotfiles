@@ -243,12 +243,7 @@ window.cat_new_url = ()->
         'category_ids': cats_input_ids
       }
 
-  #remove this console log when ready
-  console.log categorizations_to_submit
-
   data = {data: categorizations_to_submit}
-  debugger
-  console.log data
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
