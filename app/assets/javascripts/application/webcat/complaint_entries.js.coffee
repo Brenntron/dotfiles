@@ -273,9 +273,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           else
             std_msg_error('Error Taking Entries', [json.error])
         else
-          $status = $('.status-wrapper > .top-info-data')
+          $status = $('#complaint_entry_status')
 
-          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text())
+          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text().trim())
             $status.text('ASSIGNED')
 
           $assignee_type.text(json.name)
@@ -305,9 +305,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           else
             std_msg_error('Error Returning Entries', [json.error.join(' ')])
         else
-          $status = $('.status-wrapper > .top-info-data')
+          $status = $('#complaint_entry_status')
 
-          if assignment_type == 'assignee' && $status.text() == 'ASSIGNED'
+          if assignment_type == 'assignee' && $status.text().trim() == 'ASSIGNED'
             $status.text('NEW')
 
           assignment_text = switch assignment_type
@@ -352,9 +352,9 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           else
             std_msg_error('Error Assigning Entries', [json.error.join(' ')])
         else
-          $status = $('.status-wrapper > .top-info-data')
+          $status = $('#complaint_entry_status')
 
-          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text())
+          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text().trim())
             $status.text('ASSIGNED')
 
           $assignee_type.text(json.name)
