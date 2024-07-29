@@ -31,21 +31,41 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           changes.splice(change_index, 1)
     }
 
-  verifySubmit = () ->
+  verify_categories = (category_ids) ->
+    sorted_category_ids = category_ids.sort()
+    selectize_items = $('#ce_categories_select')[0].selectize.items.sort()
+    console.log('category_ids', category_ids)
+    console.log('selectize_items', selectize_items)
+
+    sorted_category_ids.forEach((value, index) ->
+      selectize_item = selectize_items[index]
+
+      if value == selectize_item
+        selectize_items.splice(index, 1)
+      else if !selectize_item
+        change_store.add("removed category: #{value}")
+    )
+
+    # Add any selectize items that were not matched with a submtited category to the change_store
+    if selectize_items.length
+      selectize_items.forEach (value) ->
+        change_store.add("category: #{value}")
+
+  verify_submit = () ->
     can_submit = if is_pending() && ['commit', 'decline'].includes(review_option) && can_review()
-                   true
-                 else if !$('.ce-ip-uri-input').val()
-                   # All resolution options, as well as the commit review option, requite a user comment
-                   # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
-                   # then it can only be declined.
-                   false
-                 else if !is_pending() && resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
-                   # The fixed resolution requires a change to the category list and at least one category.
-                   true
-                 else if !is_pending() && ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
-                   true
-                 else
-                   false
+      true
+    else if !$('.ce-ip-uri-input').val()
+      # All resolution options, as well as the commit review option, requite a user comment
+      # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
+      # then it can only be declined.
+      false
+    else if !is_pending() && resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
+      # The fixed resolution requires a change to the category list and at least one category.
+      true
+    else if !is_pending() && ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
+      true
+    else
+      false
 
     window.prevent_close(can_submit.toString())
     return can_submit
@@ -64,7 +84,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       true
 
   toggleSubmitButton = () ->
-    can_submit = verifySubmit()
+    can_submit = verify_submit()
     $('.ce-submit-button').prop('disabled', !can_submit)
 
   window.set_tags = (tags, entry_status) ->
@@ -93,13 +113,13 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       onItemAdd: (value) ->
         change_store.add("tags: #{value}")
 
-        can_submit = verifySubmit()
+        can_submit = verify_submit()
 
         $('.ce-submit-button').prop('disabled', !can_submit)
       onItemRemove: (value) ->
         change_store.remove("tags: #{value}")
 
-        can_submit = verifySubmit()
+        can_submit = verify_submit()
 
         $('.ce-submit-button').prop('disabled', !can_submit)
     }
@@ -168,7 +188,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               else
                 change_store.add("category: #{value}")
 
-              can_submit = verifySubmit()
+              can_submit = verify_submit()
 
               $('.ce-submit-button').prop('disabled', !can_submit)
           onItemRemove: (value) ->
@@ -179,7 +199,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               else
                 change_store.add("removed category: #{value}")
 
-              can_submit = verifySubmit()
+              can_submit = verify_submit()
 
               $('.ce-submit-button').prop('disabled', !can_submit)
           score: (input) ->
@@ -203,7 +223,13 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                 0
         }
 
-        selectize[0].selectize.disable() if entry_status == 'PENDING'
+        if entry_status == 'PENDING'
+          selectize[0].selectize.disable()
+        else
+          # Firefox will cache the page state due if the page is reloaded and the navigate away pop up appears.
+          # Because of this changes may be present in the select box that haven't been submitted.
+          verify_categories(category_ids)
+          verify_submit()
       )
 
   window.set_lookup = (lookup) ->
@@ -688,7 +714,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     check_ip_uri_input(value)
 
-    disable_submit = !verifySubmit()
+    disable_submit = !verify_submit()
 
     $('.ce-submit-button').prop('disabled', disable_submit)
 
@@ -843,7 +869,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     if resolution_option
       get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
         $('.ce-customer-comment-textarea').val(resolution_comment) if resolution_comment != ''
-        $('.ce-submit-button').prop('disabled', !verifySubmit())
+        $('.ce-submit-button').prop('disabled', !verify_submit())
 
     $(document).on 'change', '.resolution-radio-button', ->
       resolution_option = $(this).val()
@@ -856,6 +882,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
     $(document).on 'change', '.ce-input, #self_review', ->
       # The onItemRemove and onItemAdd events for the selectize dropdowns will handle the submit button for categories
       unless $(this).attr('id') == 'ce_categories_select'
-        disable_submit = !verifySubmit()
+        disable_submit = !verify_submit()
 
         $('.ce-submit-button').prop('disabled', disable_submit)
