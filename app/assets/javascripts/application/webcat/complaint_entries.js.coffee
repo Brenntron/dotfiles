@@ -321,7 +321,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         json = $.parseJSON(response)
 
         if json.error
-          if JQuery.type(json.error) != 'array'
+          if $.type(json.error) != 'array'
             std_msg_error('Error Assigning Entries', [json.error])
           else
             std_msg_error('Error Assigning Entries', [json.error.join(' ')])

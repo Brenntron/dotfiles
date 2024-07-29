@@ -238,9 +238,9 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def reassign(assignee, assignment_type)
-    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
-    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
-    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
+    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee && assignment_type == 'assignee'
+    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer && assignment_type == 'reviewer'
+    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer && assignment_type == 'second_reviewer'
     raise "Already completed" if status == "COMPLETED"
 
     case assignment_type
