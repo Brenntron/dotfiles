@@ -153,16 +153,16 @@ class ComplaintEntry < ApplicationRecord
 
     if assignment_type == 'assignee' && [reviewer&.id, second_reviewer&.id].include?(current_user.id)
       return('A Reviewer cannot also be the Assignee.')
-    elsif assignment_type == 'assignee' && (self.user.nil? || self.user.display_name == 'Vrt Incoming')
+    elsif assignment_type == 'assignee' && (user.nil? || user&.display_name == 'Vrt Incoming')
       update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
       complaint.set_status("ASSIGNED")
-    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id && !self.user.enabled_self_review
+    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && user&.id == current_user.id && !user&.enabled_self_review
       return('The Assignee cannot also be a Reviewer.')
-    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id && !self.user.enabled_self_review
+    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == current_user&.id && !user&.enabled_self_review
       return('The Reviewer cannot also be the Second Reviewer.')
     elsif assignment_type == 'reviewer' && reviewer.nil?
       update(reviewer: current_user)
-    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id && !self.user.enabled_self_review
+    elsif assignment_type == 'second_reviewer' && second_reviewer.nil? && reviewer&.id == current_user&.id && !user&.enabled_self_review
       return('The Second Reviewer cannot also be the Reviewer.')
     elsif assignment_type == 'second_reviewer' && second_reviewer.nil?
       update(second_reviewer: current_user)
@@ -238,9 +238,9 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def reassign(assignee, assignment_type)
-    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
-    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
-    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
+    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee && assignment_type == 'assignee'
+    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer && assignment_type == 'reviewer'
+    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer && assignment_type == 'second_reviewer'
     raise "Already completed" if status == "COMPLETED"
 
     case assignment_type

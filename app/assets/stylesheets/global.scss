@@ -1,4 +1,5 @@
-/***** Variables ******/
+/***** Variables *****/
+
 
 
 /* Background Colors */
@@ -16,7 +17,6 @@ $third-section-color   : #EFAF34;   /* Yellow Ochre   */
 $fourth-section-color  : #8cc63f;   /* Bright Green   */
 $fifth-section-color   : #65A1A1;   /* Dusty Teal     */
 $primary-section-color-light : #b5ebff;   /* Light Blue    */
-
 $bug-section-color         : $primary-section-color;
 $escalations-section-color : $second-section-color;
 $user-section-color        : $third-section-color;
@@ -46,7 +46,7 @@ $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
 $grey-section-color: #e2e2e2;
-$yellow-graph-bar:#f9cf81;
+$yellow-graph-bar: #f9cf81;
 $yet-another-pale-grey: #e8e8e8;
 
 /* Content Label Color */
@@ -64,7 +64,6 @@ $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
 $type-lightest: #fff; /* White */
-$type-darkest: #000; /* black */
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
 $faint-neutral-color: #f2f2f2;
@@ -204,10 +203,6 @@ h1.inline-header {
   color: $type-lighter-color;
 }
 
-.capitalize {
-  text-transform: capitalize;
-}
-
 h4 {
   font-weight: 500;
   margin-bottom: 8px;
@@ -220,10 +215,6 @@ h5 {
   font-size: 8pt;
   line-height: 2em;
 }
-
-.text-center {text-align: center;}
-.text-right {text-align: right;}
-.text-left {text-align: left;}
 
 .data_small_emphasis {
   color: $content-label-color;
@@ -4118,9 +4109,9 @@ fieldset.top-content {
 }
 
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
-.nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
+.nav-tabs > li > a#research-tab-link, a#research_tab_link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
-.nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
+.nav-tabs > li > a#history-tab-link, a#history_tab_link {background-image: url(image_path('icon_history_tab.svg'));}
 .nav-tabs > li > a#context-tags-tab-link {background-image: url(image_path('icon_context_tag.svg'));}
 
 .email-msg-content {
@@ -4608,6 +4599,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 // TODO We should consolidate these soon and make a single class that just covers all this
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
+.escalations--webcat--complaint_entries-controller,
 .escalations--webcat--reports-controller,
 .escalations--webcat--csam_reports-controller,
 .users-controller,
@@ -6094,19 +6086,19 @@ input.table-entry-input:focus {
     height: 100%;
   }
 
-  .webcat-research-svg {
-    background-repeat: no-repeat;
-    display: none;
-    float: left;
-    height: 20px;
-    margin-right: 3px;
-    margin-top: 0;
-    width: 20px;
-  }
-
   .table .webcat-research-svg {
     display: initial;
   }
+}
+
+.webcat-research-svg {
+  background-repeat: no-repeat;
+  display: none;
+  float: left;
+  height: 20px;
+  margin-right: 3px;
+  margin-top: 0;
+  width: 20px;
 }
 
 #domain-history-table_filter, #xbrs-history-table_filter {
@@ -7652,7 +7644,7 @@ table.dispute-entry-table tbody tr.selected {
   background-color: transparent !important;
 }
 
-.dispute-owner-buttons-wrapper .ticket-owner-button {
+.complaint-owner-buttons-wrapper .ticket-owner-button, .dispute-owner-buttons-wrapper .ticket-owner-button {
   background-image: url(image_path('icon_user_white.svg'));
   &:hover {
     background-color: $primary-section-color !important;
@@ -7697,11 +7689,11 @@ table.dispute-entry-table tbody tr.selected {
   margin: 0 6px 0 6px;
 }
 
-.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
+.complaint-owner-buttons-wrapper .inline-tool-content-wrapper, .dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
   padding-bottom: 20px;
 }
 
-.priority-col-wrapper, .case-id-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
+.priority-col-wrapper, .case-id-wrapper, .complaint-owner-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
   display: inline-block;
 }
 
@@ -8173,6 +8165,7 @@ table.dispute-entry-table tbody tr.selected {
   color: $content-bg-color;
   font-weight: 300;
 }
+
 .retake-screenshot:hover{
   background-color: darken($type-lighter-color, 8%);
   color: $content-bg-color;
@@ -8180,13 +8173,16 @@ table.dispute-entry-table tbody tr.selected {
   font-weight: 300;
 }
 
-
 .nested-complaint-static-data .col-with-divider {
   border-color: darken($faint-neutral-color, 15%);
 }
 
 .nested-complaint-editable-data .col-with-divider {
   border-color: lighten($content-bg-color, 5%);
+}
+
+.bottom-divider {
+  border-bottom: 1px solid darken($content-bg-color, 6.5%)
 }
 
 .simple-nested-table th {
@@ -8316,6 +8312,7 @@ table.dispute-entry-table tbody tr.selected {
   cursor: pointer;
   display: inline-block;
   margin: 4px 2px 0 2px;
+  min-height: 20px;
   padding: 2px 4px;
 
   &:hover {
@@ -8978,10 +8975,6 @@ h2 {
 
     .font-lg {
       font-size: 20px;
-    }
-
-    .uppercase {
-      text-transform: uppercase;
     }
   }
 
@@ -9793,6 +9786,8 @@ td.text-center span {
   background-image: url(image_path('icon_google_grey.svg'));
   background-color: $nav-toolbar-color;
 }
+
+.icon-google {background-image: url(image_path('icon_google_grey.svg'));}
 
 .cluster-dup-btn {
   background-image: url(image_path('icon_mark_duplicate.svg'));

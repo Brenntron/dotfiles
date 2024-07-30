@@ -35,8 +35,8 @@ require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'
 
-Capybara.default_driver = :selenium_chrome
-Capybara.javascript_driver = :selenium_chrome
+Capybara.default_driver = :selenium_headless
+Capybara.javascript_driver = :selenium_headless
 Selenium::WebDriver.logger.level = :error
 
 # This setting is required for DataTables to be compatible with Selenium
@@ -66,14 +66,12 @@ Capybara.server = :puma, { Silent: true }
 #
 ActionController::Base.allow_rescue = false
 
-# Remove/comment out the lines below if your app doesn't have a database.
-# For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
-begin
-  DatabaseCleaner.strategy = :truncation
-  DatabaseCleaner.clean_with(:truncation)
-rescue NameError
-  raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
-end
+DatabaseCleaner.strategy = [:truncation, { except: %w(ar_internal_metadata service_statuses) }]
+
+# Possible values are :truncation and :transaction
+# The :transaction strategy is faster, but might give you threading problems.
+# See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
+Cucumber::Rails::Database.javascript_strategy = [:truncation, { except: %w(ar_internal_metadata service_statuses) }]
 
 # You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
 # See the DatabaseCleaner documentation for details. Example:
@@ -107,8 +105,3 @@ end
 Before('@poltergeist') do
   Capybara.javascript_driver = :selenium_chrome
 end
-
-# Possible values are :truncation and :transaction
-# The :transaction strategy is faster, but might give you threading problems.
-# See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
-Cucumber::Rails::Database.javascript_strategy = :truncation

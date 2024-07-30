@@ -1200,4 +1200,11 @@ For future web and email reputation requests, please open a web and email reputa
 
   end
 
+  def customer_org
+    if customer.nil?
+      ''
+    else
+      customer.company.nil? ? '' : customer.company.name
+    end
+  end
 end

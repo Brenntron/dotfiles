@@ -59,7 +59,7 @@ RSpec.configure do |config|
   config.before(:context) do
     DatabaseCleaner.clean_with(
       :truncation,
-      except: %w(ar_internal_metadata)
+      except: %w(ar_internal_metadata service_statuses)
     )
   end
 end

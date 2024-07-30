@@ -109,16 +109,7 @@ window.build_complaints_table = (url) ->
 
         # for longer descriptions let user toggle full vs truncated
         $('.truncated-description').on 'click', () ->
-          short = $(this).attr('data-truncated')
-          full = $(this).attr('data-full')
-          wrapper = $(this).prev()
-
-          if $(wrapper).text() == short
-            $(wrapper).text(full)
-            $(this).html('&larr;')
-          else
-            $(wrapper).text(short)
-            $(this).html('&hellip;')
+          toggle_truncation($(this))
 
 
     createdRow: (row, data) ->
@@ -196,7 +187,7 @@ window.build_complaints_table = (url) ->
           ticket_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
-              '<tr class="entry-id-row"><td><a href="complaints/' + full.complaint_id + '" >' + full.entry_id + '</a></td></tr>' +
+              '<tr class="entry-id-row"><td><a href="complaint_entries/' + full.entry_id + '" >' + full.entry_id + '</a></td></tr>' +
               '<tr class="age-row"><td class="' + age_class + '">' + data + '</td></tr>' +
               '<tr class="state-row"><td>' + full.status + '</td></tr>' +
               '<tr class="channel-row"><td>' + complaint_channel + '</td></tr>' +
@@ -439,7 +430,7 @@ window.build_complaints_table = (url) ->
           whois_url = full.domain || full.ip_address
           whois_button =
             '<button class="whois-button esc-tooltipped" id="whois-' + full.entry_id + '" ' +
-              'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"' +
+              'onclick="whois_dialog(\'' + whois_url + '\')"' +
               'title="Whois Information"></button>'
 
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address
@@ -508,7 +499,7 @@ window.build_complaints_table = (url) ->
               '<select class="response-template-select" id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Response to Customer</label>' +
-              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
+              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text">' + res_comment + '</textarea>' +
               '<label class="content-label-sm full-row-label">*Edits to the above textarea will be saved upon submitting the entry. Selecting a different template or resolution will replace any text added above.</label>' +
               '</div></div></div>' +
             '</div>'
@@ -797,7 +788,7 @@ window.build_header = (data) ->
       if search_name.includes('?f=')
         search_name = search_name.replace('?f=', '')
 
-    if search_type == 'standard'
+    if search_type == 'standard' && search_name?
 
       #'My Open Tickets' filter is now default, so load that instead of any 'all' filters that load whole table
       if search_name == 'all'

@@ -15,7 +15,6 @@ window.wbrs_display = (score) ->
   else if score >= 6
     return 'trusted'
 
-
 # clear out 'touched' entries
 window.clear_stored_entries = () ->
   sessionStorage.getItem("webcat_entries_changed") || ""
@@ -23,22 +22,34 @@ window.clear_stored_entries = () ->
   sessionStorage.getItem("webcat_entries_reviewed") || ""
   sessionStorage.setItem("webcat_entries_reviewed", "")
 
+window.toggle_truncation = ($element) ->
+  truncated = $element.data('truncated')
+  full = $element.data('full')
+  $wrapper = $element.prev()
+
+  if $wrapper.text().trim() == truncated
+    $wrapper.text(full)
+    $element.html('&larr;')
+  else
+    $wrapper.text(truncated)
+    $element.html('&hellip;')
 
 $ ->
   clear_stored_entries()
 
-
+  $body = $('body')
   # webcat: have top navigation bar scroll with page per user request
-  if $('body').hasClass("escalations--webcat--complaints-controller") && $('body').hasClass("index-action")
+  if $body.hasClass("escalations--webcat--complaints-controller") && $body.hasClass("index-action")
     $('#nav-banner').addClass('fixed-nav')
 
     #pin webcat toolbar under navigation bar, add padding
     toolbar = $('#webcat-index-toolbar')
+
     $('#nav-banner').append(toolbar)
-    $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top','60px')
+    $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top', '60px')
 
     #align tooltips under toolbar
-    $('body').addClass('pinned-toolbar-true')
+    $body.addClass('pinned-toolbar-true')
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
@@ -155,8 +166,13 @@ $ ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
     localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
-    $('#complaints-index').DataTable().state.clear()
-    refresh_url()
+    $complaints_index = $('#complaints-index')
+
+    if $complaints_index.length
+      $complaints_index.DataTable().state.clear()
+      refresh_url()
+    else
+      window.location.replace('/escalations/webcat/complaints')
 
 
   window.search_for_tag = (tag) ->
@@ -179,7 +195,7 @@ $ ->
 
   # This is used when there is an error calling the data
   # or when clearing the search to the default data (favorite filter if set by user)
-  window.webcat_refresh = ()->
+  window.webcat_refresh = () ->
     refresh_webcat_localStorage()
     refresh_url()
     # add 'selected' to default filter
@@ -189,9 +205,10 @@ $ ->
     { webcat_search_type, webcat_search_name } = localStorage
     url_check = current_url.split('/escalations/webcat/complaints/')[0]
     new_url = '/escalations/webcat/complaints'
+
     if href != undefined
       window.location.replace( new_url + href )
-    if !href && typeof parseInt(url_check) == 'number'
+    else if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
       localStorage.setItem('webcat_reset_page', true)
 
@@ -254,7 +271,7 @@ $ ->
     fav_icon = $('.favorite-search-icon-active')
     link = fav_icon.parent().find('a')
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
-    { icon: fav_icon, link: link, name: name }
+    {icon: fav_icon, link: link, name: name}
 
   window.current_page_is_favorite = (search_name) ->
     { icon, name } = chosen_default_filter()
@@ -631,107 +648,11 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
 
 
 fetch_external_categories = (entry_id) ->
-  std_msg_ajax(
-    method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
-    data: {'id': entry_id}
-    success: (response) ->
-      row_id = JSON.parse(this.data).id
-      { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
+  error_callback = (response) ->
+    # maintain this for troubleshooting external api responses
+    console.error response
 
-      # If there are any current categories (WBRS)
-      # Put the top one in the list
-      # All other cat details will be in a tooltip
-      primary_cat = '<span class="missing-data">No current external categories</span>'
-
-      if current_categories || sds_category || sds_domain_category
-        tooltip_table = '<div class="current-external-cat-info">'
-      else
-        tooltip_table = ''
-
-      if current_categories
-        tooltip_table +=
-          '<label class="tooltip-table-label">WBRS</label>' +
-            '<table class="category-tooltip-table"><thead><tr>' +
-            '<th>Conf</th><th>WBRS Categories</th><th>Certainty</th><th colspan="3">Feeds</th>' +
-            '</tr></thead><tbody>'
-
-        $.each current_categories, (key, value) ->
-          active =  $(this).attr("is_active")
-          if active == true
-            { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = this
-            if certainties
-              rowspan = certainties.length
-            else
-              rowspan=''
-
-            tooltip_table +=
-              '<tr><td rowspan="' + rowspan + '">' + value.confidence + '</td>' +
-                '<td rowspan="' + rowspan + '">' + value.mnem + ' - ' + value.descr + '</td>' +
-                '<td rowspan="' + rowspan + '">' + value.top_certainty + '</td>'
-            if certainties
-              $(certainties).each (i) ->
-                { certainty:source_certainty, source_description, source_mnemonic: source_name } = this
-                unless i == 0
-                  tooltip_table += '<tr>'
-
-                tooltip_table +=
-                  '<td class="alt-col">' + this.certainty + '</td>' +
-                    '<td class="alt-col">' + this.source_mnemonic + '</td>' +
-                    '<td class="alt-col">' + this.source_description + '</td>'
-            else
-              tooltip_table += '<td colspan="3"></td>'
-
-            tooltip_table += '</tr></tbody></table>'
-
-            if key == '1.0'
-              primary_cat = '<a class="esc-tooltipped tooltip-underline">' + value.mnem + ' - ' + value.descr + ' <span class="ex-category-source">WBRS</span></a>'
-
-      else if sds_category
-        primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_category + ' <span class="ex-category-source">SDS URI</span></a>'
-
-      else if sds_domain_category
-        primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_domain_category + ' <span class="ex-category-source">SDS Domain</span></a>'
-
-      # build the rest of the tooltip if there is stuff from SDS
-      if sds_category || sds_domain_category
-        tooltip_table +=
-          '<label class="tooltip-table-label">SDS</label>' +
-            '<table class="category-tooltip-table"><thead><tr>' +
-            '<th>SDS URI Category</th><th>SDS Domain Category</th>' +
-            '</tr></thead>' +
-            '<tbody><tr>'
-
-        if sds_category
-          tooltip_table += '<td>' + sds_category + '</td>'
-        else
-          tooltip_table += '<td></td>'
-        if sds_domain_category
-          tooltip_table += '<td>' + sds_domain_category + '</td>'
-        else
-          tooltip_table += '<td></td>'
-
-        tooltip_table +=
-          '</tr></tbody></table>'
-
-      tooltip_table += '</div>'
-
-      $('#current_cat_' + entry_id).html(primary_cat)
-      if tooltip_table != '</div>'
-        $('#current_cat_' + entry_id + ' a.esc-tooltipped').tooltipster
-          content: $(tooltip_table),
-          theme: [
-            'tooltipster-borderless'
-            'tooltipster-borderless-customized'
-          ],
-          minWidth: '820'
-
-    error: (response) ->
-      # maintain this for troubleshooting external api responses
-      console.log response
-      current_categories = ''
-  )
-
+  AC.WebCat.get_current_categories(entry_id, true, error_callback)
 
 # Sending individual entry info to the backend
 process_entry = (entry_data) ->

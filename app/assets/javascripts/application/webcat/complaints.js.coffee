@@ -64,8 +64,6 @@ window.getTouchedFormCount = () ->
 window.bulk_submit_categorize_entries = () ->
   # grab what has been touched / stored in session
   changes = (sessionStorage.getItem("webcat_entries_changed")|| "" )
-  if changes.split(',').length < 0
-    return
 
   $('#complete-entries-wrapper tbody').empty()
   $('#incomplete-entries-wrapper tbody').empty()
@@ -426,10 +424,10 @@ window.fetch_complaints = () ->
 # Enables the bulk submit button if there have been
 window.verifyMasterSubmit = () ->
   changes = getTouchedFormCount()
-  boolean = false
-  if $(changes).length > 0
-    boolean = true
-  return boolean
+  enable_submit = false
+  if changes > 0
+    enable_submit = true
+  return enable_submit
 
 window.updateResolutionDialog = (confirm) ->
 #   { status } = row

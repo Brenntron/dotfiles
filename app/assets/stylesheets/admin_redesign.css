@@ -16,6 +16,7 @@
  *= require webcat_index
  *= require webcat_telemetry
  *= require webcat_complaints
+ *= require webcat_complaint_entries
  *= require webcat_clusters
  *= require webcat_bulk_resolution_dialog
  *= require webcat_csam_reports

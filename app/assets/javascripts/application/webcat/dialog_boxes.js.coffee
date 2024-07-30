@@ -7,122 +7,140 @@
 # Includes tabs for domain history, complaint entry history,
 # and xbrs history of the url.
 window.history_dialog = (id, url) ->
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  std_msg_ajax(
+  headers = { 'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val() }
+  history_call = std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
     method: 'POST'
     headers: headers
-    data: {'id': id}
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        alert(json.error)
-      else
-        history_dialog_content =
-          "<div class='cat-history-dialog dialog-content-wrapper'>
-               <h4>#{url}</h4>
-              <ul class='nav nav-tabs dialog-tabs' role='tablist'>
-               <li class='nav-item active' role='presentation'>
-                <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
-                   Domain History
-                </a>
-               </li>
-              <li class='nav-item' role='presentation'>
-                <a class='nav-link' role='tab' data-toggle='tab' href='#complaint-history-tab' aria-controls='complaint-history-tab'>
-                   Complaint Entry History
-                </a>
-              </li>
-               <li class='nav-item' role='presentation'>
-                <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
-                  XBRS Timeline
-                </a>
-               </li>
-            </ul>
-            <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
-            <h5>Domain History</h5>"
-
-        if json.entry_history.domain_history.length < 1
-          history_dialog_content += '<span class="missing-data">No domain history available.</span>'
-        else
-          history_dialog_content +=
-            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-              '<tbody>'
-          # Build domain history table
-          for entry in json.entry_history.domain_history
-            history_dialog_content +=
-              '<tr>' +
-                '<td>' + entry['action'] + '</td>' +
-                '<td>' + entry['confidence'] + '</td>' +
-                '<td>' + entry['description'] + '</td>' +
-                '<td>' + entry['time'] + '</td>' +
-                '<td>' + entry['user'] + '</td>' +
-                '<td>' + entry['category']['descr'] + '</td>' +
-                '</tr>'
-          # End domain history table
-          history_dialog_content += '</tbody></table>'
-
-        # End domain history tab start Complaint Entry Tab
-        history_dialog_content +=
-          '</div>' +
-            '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
-            '<h5>Complaint Entry History</h5>'
-
-        if json.entry_history.complaint_history.length < 1
-          history_dialog_content += '<span class="missing-data">No complaint entry history available.</span></div>'
-        else
-          history_dialog_content +=
-            '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
-              '<tbody>'
-
-          # Build the complaint history table
-          entry_row = ""
-          for entry in json.entry_history.complaint_history
-            entry_row = "<tr><td>" + entry[0] + '</td>'
-            details_col = ""
-            i = 0
-            for change_key, change_entry of entry
-              i = i + 1
-              if i > 1
-                for key, value of change_entry
-                  if key == "whodunnit"
-                    entry_row += "<td>" + value + "</td>"
-                  else
-                    details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
-            entry_row += '<td>' + details_col + '</td></tr>'
-            history_dialog_content += entry_row
-          # End complaint history table
-          history_dialog_content += '</tbody></table></div>'
-
-
-        # End complaint history table tab
-        # Start XBRS Tab
-        history_dialog_content +=
-          "
-           <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
-            <h5>XBRS Timeline</h5>
-              <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
-            </div>
-           "
-
-        # Only one history dialog open at a time - content gets swapped out
-        if $("#history_dialog").length
-          history_dialog = this
-          $("#history_dialog").html(history_dialog_content)
-          $('#history_dialog').dialog('open')
-        else
-          history_dialog = '<div id="history_dialog" title="History Information"></div>'
-          $('body').append(history_dialog)
-          $("#history_dialog").html(history_dialog_content)
-          $('#history_dialog').dialog
-            autoOpen: false
-            minWidth: 800
-            position: { my: "right top", at: "right top", of: window }
-          $('#history_dialog').dialog('open')
+    data: { 'id': id }
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      console.error(response)
   , this)
+  domain_history_call = std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
+    method: 'GET'
+    headers: headers
+    data:
+      'domain': url
+    error: (errorResponse) ->
+      console.error(errorResponse)
+      std_api_error(errorResponse, "Domain History for this Entry could not be retrieved.", reload: false)
+      $('#ce_domain_history_loader').hide()
+  )
+  $.when(history_call, domain_history_call).then((history_resposne, domain_history_response) ->
+    history_data = $.parseJSON history_resposne[0]
 
+    if history_data.error
+      alert(json.error)
+      return
+
+    domain_history_data = domain_history_response[0].data
+    # remove baseline domain entry
+    domain_history_data.splice(0, 1)
+
+    history_dialog_content = """
+      <div class='cat-history-dialog dialog-content-wrapper'>
+         <h4>#{url}</h4>
+        <ul class='nav nav-tabs dialog-tabs' role='tablist'>
+         <li class='nav-item active' role='presentation'>
+          <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
+             Domain History
+          </a>
+         </li>
+        <li class='nav-item' role='presentation'>
+          <a class='nav-link' role='tab' data-toggle='tab' href='#complaint-history-tab' aria-controls='complaint-history-tab'>
+             Complaint Entry History
+          </a>
+        </li>
+         <li class='nav-item' role='presentation'>
+          <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
+            XBRS Timeline
+          </a>
+         </li>
+      </ul>
+      <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
+      <h5>Domain History</h5>
+      """
+
+    if domain_history_data.length < 1
+      history_dialog_content += '<span class="missing-data">No domain history available.</span>'
+    else
+      history_dialog_content +=
+        '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+          '<tbody>'
+      # Build domain history table
+      for entry in domain_history_data
+        history_dialog_content +=
+          '<tr>' +
+            '<td>' + entry['action'] + '</td>' +
+            '<td>' + entry['confidence'] + '</td>' +
+            '<td>' + entry['description'] + '</td>' +
+            '<td>' + entry['time_of_action'] + '</td>' +
+            '<td>' + entry['user'] + '</td>' +
+            '<td>' + entry['category'] + '</td>' +
+            '</tr>'
+      # End domain history table
+      history_dialog_content += '</tbody></table>'
+
+    # End domain history tab start Complaint Entry Tab
+    history_dialog_content +=
+      '</div>' +
+        '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
+        '<h5>Complaint Entry History</h5>'
+
+    if history_data.entry_history.complaint_history.length < 1
+      history_dialog_content += '<span class="missing-data">No complaint entry history available.</span></div>'
+    else
+      history_dialog_content +=
+        '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
+          '<tbody>'
+
+      # Build the complaint history table
+      entry_row = ""
+      for entry in history_data.entry_history.complaint_history
+        entry_row = "<tr><td>" + entry[0] + '</td>'
+        details_col = ""
+        i = 0
+        for change_key, change_entry of entry
+          i = i + 1
+          if i > 1
+            for key, value of change_entry
+              if key == "whodunnit"
+                entry_row += "<td>" + value + "</td>"
+              else
+                details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
+        entry_row += '<td>' + details_col + '</td></tr>'
+        history_dialog_content += entry_row
+      # End complaint history table
+      history_dialog_content += '</tbody></table></div>'
+
+
+    # End complaint history table tab
+    # Start XBRS Tab
+    history_dialog_content +=
+      "
+       <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
+        <h5>XBRS Timeline</h5>
+          <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+        </div>
+       "
+
+    # Only one history dialog open at a time - content gets swapped out
+    if $("#history_dialog").length
+      history_dialog = this
+      $("#history_dialog").html(history_dialog_content)
+      $('#history_dialog').dialog('open')
+    else
+      history_dialog = '<div id="history_dialog" title="History Information"></div>'
+      $('body').append(history_dialog)
+      $("#history_dialog").html(history_dialog_content)
+      $('#history_dialog').dialog
+        autoOpen: false
+        minWidth: 800
+        position: { my: "right top", at: "right top", of: window }
+      $('#history_dialog').dialog('open')
+  )
 
 ## Fetches XBRS history of a url on click of the XBRS tab in history
 window.get_xbrs_history = (url, tab) ->
@@ -161,6 +179,10 @@ window.get_xbrs_history = (url, tab) ->
           data_row = ""
 
           for key, value of row
+            if key == 'time'
+              date = moment(value)
+              value = date.format('LLL')
+
             data_row += "<td>#{value || '-'}</td>"
 
           tbody.append("<tr>#{data_row}</tr>")
@@ -169,12 +191,56 @@ window.get_xbrs_history = (url, tab) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
+window.whois_dialog = (ipDomain) ->
+  if $('#whoisContent').length > 0
+    $('#whoisContent').dialog(title: "ICANN Whois for: #{ipDomain}").dialog('open')
+  else
+    whoisContent = "<div id='whoisContent' class='webcat-whois-dialog-content' title='ICANN Whois for: #{ipDomain}'>
+                      <div class='dialog-content-wrapper'>
+                        <div id='icann_whois'>
+                          <div id='inline-webcat' class='webcat-loader-wrapper'>
+                            <span class='loader-msg'>
+                              Loading Data...
+                            <span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>"
 
+    $('body').append(whoisContent)
 
+    $('#whoisContent').dialog
+      autoOpen: true
+      classes: { 'ui-dialog': 'webcat-whois-dialog' }
+      minWidth: 800
+      position: { my: "right center", at: "right center", of: window }
+      title: "Whois for: #{ipDomain}"
 
+  $('#icannContent').remove()
+  $('#icann_whois > .webcat-loader-wrapper').show()
+
+  whois_callback = (formattedData) ->
+    $("#icann_whois").append("<div id='icannContent'>#{formattedData}</div>")
+    $('#icann_whois > .webcat-loader-wrapper').hide()
+
+  error_callback = (response) ->
+    $('#icann_whois > .webcat-loader-wrapper').hide()
+
+    if response?
+      { responseJSON } = response
+
+      if !responseJSON
+        std_msg_error("Error retrieving WHOIS query.","")
+      else
+        std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
+
+      return $.each(response.responseJSON, (key, value) ->
+        console.error value
+      )
+
+  AC.WebCat.Whois.get_whois_data(ipDomain, whois_callback, error_callback)
 
 $ ->
-
   # initialize bulk resolution dialog
   $('#index_change_resolution_dialog').dialog
     autoOpen: false
@@ -223,6 +289,12 @@ $ ->
     entry_id = $(this).attr('id').replace(lc_res, '')
     get_resolution_templates(resolution, 'individual', [entry_id])
 
+  # Update complaint entry show page templates and text when a user selects a different resolution
+  if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
+    $(document).on 'change', '.resolution-radio-button', ->
+      entry_id = $('#complaint_entry_id')[0].innerText
+      resolution = $(this).val()
+      get_resolution_templates(resolution, 'individual', [entry_id])
 
 window.create_ind_res_dialogs = () ->
   fixed_res = []
@@ -310,7 +382,7 @@ window.get_resolution_templates = (resolution, dialog_type, entry_ids) ->
           text_area = $("#entry-email-response-to-customers_" + entry_id)
           select.empty()
           select.append(template_options)
-          $(text_area).val(email_text)
+          text_area.val(email_text)
 
       error: (response) ->
         std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
