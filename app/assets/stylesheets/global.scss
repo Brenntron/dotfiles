@@ -13795,11 +13795,8 @@ table > tbody > tr > td.no-padding {
     line-height: 12pt;
     margin-bottom: 5px;
   }
-  hr {
-    display: none;
-  }
   .form-group {
-    margin-bottom: 20px;
+    margin-bottom: -7px;
   }
   .form-control.selectize {
     font-size: 8.5pt;
@@ -13822,7 +13819,9 @@ table > tbody > tr > td.no-padding {
   .form-control.selectize {
     margin-bottom: 4px;
   }
-  input, .form-control.selectize {
+  input,
+  .form-control.selectize,
+  select {
     display: inline-block;
     width: 360px;
     padding-left: 2px;

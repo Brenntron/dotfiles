@@ -1,32 +1,48 @@
 ## WEBCAT CATEGORIZE URLS DROPDOWN FUNCTIONS ##
 $ ->
 
-  # Populate the category selectizes on the dropdown
-  new_url_cats = $('select.cat_new_url')
-  for select in new_url_cats
-    $(select).selectize {
-      persist: true,
-      create: false,
-      maxItems: 5,
-      closeAfterSelect: true,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions("##{select.id}")
-      score: (input) ->
-        #  Adding some customization for autofill
-        #  restricting on certain cats to avoid accidental categorization
-        #  (replaces selectize's built-in `getScoreFunction()` with our own)
-        (item) ->
-          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
-            item.category_code == input ? 1 : 0
-          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-            1
-          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
-            0.9
-          else
-            0
-    }
+  $('#categorize-urls').on 'click', ->
+
+    # Populate the category selectizes on the dropdown
+    new_url_cats = $('select.cat_new_url')
+    for select in new_url_cats
+      $(select).selectize {
+        persist: true,
+        create: false,
+        maxItems: 5,
+        closeAfterSelect: true,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions("##{select.id}")
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
+      }
+
+    # Populate the platform selects
+    AC.DataLoaders.load_plaforms().then( (platforms) =>
+      $('#multiurl_platform_select').empty()
+      $('.platform-new-url').empty()
+
+      platform_options = ''
+      for platform in platforms.data
+        platform_options += '<option value="' + platform.public_name + '">' + platform.public_name + '</option>'
+
+      $('#multiurl_platform_select').append platform_options
+      $('.platform-new-url').each ->
+        $(this).append platform_options
+    )
 
   # Switch which form type is shown
   $('#cat-urls-diff').click ->

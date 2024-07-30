@@ -44,6 +44,9 @@
                                                                                style: "display: none;",
                                                                                tabindex: "2"
                                                                              }
+
+            %label.content-label-sm Platform
+            %select.form-control#platform_new_url_1.platform-new-url
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -62,6 +65,9 @@
                                                                                style: "display: none;",
                                                                                tabindex: "4"
                                                                               }
+
+            %label.content-label-sm Platform
+            %select.form-control#platform_new_url_2.platform-new-url
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -80,6 +86,8 @@
                                                                                style: "display: none;",
                                                                                tabindex: "6"
                                                                               }
+            %label.content-label-sm Platform
+            %select.form-control#platform_new_url_3.platform-new-url
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -98,6 +106,8 @@
                                                                                style: "display: none;",
                                                                                tabindex: "8"
                                                                               }
+            %label.content-label-sm Platform
+            %select.form-control#platform_new_url_4.platform-new-url
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -116,6 +126,8 @@
                                                                                style: "display: none;",
                                                                                tabindex: "10"
                                                                              }
+            %label.content-label-sm Platform
+            %select.form-control#platform_new_url_5.platform-new-url
           .form-group.text-center
             .webcat-loader.gear-loader-wrapper.hidden
               = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
@@ -129,7 +141,9 @@
           .form-group
             %label.content-label-sm Categories
             %select.form-control#multi_cat_url_cats.cat_new_url.selectize{multiple: "multiple", placeholder: "Enter up to 5 categories", style: "display: none;"}
-          %hr.thin.condensed
+          .form-group
+            %label.content-label-sm Platform
+            %select#multiurl_platform_select.form-control
           .form-group
             %label.content-label-sm URLs/IP Addresses
             %textarea#categorize_urls{required: true}
