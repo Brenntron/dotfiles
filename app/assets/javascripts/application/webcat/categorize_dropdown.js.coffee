@@ -284,7 +284,7 @@ window.cat_new_url = ()->
 
 
 window.multiple_url_categorization = () ->
-  loader = $('.lookup-drop-loader')
+  loader = $('#bulk_cat_url_loader')
   loader.removeClass('hidden')
 
   categorizations_to_submit = {}
@@ -318,7 +318,7 @@ window.multiple_url_categorization = () ->
             popular_entries.push(val.url)
 
         if popular_entries.length > 0
-          message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+          message = "Pending complaint entries have been created for #{popular_entries.join(', ')}"
         else
           message = "No pending complaint entries have been created"
 
@@ -330,6 +330,7 @@ window.multiple_url_categorization = () ->
             # clear form inputs
             $('#categorize_urls').val('')
             $('#multi_cat_url_cats')[0].selectize.clear()
+            loader.addClass('hidden')
           )
         )
       error: (response) ->
@@ -341,7 +342,7 @@ window.multiple_url_categorization = () ->
 
 
 window.drop_multiple_url_categories = () ->
-  loader = $('.lookup-drop-loader')
+  loader = $('#bulk_cat_url_loader')
   urls = {}
 
   for url, index in $("#categorize_urls").val().trim().split(/\s+/)
@@ -380,6 +381,7 @@ window.drop_multiple_url_categories = () ->
             # clear form inputs
             $('#categorize_urls').val('')
             $('#multi_cat_url_cats')[0].selectize.clear()
+            loader.addClass('hidden')
           )
         )
 
