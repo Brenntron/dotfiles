@@ -1,69 +1,116 @@
-.nav-tool-content-wrapper#categorize-urls-form-wrapper {
-  padding-top: 10px;
-}
+// WEBCAT CATEGORIZE URLS DROPDOWN - FEATURE FOR CATEGORIZING URLS ON THE FLY W/OUT CREATING A TICKET FIRST
 
-#categorize-diff-form .content-label-sm {
-  margin-bottom: 0;
-}
-
-#categorize-diff-form input {
-  margin-bottom: 0;
-}
-
-#categorize-same-form {
-  display: none;
-}
-
-#categorize-urls-form-wrapper .modal-header {
-  background-color: #6dbcdb;
-  border: none;
-  border-radius: 4px 4px 0 0;
-}
-
-#categorize-urls-form-wrapper .modal-header h3 {
-  color: #fff;
-  font-size: 14pt;
-  font-weight: 300;
-}
-
-#categorize-urls-form-wrapper button.close {
-  background-image: url(image_path('icon_cancel_white.svg'));
-  right: 3px;
-  top: 5px;
-}
-
-#categorize-urls-form-wrapper {
-  width: 500px;
+// CATEGORIZE URLs dropdown - overall wrapper
+.nav-tools-dropdown[aria-labelledby='categorize-urls'] {
+  padding-top: 5px;
+  h3 {
+    padding: 6px 5px 9px;
+  }
 }
 
 .categorize-radio-wrapper {
   line-height: initial;
   background-color: #f2f2f2;
+  padding: 5px 6px 10px;
 
   .radio-label {
     font-size: 8pt;
-    padding-left: 8px;
+    padding-left: 4px;
     vertical-align: middle;
   }
 
   .cat-url-radio {
     border: none !important;
-    margin-top: -1px;
+    margin-top: 1px;
     outline: none !important;
     vertical-align: middle;
   }
 }
 
-.categorize-radio-wrapper.row {
-  padding: 12px 6px;
+// This id wraps both below forms, includes styles tweaks that affect both forms
+#categorize-urls-form-wrapper {
+  width: 500px;
+  padding: 10px 15px;
+
+  input, select {
+    display: block;
+    font-size: 8pt;
+    line-height: 12pt;
+    margin-bottom: 5px;
+  }
+
+  .form-control.selectize {
+    font-size: 8.5pt;
+    min-height: 28px !important;
+    max-width: 455px;
+    margin-bottom: 4px;
+    border-width: 3px;
+
+    .selectize-input {
+      margin-top: -3px !important;
+    }
+  }
+
+  .item {
+    font-size: 8pt;
+    line-height: 12pt;
+    margin: 3px 2px 0 !important; // override needed
+  }
+
+  button#cat_dif_submit {
+    font-size: 9pt;
+    line-height: 14pt;
+    margin: 0 10px;
+    padding: 12px 30px;
+  }
+
 }
 
-// webcat > categorize urls dropdown in top nav
+// Form with 5 diff url inputs and settings for each
 #categorize-diff-form {
-  .current-categories-button {
-    margin-right: 3px;
+  .toolbar {
+    margin-top: 4px;
+    .toolbar-button {
+      background-size: 16px 16px;
+      background-position: 5px center;
+
+      &.current-categories-button {
+        margin-right: 3px;
+      }
+
+      span {
+        font-size: 8pt;
+        line-height: 12pt;
+      }
+    }
   }
-  .history-button.inline-button {
+
+  .form-group {
+    margin-bottom: -7px;
+
+    .content-label-sm {
+      display: inline-block;
+      float: left;
+      width: 60px;
+      padding-top: 6px;
+      padding-left: 2px;
+      margin-bottom: 0;
+    }
+
+    input {
+      margin-bottom: 0;
+    }
+
+    input,
+    .form-control.selectize,
+    select {
+      display: inline-block;
+      width: 360px;
+      padding-left: 2px;
+    }
+  }
+
+  .history-button {
     margin-left: 4px;
   }
   // FF needs a tiny alignment correction
@@ -75,83 +122,47 @@
   }
 }
 
-// CATEGORIZE URLs dropdown - overall wrapper
-.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'],
-.escalations--webcat--csam_reports-controller .nav-tools-dropdown[aria-labelledby='categorize-urls']
-{
-  padding-top: 5px;
-  h3 {
-    padding: 6px 5px 9px;
+#categorize-same-form {
+  display: none;
+
+  label.content-label-sm {
+    padding-top: 5px;
+    display: block;
+    width: 90%;
+  }
+  .form-group {
+    margin-bottom: 10px;
   }
 }
 
+.cat-url-error{
+  color: #000;
+  font-size: 11px;
+  font-weight: normal;
+  display: none;
+}
 
-// CATEGORIZE URLs dropdown - vertical spacing tightening (below the radio buttons)
-.escalations--webcat--complaints-controller #categorize-urls-form-wrapper {
-  // "Different categories for each url" is radio selected (the default view)
-  padding: 8px 15px 5px;
-  input {
-    display: block;
-    font-size: 8pt;
-    line-height: 12pt;
-    margin-bottom: 5px;
-  }
-  .form-group {
-    margin-bottom: -7px;
-  }
-  .form-control.selectize {
-    font-size: 8.5pt;
-    line-height: 14pt;
-    height: 28px;
-    max-width: 455px;
-  }
-  .item {
-    font-size: 8pt;
-    line-height: 12pt;
-    margin: 3px 2px 0 !important; // override needed
-  }
-  .content-label-sm {
-    display: inline-block;
-    float: left;
-    width: 60px;
-    padding-top: 6px;
-    padding-left: 2px;
-  }
-  .form-control.selectize {
-    margin-bottom: 4px;
-  }
-  input,
-  .form-control.selectize,
-  select {
-    display: inline-block;
-    width: 360px;
-    padding-left: 2px;
-  }
-  .toolbar span {
-    font-size: 8pt;
-    line-height: 12pt;
-  }
-  .toolbar-button {
-    font-size: 8pt;
-    line-height: 12pt;
-    background-size: 16px 16px;
-    background-position: 5px center;
-  }
-  button#cat_dif_submit {
-    font-size: 9pt;
-    line-height: 14pt;
-    margin: 0 10px;
-    padding: 12px 30px;
-  }
-  // "Same categories for each url" is the radio selected
-  #categorize-same-form {
-    label.content-label-sm {
-      padding-top: 5px;
-      display: block;
-      width: 90%;
-    }
-    .form-group {
-      margin-bottom: 10px;
-    }
-  }
+.cat-url-success{
+  color: #000;
+  font-size: 11px;
+  font-weight: normal;
+  display: none;
+}
+
+.categorize-urls-warning-icon{
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  border:0;
+}
+
+.categorize-urls-success-icon{
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_success.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  border:0;
 }
