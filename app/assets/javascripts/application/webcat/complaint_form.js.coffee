@@ -147,7 +147,7 @@ $ ->
     $('#select-to-new').selectize()[0].selectize.clear()
 
 
-  createSelectOptions = ->
+  tag_select_options = ->
     tags = $('#complaint_tag_list')[0]
     if tags
       tag_list = tags.value
@@ -165,7 +165,7 @@ $ ->
     valueField: 'name'
     labelField: 'name'
     searchField: 'name'
-    options: createSelectOptions()
+    options: tag_select_options()
     onFocus: () ->
       window.toggle_selectize_layer(this, 'true')
     onBlur: () ->

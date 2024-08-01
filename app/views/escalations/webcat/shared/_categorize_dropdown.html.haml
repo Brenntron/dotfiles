@@ -45,8 +45,12 @@
                                                                                tabindex: "2"
                                                                              }
 
-            %label.content-label-sm Platform
-            %select.form-control#platform_new_url_1.platform-new-url
+            .form-col-wrapper
+              %label.content-label-sm Platform
+              %select.form-control#platform_new_url_1.platform-new-url
+              %label.content-label-sm.tags-label Tags
+              %select.form-control#tags_new_url_1.tags-new-url.selectize{placeholder: "Select or create tags", multiple: "multiple"}
+
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -66,8 +70,12 @@
                                                                                tabindex: "4"
                                                                               }
 
-            %label.content-label-sm Platform
-            %select.form-control#platform_new_url_2.platform-new-url
+            .form-col-wrapper
+              %label.content-label-sm Platform
+              %select.form-control#platform_new_url_2.platform-new-url
+              %label.content-label-sm.tags-label Tags
+              %select.form-control#tags_new_url_2.tags-new-url.selectize{placeholder: "Select or create tags", multiple: "multiple"}
+
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -86,8 +94,12 @@
                                                                                style: "display: none;",
                                                                                tabindex: "6"
                                                                               }
-            %label.content-label-sm Platform
-            %select.form-control#platform_new_url_3.platform-new-url
+            .form-col-wrapper
+              %label.content-label-sm Platform
+              %select.form-control#platform_new_url_3.platform-new-url
+              %label.content-label-sm.tags-label Tags
+              %select.form-control#tags_new_url_3.tags-new-url.selectize{placeholder: "Select or create tags", multiple: "multiple"}
+
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -106,8 +118,12 @@
                                                                                style: "display: none;",
                                                                                tabindex: "8"
                                                                               }
-            %label.content-label-sm Platform
-            %select.form-control#platform_new_url_4.platform-new-url
+            .form-col-wrapper
+              %label.content-label-sm Platform
+              %select.form-control#platform_new_url_4.platform-new-url
+              %label.content-label-sm.tags-label Tags
+              %select.form-control#tags_new_url_4.tags-new-url.selectize{placeholder: "Select or create tags", multiple: "multiple"}
+
           %hr.thin.condensed
 
           .form-group.individual-url
@@ -126,9 +142,13 @@
                                                                                style: "display: none;",
                                                                                tabindex: "10"
                                                                              }
-            %label.content-label-sm Platform
-            %select.form-control#platform_new_url_5.platform-new-url
-          .form-group.text-center
+            .form-col-wrapper
+              %label.content-label-sm Platform
+              %select.form-control#platform_new_url_5.platform-new-url
+              %label.content-label-sm.tags-label Tags
+              %select.form-control#tags_new_url_5.tags-new-url.selectize{placeholder: "Select or create tags", multiple: "multiple"}
+
+          .button-row.text-center
             .webcat-loader.gear-loader-wrapper.hidden
               = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
               %span.loader-msg Loading data...

@@ -44,6 +44,35 @@ $ ->
         $(this).append platform_options
     )
 
+    # Populate the tag selects
+    $('.tags-new-url').each ->
+      $(this).selectize {
+        persist: false,
+        create: (input) ->
+          {name: input}
+        maxItmes: null
+        valueField: 'name'
+        labelField: 'name'
+        searchField: 'name'
+        options: tag_select_options()
+        onFocus: () ->
+          window.toggle_selectize_layer(this, 'true')
+        onBlur: () ->
+          window.toggle_selectize_layer(this, 'false')
+      }
+
+
+  # there is a hidden input already on the page that has all existing tags
+  tag_select_options = ->
+    tags = $('#complaint_tag_list')[0]
+    if tags
+      tag_list = tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
+
   # Switch which form type is shown
   $('#cat-urls-diff').click ->
     if $('#cat-urls-diff').prop('checked')

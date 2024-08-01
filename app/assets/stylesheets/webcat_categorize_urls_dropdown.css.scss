@@ -32,22 +32,29 @@
   width: 500px;
   padding: 10px 15px;
 
-  input, select {
+  input[type='text'],
+  select,
+  .form-control.selectize {
+    min-height: 28px !important;
+  }
+
+  input,
+  select {
     display: block;
     font-size: 8pt;
     line-height: 12pt;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
 
   .form-control.selectize {
     font-size: 8.5pt;
-    min-height: 28px !important;
     max-width: 455px;
     margin-bottom: 4px;
     border-width: 3px;
 
     .selectize-input {
       margin-top: -3px !important;
+      padding-top: 0 !important;
     }
   }
 
@@ -55,13 +62,6 @@
     font-size: 8pt;
     line-height: 12pt;
     margin: 3px 2px 0 !important; // override needed
-  }
-
-  button#cat_dif_submit {
-    font-size: 9pt;
-    line-height: 14pt;
-    margin: 0 10px;
-    padding: 12px 30px;
   }
 
 }
@@ -97,16 +97,26 @@
       margin-bottom: 0;
     }
 
-    input {
-      margin-bottom: 0;
-    }
-
     input,
-    .form-control.selectize,
+    .form-control.cat_new_url,
     select {
       display: inline-block;
       width: 360px;
       padding-left: 2px;
+
+    }
+
+    .form-col-wrapper {
+      display: flex;
+      margin-bottom: 15px;
+      
+      select, .form-control {
+        width: 162px;
+      }
+      .tags-label {
+        width: 23px;
+        margin-left: 7px;
+      }
     }
   }
 
@@ -120,6 +130,14 @@
       bottom: 2px;
     }
   }
+
+  #cat_dif_submit {
+    font-size: 9pt;
+    line-height: 14pt;
+    margin: 20px 10px 10px;
+    padding: 12px 30px;
+  }
+
 }
 
 #categorize-same-form {
