@@ -1,5 +1,5 @@
 .nav-tool-blocks.col-xs-3.col-sm-3.col-md-2.col-lg-2.dropdown
-  %a{href: '#', class: 'dropdown-toggle', id: 'categorize-urls', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+  %a#categorize-urls.dropdown-toggle{href: '#', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
     %span{class: 'nav-toolbar-icon icon-categorize-white'}
     Categorize URLs
   .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'categorize-urls'}
@@ -141,9 +141,13 @@
           .form-group
             %label.content-label-sm Categories
             %select.form-control#multi_cat_url_cats.cat_new_url.selectize{multiple: "multiple", placeholder: "Enter up to 5 categories", style: "display: none;"}
-          .form-group
-            %label.content-label-sm Platform
-            %select#multiurl_platform_select.form-control
+          .form-group-wrapper
+            .form-group
+              %label.content-label-sm Platform
+              %select#multiurl_platform_select.form-control
+            .form-group
+              %label.content-label-sm Tags
+              %select#multiurl_tag_select.form-control
           .form-group
             %label.content-label-sm URLs/IP Addresses
             %textarea#categorize_urls{required: true}
