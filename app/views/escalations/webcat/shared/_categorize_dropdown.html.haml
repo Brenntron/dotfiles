@@ -162,13 +162,13 @@
           .form-group
             %label.content-label-sm Categories
             %select.form-control#multi_cat_url_cats.cat_new_url.selectize{multiple: "multiple", placeholder: "Enter up to 5 categories", style: "display: none;"}
-          .form-group-wrapper
+          .form-col-wrapper
             .form-group
               %label.content-label-sm Platform
               %select#multiurl_platform_select.form-control
             .form-group
               %label.content-label-sm Tags
-              %select#multiurl_tag_select.form-control
+              %select#multiurl_tag_select.form-control.selectize.tags-new-url{placeholder: "Select or create tags", multiple: "multiple"}
           .form-group
             %label.content-label-sm URLs/IP Addresses
             %textarea#categorize_urls{required: true}

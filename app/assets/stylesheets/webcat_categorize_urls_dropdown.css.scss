@@ -47,8 +47,6 @@
   }
 
   .form-control.selectize {
-    font-size: 8.5pt;
-    max-width: 455px;
     margin-bottom: 4px;
     border-width: 3px;
 
@@ -109,7 +107,7 @@
     .form-col-wrapper {
       display: flex;
       margin-bottom: 15px;
-      
+
       select, .form-control {
         width: 162px;
       }
@@ -151,16 +149,22 @@
   .form-group {
     margin-bottom: 10px;
   }
+  .form-col-wrapper {
+    display: flex;
+
+    .form-group:first-of-type {
+      margin-right: 10px;
+    }
+    select, .form-control {
+      width: 230px;
+      &.selectize {
+        height: auto;
+      }
+    }
+  }
 }
 
-.cat-url-error{
-  color: #000;
-  font-size: 11px;
-  font-weight: normal;
-  display: none;
-}
-
-.cat-url-success{
+.cat-url-error, .cat-url-success {
   color: #000;
   font-size: 11px;
   font-weight: normal;
