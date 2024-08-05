@@ -133,7 +133,8 @@ window.drop_current_categories = () ->
 
   for i in [1 .. 5]
     if $("#url_" + i ).val() != ""
-      urls[i] = $("#url_" + i ).val()
+      url_data = {url: $("#url_" + i ).val(), platform: $("#platform_new_url_" + i).val(), tags: $("#tags_new_url_" + i).val()}
+      urls[i] = url_data
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
@@ -274,11 +275,13 @@ window.cat_new_url = ()->
     cats_input_ids = $($(this).find('.cat_new_url')[0]).val()
     cats_input_names = []
     url_index = $($(this).find('.url-input')[0]).attr('id').split('_').pop()
+    platform = $(this).find('.platform-new-url').val()
+    tags = $(this).find('.tags-new-url').val()
 
     if url_input == '' || cats_input_ids == ''
       return
     else
-      $(this).find('.selectize-input .item').each ->
+      $(this).find('.cat_new_url .item').each ->
         cat_name = $(this).text()
         cats_input_names.push(cat_name)
 
@@ -286,6 +289,8 @@ window.cat_new_url = ()->
         'url': url_input,
         'category_names': cats_input_names,
         'category_ids': cats_input_ids
+        'platform': platform
+        'tags': tags
       }
 
   data = {data: categorizations_to_submit}
@@ -336,6 +341,9 @@ window.multiple_url_categorization = () ->
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
+  platform = $("#multiurl_platform_select").val()
+  tags = $("#multiurl_tag_select").val()
+
   for category in $("#multi_cat_url_cats")
     for i in [0..5] by 1
       if category[i]
@@ -345,7 +353,9 @@ window.multiple_url_categorization = () ->
     categorizations_to_submit[i] = {
       'url': this,
       'category_names': category_names,
-      'category_ids': category_ids
+      'category_ids': category_ids,
+      'platform': platform,
+      'tags': tags
     }
 
   data = {data: categorizations_to_submit}

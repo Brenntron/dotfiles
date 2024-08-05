@@ -147,6 +147,8 @@ module API
                                                        category_ids_string: prefix["category_ids"].join(','),
                                                        category_names_string: prefix["category_names"].join(','),
                                                        description: '',
+                                                       tags: prefix["tags"],
+                                                       platform: prefix["platform"],
                                                        user: current_user.email,
                                                        bugzilla_rest_session: bugzilla_rest_session)
 
@@ -227,17 +229,17 @@ module API
               paper_trail_urls = {}
               urls.each do |key, value|
                 begin
-                  if !Wbrs::Prefix.where(:urls => [value]).empty?
-                    prefix_ids[key] = Wbrs::Prefix.where(:urls => [value]).first.prefix_id
-                    top_url = Wbrs::TopUrl.check_urls([value]).first.is_important
-                    description = "Dropping all current categories for #{value}"
+                  if !Wbrs::Prefix.where(:urls => [value['url']]).empty?
+                    prefix_ids[key] = Wbrs::Prefix.where(:urls => [value['url']]).first.prefix_id
+                    top_url = Wbrs::TopUrl.check_urls([value['url']]).first.is_important
+                    description = "Dropping all current categories for #{value['url']}"
                     if top_url
                       description += " Moving to peer review as attempt of category drop is on an important url"
-                      Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
-                      response[key] = { url: value, popular: top_url }
+                      Complaint.create_complaint_paper_trail(EscalationTicket, value['url'], description, nil, value['tags'], value['platform'], nil, nil, current_user)
+                      response[key] = { url: value['url'], popular: top_url }
                     else
                       response[key] = Wbrs::Prefix.disable(prefix_ids[key], current_user.email)
-                      Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
+                      Complaint.create_complaint_paper_trail(EscalationTicket, value['url'], description, nil, value['tags'], value['platform'], nil, nil, current_user)
                     end
 
                   else
