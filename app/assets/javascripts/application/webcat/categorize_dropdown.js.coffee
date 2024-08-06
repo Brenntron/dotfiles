@@ -301,20 +301,27 @@ window.cat_new_url = ()->
     data: data
     success: (response) ->
       popular_entries = []
+      non_pop_entries = []
+      pending_message = ""
       message = ""
+
       for key, val of response
         if val.popular == true
           popular_entries.push(val.url)
+        else
+          non_pop_entries.push(val.url)
 
       if popular_entries.length > 0
-         message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        pending_message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        if non_pop_entries.length > 0
+          message = "All other entries have been submitted directly to WBRS."
       else
-         message = "No pending complaint entries have been created"
+         message = "Entries have been submitted directly to WBRS."
 
-      reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
+
       std_msg_success(
         'URLs categorized successfully',
-        [message, "All other entries have been submitted directly to WBRS.", reload_message],
+        [pending_message, message],
         reload: false,
         complete: (->
           # clear url inputs
@@ -325,6 +332,13 @@ window.cat_new_url = ()->
           $('#cat_new_url_3')[0].selectize.clear()
           $('#cat_new_url_4')[0].selectize.clear()
           $('#cat_new_url_5')[0].selectize.clear()
+          # clear tags
+          $('#tags_new_url_1')[0].selectize.clear()
+          $('#tags_new_url_2')[0].selectize.clear()
+          $('#tags_new_url_3')[0].selectize.clear()
+          $('#tags_new_url_4')[0].selectize.clear()
+          $('#tags_new_url_5')[0].selectize.clear()
+
         )
       )
     error: (response) ->
@@ -367,24 +381,32 @@ window.multiple_url_categorization = () ->
       data: data
       success: (response) ->
         popular_entries = []
-        message = ""
-        for key, val of response
-          if val.popular == true
-            popular_entries.push(val.url)
+        non_pop_entries = []
+      pending_message = ""
+      message = ""
 
-        if popular_entries.length > 0
-          message = "Pending complaint entries have been created for #{popular_entries.join(', ')}"
+      for key, val of response
+        if val.popular == true
+          popular_entries.push(val.url)
         else
-          message = "No pending complaint entries have been created"
+          non_pop_entries.push(val.url)
+
+      if popular_entries.length > 0
+        pending_message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        if non_pop_entries.length > 0
+          message = "All other entries have been submitted directly to WBRS."
+      else
+        message = "Entries have been submitted directly to WBRS."
 
         std_msg_success(
           'URLs categorized successfully',
-          [message, "All other entries have been submitted directly to WBRS."],
+          [message, pending_message],
           reload: false,
           complete: (->
             # clear form inputs
             $('#categorize_urls').val('')
             $('#multi_cat_url_cats')[0].selectize.clear()
+            $('#multiurl_tag_select')[0].selectize.clear()
             loader.addClass('hidden')
           )
         )
