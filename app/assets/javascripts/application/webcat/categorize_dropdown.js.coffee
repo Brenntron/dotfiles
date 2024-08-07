@@ -141,6 +141,8 @@ window.drop_current_categories = () ->
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
+      debugger
+      
       message = ""
       for key, value of response.json
         if value && (value.popular || value.code == 200)
@@ -434,33 +436,51 @@ window.drop_multiple_url_categories = () ->
       method: 'POST'
       data: { 'urls': urls }
       success: (response) ->
+        debugger
+        # GETTING ERROR IN HERE
         popular_entries = []
+        non_pop_entries = []
+        pending_message = ""
         message = ""
         successed_response = true
 
         for key, value of response.json
           if value && value.popular == true
             popular_entries.push(value.url)
+          else if value && value.popular != true
+            non_pop_entries.push(val.url)
           if value && !(value.popular || value.code == 200)
-            successed_response = false
+            success_response = false
 
-        if successed_response
+        if success_response
           if popular_entries.length > 0
-            message = "Pending complaint entries have been created for #{popular_entries.join(', ')}"
-        else
-          message = "No pending complaint entries have been created"
+            pending_message = "Pending complaint entries have been created for #{popular_entries.join(', ')}"
+            if non_pop_entries.length > 0
+              message = "All other entries have been submitted directly to WBRS."
+          else
+            message = "Entries have been submitted directly to WBRS."
 
-        std_msg_success(
-          'URLs categories successfully dropped',
-          [message, "All other entries have been submitted directly to WBRS."],
-          reload: false,
-          complete: (->
-            # clear form inputs
-            $('#categorize_urls').val('')
-            $('#multi_cat_url_cats')[0].selectize.clear()
-            loader.addClass('hidden')
+          std_msg_success(
+            'URLs categories successfully dropped',
+            [pending_message, message],
+            reload: false,
+            complete: (->
+              # clear form inputs
+              $('#categorize_urls').val('')
+              $('#multi_cat_url_cats')[0].selectize.clear()
+              loader.addClass('hidden')
+            )
           )
-        )
+
+        else
+          std_msg_error(
+            "Error dropping categories", '',
+            reload: false,
+            complete: (->
+              loader.addClass('hidden')
+            )
+          )
+
 
       error: (response) ->
         loader.addClass('hidden')

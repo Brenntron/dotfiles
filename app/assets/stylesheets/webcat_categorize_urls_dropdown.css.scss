@@ -62,6 +62,17 @@
     margin: 3px 2px 0 !important; // override needed
   }
 
+  .webcat-loader {
+    margin-top: -10px;
+    position: absolute;
+  }
+  .loader-msg{
+    width: 90px;
+    margin-top: 6px;
+    margin-left: 0;
+    font-weight: 400;
+  }
+
 }
 
 // Form with 5 diff url inputs and settings for each
@@ -187,4 +198,8 @@
   background-repeat: no-repeat;
   background-position: center center;
   border:0;
+}
+
+#cat_multiple_urls, #cat_dif_submit{
+  margin-top: 20px;
 }
