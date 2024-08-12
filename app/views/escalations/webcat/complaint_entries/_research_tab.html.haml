@@ -1,0 +1,268 @@
+%h1.ce-tab-title Research
+.row.ce-research-tab
+  #alert_message
+  .col-xs-4.ce-research-column
+    .customer-submitted-section.bottom-divider
+      %h2 Customer Submitted Info
+      #ce_research_toolbar
+        .toolbar
+          %div
+            %label.toolbar-section-label View
+            %button.btn.toolbar-button.toolbar-button-spacer.esc-tooltipped-webcat-toolbar.open-all{ title: 'Open in a new tab.', type: 'button', onclick: 'open_ip_uri()' }
+              %span.toolbar-button-text Open in new tab
+            %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.icon-google{ title: 'Google It!', type: 'button', onclick: "google_it()" }
+              %span.toolbar-button-text Search in Google
+          %div
+            %label.toolbar-section-label Edit
+            %span.dropdown
+              %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-expanded': 'false',
+                                                                                                                                'aria-haspopup': 'true',
+                                                                                                                                'data-toggle': 'dropdown',
+                                                                                                                                disabled: [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::PENDING, ComplaintEntry::RESOLVED].include?(@complaint_entry.status),
+                                                                                                                                onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})",
+                                                                                                                                title: 'Convert ticket to web reputation ticket',
+                                                                                                                                type: 'button' }
+                %span.toolbar-button-text Convert to Webrep
+              .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{ 'aria-labelledby': 'convert-ticket-button' }
+                .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
+                .inline-tool-content-wrapper
+                  .dropdown-loader-wrapper.hidden
+                    .gear-loader-wrapper
+                      = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+                    %span.loader-msg Converting to Webrep...
+                  .row
+                    .col-xs-8
+                      %label.content-label-sm
+                        Ticket ID to Convert:
+                      %span.ticket-id-to-convert#complaint-id-to-convert
+                    .col-xs-4
+                      %label.content-label-sm Reputation Ticket Type
+                      #convert-ticket-type.form-group
+                        .inline-radio-wrapper
+                          %label{ for: 'web-ticket-type' } Web
+                          %input.convert-input#web-ticket-type{ type: 'radio', name: 'ticket-type', value: 'w' }
+                        .inline-radio-wrapper
+                          %label{ for: 'email-ticket-type' } Email
+                          %input.convert-input#email-ticket-type{ type: 'radio', name: 'ticket-type', value: 'e' }
+                  %hr.thin
+                  .row
+                    .col-xs-12
+                      %label.content-label-sm
+                        Ticket Entries:
+                        %span.convert-entry-count
+                      .convert-entry-table-wrapper
+                        %table#entries-to-convert
+                          %thead
+                            %tr
+                              %th Entry ID
+                              %th Entry Content
+                              %th.convert-disposition-cell.text-right Suggested Disposition
+                          %tbody
+                  %hr.thin
+                  .comment-wrapper
+                    %label.content-label-sm Ticket Summary
+                    %textarea.dropdown-comment.note-input#convert-ticket-summary
+                  .button-row-center
+                    %button.primary.dropdown-submit-button#convert-to-webrep{ type: 'button', disabled: 'disabled' }
+                      Convert Ticket
+
+      .ce-submitted-wbrs-wrapper.customer-submitted-data-wrapper
+        .webcat-research-svg#ce_wbrs_score_wrapper{ class: wbrs_score_icon(@complaint_entry.wbrs_score) }
+          = @wbrs_score
+
+        #ce_submitted_ip_uri_wrapper
+          %p.ce-submitted-ip-uri= @submitted_ip_uri
+
+          %label.content-label-sm Suggested Categories
+          %p#ce_suggested_categories= suggested_categories(@complaint_entry.suggested_disposition)
+
+          %label.content-label-sm Description
+          %p#ce_description= @complaint.description
+
+    .external-categories-section.bottom-divider
+      %h2 Current Categories
+      .loader-div#current_categories_loader
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg'
+        %span.loader-msg Loading Current Categories...
+
+
+    .tags-section
+      %h2 Tags
+      #ce_tags_wrapper
+        = render_tags(@tags)
+        -# %input.ce-tags-select.hidden#ce_tags_select{ placeholder: 'Enter Tags' }
+        -# %button.tags-button#edit_tags
+        -# %button.primary.save-tags{ onClick: 'webcat_show_page_edit_tags()' }
+        -#   Save
+
+  .col-xs-4.ce-research-column.form-wrapper-column
+    %h2 Categorization Resolution
+
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Resolved IP/URI
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include?(@complaint_entry.status)
+          %p.ce-submitted-ip-uri
+            = @input_ip_uri
+        - else
+          %input.ce-input.ce-ip-uri-input#ce_ip_uri_input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                           value: @input_ip_uri }
+          .ce-resolved-ip-uri-button-wrapper
+            %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
+                                                    # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
+                                                    disabled: @complaint_entry.uri_as_categorized == @complaint_entry.domain ||
+                                                      @complaint_entry.status == ComplaintEntry::PENDING ||
+                                                      @complaint_entry.domain == @input_ip_uri,
+                                                    onclick: "update_uri_input('#{@complaint_entry.domain}')" }
+              domain
+            %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
+                                                       disabled: @complaint_entry.subdomain.blank? ||
+                                                        @complaint_entry.status == ComplaintEntry::PENDING ||
+                                                        "#{@complaint_entry.subdomain}.#{@complaint_entry.domain}" == @input_ip_uri,
+                                                       onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}')" }
+              subdomain
+            %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.uri },
+                                                      disabled: true,
+                                                      onclick: "update_uri_input('#{@complaint_entry.uri}')" }
+              original uri
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Categories
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
+          %input.ce-categories-select.ce-input#ce_categories_select{ placeholder: 'Enter Categories / Confidence Order' }
+        - elsif @complaint_entry.url_primary_category.blank?
+          %p.category-list.missing-data= 'No submitted categories.'
+        - else
+          %p.category-list= @complaint_entry.url_primary_category
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Resolution
+        - if [ComplaintEntry::RESOLVED, ComplaintEntry::STATUS_COMPLETED].include?(@complaint_entry.status) || duplicate?(@complaint_entry)
+          %p.resolution= resolution(@complaint_entry)
+        - else
+          .ce-radio-group-wrapper
+            .ce-radio-group
+              %input.resolution-radio-button#res-unchanged-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
+                                                                  name: 'resolution',
+                                                                  checked: @complaint_entry.resolution&.upcase == 'UNCHANGED',
+                                                                  type: 'radio',
+                                                                  value: 'UNCHANGED' }
+              %label.radio-label{ for: 'res-unchanged-radio' }
+                Unchanged
+            .ce-radio-group
+              %input.resolution-radio-button#res-fixed-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
+                                                              name: 'resolution',
+                                                              checked: @complaint_entry.resolution&.upcase == 'FIXED' || @complaint_entry.resolution.blank?,
+                                                              type: 'radio',
+                                                              value: 'FIXED' }
+              %label.radio-label{ for: 'res-fixed-radio' }
+                Fixed
+            .ce-radio-group
+              %input.resolution-radio-button#res-invalid-radio{ disabled: (true if @complaint_entry.status == ComplaintEntry::PENDING),
+                                                                name: 'resolution',
+                                                                checked: @complaint_entry.resolution&.upcase == 'INVALID',
+                                                                type: 'radio',
+                                                                value: 'INVALID' }
+              %label.radio-label{ for: 'res-invalid-radio' }
+                Invalid
+
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Email Response to Customer
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
+          %p{ class: ('missing-data' if @complaint_entry.resolution_comment.blank?) }
+            = @complaint_entry.resolution_comment.presence || 'No response created or sent to customer.'
+        - else
+          %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                                                    id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
+            %option{ value: 'fixed', selected: true } Fixed - Default Response
+          %textarea.ce-customer-comment-textarea.ce-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                           id: "entry-email-response-to-customers_#{@complaint_entry.id}",
+                                                           maxlength: '64000',
+                                                           name: 'ce_customer_comment_textarea' }
+            = @complaint_entry.resolution_comment
+
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Internal Comment
+        - if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].include? @complaint_entry.status
+          %p.internal-comment{ class: ('missing-data' if @complaint_entry.internal_comment.blank?) }
+            = @complaint_entry.internal_comment.presence || 'No internal comment.'
+        - else
+          %textarea.ce-internal-comment-textarea.ce-input{ disabled: @complaint_entry.status == ComplaintEntry::PENDING,
+                                                           name: 'ce_internal_comment_textarea',
+                                                           placeholder: 'Internal note for choosing categories' }
+            = @complaint_entry.internal_comment
+
+    - if @complaint_entry.status == ComplaintEntry::PENDING
+      .row
+        .col-xs-6
+          %label.content-label-sm
+            Review
+          .ce-radio-group-wrapper
+            .ce-radio-group
+              %input.review-radio-button#review_commit_radio{ name: 'review',
+                                                              type: 'radio',
+                                                              value: 'commit' }
+              %label.radio-label{ for: 'review-commit-radio' } Commit
+            .ce-radio-group
+              %input.review-radio-button#review_decline_radio{ name: 'review',
+                                                               type: 'radio',
+                                                               value: 'decline' }
+              %label.radio-label{ for: 'review_decline_radio' } Decline
+
+        - if @complaint_entry.user_id == current_user.id
+          .col-xs-6
+            .ce-allow-review-container
+              %input{ type: 'checkbox', id: 'self_review', checked: current_user.enabled_self_review }
+              %label{ for: 'self_review' }
+                Allow Self Review
+      .row
+        .col-xs-12.text-center
+          %button.tertiary.ce-submit-button{ disabled: true,
+                                             id: 'ce_submit_button',
+                                             onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+            Submit
+    - elsif @complaint_entry.status == ComplaintEntry::STATUS_COMPLETED && !duplicate?(@complaint_entry) && @complaint_entry.resolution.present?
+      .loader-div.hidden#reopen_loader
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg'
+        %span.loader-msg Reopening entry...
+
+      .row
+        .col-xs-12.text-center
+          %button.tertiary.ce-submit-button{ id: 'ce_reopen_button', onclick: "reopen_complaint(#{@complaint_entry.id})" }
+            Reopen
+    - elsif !duplicate?(@complaint_entry)
+      .row
+        .col-xs-12.text-center
+          %button.tertiary.ce-submit-button{ disabled: true,
+                                             id: 'ce_submit_button',
+                                             onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+            Submit
+
+  .col-xs-4.ce-research-column.whois-column
+    %h2 Whois
+    .loader-div#whois_loader
+      .gear-loader-wrapper
+        = inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading Whois data...
+    .whois-data-container#whois_data_container
+
+:javascript
+  $(document).ready(function() {
+    window.set_tags("#{@tags.join(', ')}", "#{@complaint_entry.status}");
+    window.set_lookup("#{@submitted_ip_uri}")
+  });
+
+- if [ComplaintEntry::STATUS_COMPLETED, ComplaintEntry::RESOLVED].exclude?(@complaint_entry.status)
+  :javascript
+    $(document).ready(function() {
+      window.set_complaint_entry_data("#{@complaint_entry.url_primary_category}", '#{@complaint_entry.status}');
+    });

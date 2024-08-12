@@ -1,0 +1,887 @@
+if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
+  #set empty string header so it can be updated on document ready
+  current_user_id = 0
+  entry_id = 0
+  headers = ''
+  initial_status = ''
+  resolution_option = ''
+  review_option = ''
+  # We do not want unsubmitted changes to persist across page reloads
+  # So we store themm in memory
+  change_store = do () ->
+    changes = []
+
+    {
+      add: (change) ->
+        if changes.indexOf(change) < 0
+          changes.push change
+      category_changed: () ->
+        changes.some (change) ->
+          change.includes('category')
+      getChanges: () ->
+        changes
+      hasChange: (change) ->
+        change_index = changes.indexOf(change)
+
+        return change_index > -1
+      remove: (change) ->
+        change_index = changes.indexOf(change)
+
+        if change_index > -1
+          changes.splice(change_index, 1)
+    }
+
+  verify_categories = (category_ids) ->
+    sorted_category_ids = category_ids.sort()
+    selectize_items = $('#ce_categories_select')[0].selectize.items.sort()
+    console.log('category_ids', category_ids)
+    console.log('selectize_items', selectize_items)
+
+    sorted_category_ids.forEach((value, index) ->
+      selectize_item = selectize_items[index]
+
+      if value == selectize_item
+        selectize_items.splice(index, 1)
+      else if !selectize_item
+        change_store.add("removed category: #{value}")
+    )
+
+    # Add any selectize items that were not matched with a submtited category to the change_store
+    if selectize_items.length
+      selectize_items.forEach (value) ->
+        change_store.add("category: #{value}")
+
+  verify_submit = () ->
+    can_submit = if is_pending() && ['commit', 'decline'].includes(review_option) && can_review()
+      true
+    else if !$('.ce-ip-uri-input').val()
+      # All resolution options, as well as the commit review option, requite a user comment
+      # and a submittable ip or uri. If the tickets makes it to PENDING without a user comment
+      # then it can only be declined.
+      false
+    else if !is_pending() && resolution_option == 'FIXED' && change_store.category_changed() && $('#ce_categories_select')[0].selectize.items.length > 0
+      # The fixed resolution requires a change to the category list and at least one category.
+      true
+    else if !is_pending() && ['UNCHANGED', 'INVALID'].includes(resolution_option) && change_store.getChanges().length == 0
+      true
+    else
+      false
+
+    window.prevent_close(can_submit.toString())
+    return can_submit
+
+  is_pending = () ->
+    initial_status == 'PENDING'
+
+  can_review = () ->
+    allow_self_review = $('#self_review')
+
+    # #self_review only appears if the current user is the assignee.
+    # If there is no #self_review, then the current user is a reviewer and can review.
+    if allow_self_review.length > 0
+      return allow_self_review.prop('checked')
+    else
+      true
+
+  toggleSubmitButton = () ->
+    can_submit = verify_submit()
+    $('.ce-submit-button').prop('disabled', !can_submit)
+
+  window.set_tags = (tags, entry_status) ->
+    split_tags = tags.split(', ')
+    createTagOptions = ->
+      tags = $('#complaint_tag_list')[0]
+      if tags
+        tag_list = tags.value
+        array = tag_list.split(',')
+        options = []
+        for x in array
+          options.push { name: x }
+        return options
+
+    $('#ce_tags_select').selectize {
+      persist: false,
+      create: (input) ->
+        { name: input }
+      maxItems: null,
+      closeAfterSelect: false,
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
+      options: createTagOptions(),
+      items: split_tags,
+      onItemAdd: (value) ->
+        change_store.add("tags: #{value}")
+
+        can_submit = verify_submit()
+
+        $('.ce-submit-button').prop('disabled', !can_submit)
+      onItemRemove: (value) ->
+        change_store.remove("tags: #{value}")
+
+        can_submit = verify_submit()
+
+        $('.ce-submit-button').prop('disabled', !can_submit)
+    }
+
+    # $('#edit_tags').on 'click', () ->
+    #   $ce_tags = $('#ce_tags')
+    #
+    #   if $ce_tags.is(':visible')
+    #     $ce_tags.hide()
+    #     $('#ce_tags_select')[0].selectize.enable()
+    #     $('.ce-tags-select').removeClass('hidden')
+    #   else
+    #     $('.ce-tags-select').addClass('hidden')
+    #     $('#ce_tags_select')[0].selectize.disable()
+    #     $ce_tags.show()
+
+  window.set_complaint_entry_data = (category_data, entry_status) ->
+    ce_current_categories = if category_data? then category_data.split(',') else []
+    selectize = null
+
+    AC.WebCat.getAUPCategories()
+      .then((response) ->
+        all_categories = response
+        category_ids = []
+        cat_options = []
+        cleaned_cats = []
+
+        if ce_current_categories
+          cleaned_cats = ce_current_categories
+          #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+          if ce_current_categories.includes('Conferences and Trade Shows')
+            $(cleaned_cats).each (i, category) ->
+              if category == 'Conventions'
+                cleaned_cats.splice(i, 1)
+              else if category == ' Conferences and Trade Shows'
+                i2 = i - 1
+                cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
+
+        for key, value of all_categories
+          cat_code = key.split(' - ')[1]
+          value_name = key.split(' - ')[0]
+          cat_options.push({ category_id: value, category_name: value_name, category_code: cat_code })
+
+        # find the category ids that match the current cats on the entry
+        for name in cleaned_cats
+          for x, y of all_categories
+            value_name = x.split(' - ')[0]
+            if name.trim() == value_name
+              category_ids.push(y)
+
+        selectize = $('#ce_categories_select').selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: cat_options,
+          items: category_ids,
+          onItemAdd: (value) ->
+            # User shouldn't be able to change cats in pending, but just in case
+            unless entry_status == 'PENDING'
+              if change_store.hasChange("removed category: #{value}")
+                change_store.remove("removed category: #{value}")
+              else
+                change_store.add("category: #{value}")
+
+              can_submit = verify_submit()
+
+              $('.ce-submit-button').prop('disabled', !can_submit)
+          onItemRemove: (value) ->
+            unless entry_status == 'PENDING'
+              # Track adding categories and removing existing categories
+              if change_store.hasChange("category: #{value}")
+                change_store.remove("category: #{value}")
+              else
+                change_store.add("removed category: #{value}")
+
+              can_submit = verify_submit()
+
+              $('.ce-submit-button').prop('disabled', !can_submit)
+          score: (input) ->
+            #  Adding some customization for autofill
+            #  restricting on certain cats to avoid accidental categorization
+            #  (replaces selectize's built-in `getScoreFunction()` with our own)
+            (item) ->
+              if item.category_code == 'cprn' ||
+                item.category_code == 'xpol' ||
+                item.category_code == 'xita' ||
+                item.category_code == 'xgbr' ||
+                item.category_code == 'xdeu' ||
+                item.category_code == 'piah'
+                  item.category_code == input ? 1 : 0
+              else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+                1
+              else if item.category_name.toLowerCase().includes(input.toLowerCase()) ||
+                item.category_code.toLowerCase().includes(input.toLowerCase())
+                  0.9
+              else
+                0
+        }
+
+        if entry_status == 'PENDING'
+          selectize[0].selectize.disable()
+        else
+          # Firefox will cache the page state due if the page is reloaded and the navigate away pop up appears.
+          # Because of this changes may be present in the select box that haven't been submitted.
+          verify_categories(category_ids)
+          verify_submit()
+      )
+
+  window.set_lookup = (lookup) ->
+    get_ce_show_domain_history(lookup)
+#    get_related_history(lookup)
+    render_whois_table(lookup)
+    get_ce_show_xbrs_history(lookup)
+
+  window.webcat_complaint_drop_down = () ->
+    # deselect all statuses
+    $('.status-radio-wrapper').removeClass 'selected'
+    $('.webcat-ticket-status-radio').prop 'checked', false
+
+    # close comment dropdowns
+    $('.webcat-non-resolution-submit-wrapper').removeClass 'selected'
+    $('#show-ticket-resolution-submenu').hide()
+
+    # select the current status in the drodpwon (NEW is not an option so that won't select anything)
+    status = $('#show-edit-ticket-status-button').text().trim()
+    radio = $(".webcat-ticket-status-radio[data-status='#{status}'] ")
+    radio.prop("checked", true)
+    wrapper = radio.parent()
+    wrapper.addClass('selected')
+
+  window.take_single_webcat_complaint = (assignment_type) ->
+    $assignee_type = $("#complaint_#{assignment_type}")
+    previous_assignee = $assignee_type.text()
+
+    $assignee_type.text('Loading...')
+
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': [entry_id], 'assignment_type': assignment_type
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          if jQuery.type(json.error) == 'array'
+            std_msg_error('Error Taking Entries', [json.error.join(' ')])
+          else
+            std_msg_error('Error Taking Entries', [json.error])
+        else
+          $status = $('#complaint_entry_status')
+
+          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text().trim())
+            $status.text('ASSIGNED')
+
+          $assignee_type.text(json.name)
+          $assignee_type.removeClass('missing-data')
+          $("#webcat_take_ticket_#{assignment_type}").addClass('hidden')
+          $("#webcat_return_ticket_#{assignment_type}").removeClass('hidden')
+      error: (response) ->
+        std_msg_error('Error Taking Entries', response.responseText)
+    , this)
+
+  window.return_single_webcat_complaint = (assignment_type) ->
+    $assignee_type = $("#complaint_#{assignment_type}")
+    previous_assignee = $assignee_type.text()
+
+    $assignee_type.text('Loading...')
+
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': [entry_id], 'assignment_type': assignment_type
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          if jQuery.type(json.error) != 'array'
+            std_msg_error('Error Returning Entries', [json.error])
+          else
+            std_msg_error('Error Returning Entries', [json.error.join(' ')])
+        else
+          $status = $('#complaint_entry_status')
+
+          if assignment_type == 'assignee' && $status.text().trim() == 'ASSIGNED'
+            $status.text('NEW')
+
+          assignment_text = switch assignment_type
+            when 'assignee' then 'Unassigned'
+            when 'reviewer' then 'No Reviewer'
+            when 'second_reviewer' then 'No 2nd Reviewer'
+
+          $assignee_type.text(assignment_text)
+          $assignee_type.addClass('missing-data')
+          $("#webcat_take_ticket_#{assignment_type}").removeClass('hidden')
+          $("#webcat_return_ticket_#{assignment_type}").addClass('hidden')
+      error: (response) ->
+        std_msg_error('Error Returning Entries', [response.responseText])
+    , this)
+
+  window.webcat_toolbar_show_change_assignee = (assignment_type) ->
+    $assignee_type = $("#complaint_#{assignment_type}")
+    current_assignee = $assignee_type.text()
+    user_id = Number($("#change_target_#{assignment_type}").val())
+    is_current_user = user_id == current_user_id
+    data = {
+      'complaint_entry_ids': [entry_id],
+      'user_id': user_id,
+      'assignment_type': assignment_type
+    }
+
+    $assignee_type.text('Loading...')
+    $("#show_change_#{assignment_type}").dropdown('toggle')
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        json = $.parseJSON(response)
+
+        if json.error
+          if $.type(json.error) != 'array'
+            std_msg_error('Error Assigning Entries', [json.error])
+          else
+            std_msg_error('Error Assigning Entries', [json.error.join(' ')])
+        else
+          $status = $('#complaint_entry_status')
+
+          if assignment_type == 'assignee' && ['NEW', 'REOPENED'].includes($status.text().trim())
+            $status.text('ASSIGNED')
+
+          $assignee_type.text(json.name)
+          $assignee_type.removeClass('missing-data')
+          $("#webcat_take_ticket_#{assignment_type}").addClass('hidden')
+
+          if is_current_user
+            $("#webcat_return_ticket_#{assignment_type}").removeClass('hidden')
+          else
+            $("#webcat_return_ticket_#{assignment_type}").addClass('hidden')
+        error: (response) ->
+          $assignee_type.text(current_assignee)
+          std_msg_error('Error Assigning Entries', [response.responseText])
+    )
+
+  render_whois_table = (domain) ->
+    whois_callback = (formattedData) ->
+      $('#whois_loader').hide()
+      $('#ce_whois_table').hide()
+      $('#whois_data_container').append formattedData
+    error_callback = (response) ->
+      $('#whois_loader').hide()
+      $('#whois_data_container').append("<p class='missing-data'>No data available</p>")
+      show_message('error', "Error retrieving WHOIS query. #{response.responseJSON.message}", false, '#whois_loader')
+
+    AC.WebCat.Whois.get_whois_data(domain, whois_callback, error_callback)
+
+  get_current_categories = (entry_type) ->
+    return if entry_type == 'IP'
+
+    error_callback = (errorResponse) ->
+      std_api_error(errorResponse, "Current Categories for this Entry could not be retrieved.", reload: false)
+
+    AC.WebCat.get_current_categories(entry_id, false, error_callback)
+
+  get_ce_show_domain_history = (domain) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
+      method: 'GET'
+      headers: headers
+      data:
+        'domain': domain
+      success: (response) ->
+        data = response.data
+        # remove baseline domain entry
+        data.splice(0, 1)
+
+        $('#ce_domain_history_loader').hide()
+
+        $('#ce_domain_history_table').DataTable
+          data: data
+          dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
+          ordering: true
+          order: [[ 3, 'desc' ]]
+          searching: false
+          stateSave: false
+          columnDefs: [
+            {
+              targets: [ 3 ]
+              orderData: 6
+            }
+          ]
+          pageLength: 10
+          pagingType: 'simple_numbers'
+          columns: [
+            {
+              data: 'action'
+            }
+            {
+              data: 'confidence'
+            }
+            {
+              data: 'description'
+            }
+            {
+              data: 'time_of_action'
+              render: (data) ->
+                if !!data then moment(data).utc().format('MMMM D, YYYY [at] hh:mm:ss A Z') else data
+            }
+            {
+              data: 'user'
+            }
+            {
+              data: 'category'
+            }
+            {
+              data: 'time_of_action'
+              render: (data) ->
+                if !!data then moment(data).utc().format('x') else -1
+              visible: false
+            }
+          ]
+      error: (errorResponse) ->
+        console.error(errorResponse)
+        std_api_error(errorResponse, "Domain History for this Entry could not be retrieved.", reload: false)
+        $('#ce_domain_history_loader').hide()
+      )
+
+  get_ce_show_entry_history = () ->
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
+      method: 'POST'
+      headers: headers
+      data:
+        'id': entry_id
+      success: (response) ->
+        parsed_response = $.parseJSON(response)
+
+        if parsed_response.error
+          std_msg_error(response.error, [])
+          console.error(response)
+          $('#ce_entry_history_loader').hide()
+        else
+          formatted_entry_history = parsed_response.entry_history.complaint_history.map((historical_data) ->
+            formatted_history_data = {}
+            formatted_history_data['time'] = moment(historical_data[0]).utc().format('MMMM D, YYYY [at] hh:mm:ss A Z')
+            formatted_history_data['sortable_time'] = moment(historical_data[0]).format('x')
+            formatted_history_data['user'] = historical_data[1]['whodunnit']
+
+            delete historical_data[1]['whodunnit']
+
+            formatted_history_data['changes'] = historical_data[1]
+
+            return formatted_history_data
+          )
+
+          $('#ce_entry_history_loader').hide()
+
+          $('#ce_entry_history_table').DataTable
+            data: formatted_entry_history
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
+            ordering: true
+            order: [[ 0, 'desc' ]]
+            drawCallback: () ->
+              # for longer descriptions let user toggle full vs truncated
+              $('.truncated-description').on 'click', () ->
+                toggle_truncation($(this))
+            pageLength: 10
+            pagingType: 'simple_numbers'
+            searching: false
+            stateSave: false
+            columnDefs: [
+              {
+                targets: [ 0 ]
+                orderData: 3
+              }
+            ]
+            columns: [
+              {
+                data: 'time'
+              }
+              {
+                data: 'user'
+              }
+              {
+                data: null
+                render: (data) ->
+                  changes = data.changes
+                  detail_segments = []
+
+                  for key, value of changes
+                    # The second item in the value array is the updated value in the changeset. The first item is the original value.
+                    updated_value = value[1]
+
+                    continue unless updated_value
+
+                    detail_span = if updated_value.length > 500
+                                    truncated_detail = updated_value.substring(0, 500)
+                                    "<span class='description-wrapper'>
+                                      #{truncated_detail}
+                                    </span>
+                                    <span class='truncated-description'
+                                          data-truncated='#{truncated_detail}'
+                                          data-full='#{updated_value}'>
+                                      &hellip;
+                                    </span>"
+                                  else
+                                    "<span class='description-wrapper'>#{updated_value}</span>"
+
+                    detail_segments.push("<span class='bold'>#{key}:</span> #{detail_span} <br>")
+
+                  return detail_segments.join('')
+              }
+              {
+                data: 'sortable_time'
+                visible: false
+              }
+            ]
+          $('#ce_entry_history_table')
+      error: (error) ->
+        console.error(error)
+        std_msg_error(error.statusText, [error.responseText.split('\n')])
+        $('#ce_entry_history_loader').hide()
+    )
+
+  get_ce_show_xbrs_history = (url) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
+      method: 'POST'
+      headers: headers
+      data:
+        'url': url
+      success: (response) ->
+        data = response.data
+
+        if data.error?
+          console.error(data.error)
+          std_msg_error(data.error, [])
+          $('#ce_xbrs_history_loader').hide()
+        else
+
+          $('#ce_xbrs_history_loader').hide()
+
+          $('#ce_xbrs_history_table').DataTable({
+            data: data
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"l>t<ip>'
+            ordering: true
+            order: [[ 0, 'desc' ]]
+            pageLength: 10
+            pagingType: 'simple_numbers'
+            searching: false
+            stateSave: false
+            columnDefs: [
+              {
+                targets: [ 0 ]
+                orderData: 6
+              }
+            ]
+            columns: [
+              {
+                data: 'time'
+                render: (data) ->
+                  date = moment(data)
+                  formatted = date.utc().format('MMMM D, YYYY [at] hh:mm:ss A Z')
+                  return formatted
+              }
+              {
+                data: 'score'
+                className: 'col-align-right'
+                render: (data) ->
+                  return data.toFixed(1)
+              }
+              {
+                data: 'v2'
+              }
+              {
+                data: 'v3'
+              }
+              {
+                data: 'threatCats'
+              }
+              {
+                data: 'ruleHits'
+              }
+              {
+               data: 'time'
+               visible: false
+             }
+            ]
+          })
+      error: (error) ->
+        console.error(error)
+        std_msg_error(error.statusText, [error.responseText.split('\n')])
+        $('#ce_xbrs_history_loader').hide()
+    )
+
+#  get_related_history = (domain) ->
+#    # TODO: implement this when the related history endpoint exists.
+#    $('#ce_related_history_loader').hide()
+#    $('#ce_related_history_table').DataTable({
+#      data: {}
+#      ordering: true
+#      info: false
+#      paging: false
+#      searching: false
+#      stateSave: false
+#      columns: [
+#        {
+#          data: 'subdomain'
+#        }
+#        {
+#          data: 'domain'
+#        }
+#        {
+#          data: 'path'
+#        }
+#        {
+#          data: 'categories'
+#        }
+#        {
+#          data: 'user/source'
+#        }
+#        {
+#          data: 'last modified'
+#        }
+#      ]
+#    })
+
+  check_for_customer_show_page_webcat = () ->
+    submitter_type = $(".submitter-type-wrapper p").text().toLowerCase()
+    is_customer = false
+
+    if submitter_type == 'customer'
+      is_customer = true
+
+    is_customer
+
+  window.open_ip_uri = () ->
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+      data:
+        complaint_entry_id: entry_id
+      success: (response) ->
+        data = $.parseJSON(response).data
+        { viewable, uri, wbrs_score, ip_address } = data.complaint_entry
+        ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
+        path = ''
+
+        unless ip_address
+          path = "http://#{uri}"
+        else if ipv4_regex.test(ip_address)
+          # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
+          path = "http://#{ip_address}"
+        else
+          path = "http://[#{ip_address}]"
+
+        if parseInt(wbrs_score) <= -6
+          show_message('error', "#{path} could not open due to low WBRS Scores.", false, '#alert_message')
+        else if viewable
+          window.open(path, '_blank')
+        else
+          show_message('error', 'Complaint Address is not viewable.', false, '#alert_message')
+    )
+
+  window.google_it = () ->
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+      data:
+        complaint_entry_id: entry_id
+      success: (response) ->
+        data = $.parseJSON(response).data
+        { uri, ip_address } = data.complaint_entry
+        path = ''
+
+        unless ip_address?
+          path = uri
+        else
+          path = ip_address
+
+        window.open("https://www.google.com/search?q=#{path}", '_blank')
+    )
+
+  window.update_uri_input = (value) ->
+    $('.ce-ip-uri-input').val(value)
+
+    check_ip_uri_input(value)
+
+    disable_submit = !verify_submit()
+
+    $('.ce-submit-button').prop('disabled', disable_submit)
+
+  check_ip_uri_input = (text) ->
+    $domain = $('#ce_ip_uri_domain')
+    $subdomain = $('#ce_ip_uri_subdomain')
+    $original_uri = $('#ce_ip_uri_original')
+    domain_text = $domain.data('val')
+    subdomain_text = $subdomain.data('val')
+    original_uri_text = $original_uri.data('val')
+    disable_domain = text == domain_text || domain_text == ''
+    disable_subdomain = text == "#{subdomain_text}.#{domain_text}" || subdomain_text == ''
+    disable_original_uri = text == original_uri_text || original_uri_text == ''
+
+    $domain.prop('disabled', disable_domain)
+    $subdomain.prop('disabled', disable_subdomain)
+    $original_uri.prop('disabled', disable_original_uri)
+
+  window.submit_show_page_changes = (entry_id) ->
+    cat_ids = null
+    # slight differences in data sent
+    uri = $('.ce-ip-uri-input').val()
+    category_names = []
+    internal_comment = $('.ce-internal-comment-textarea').val()
+    commit = if initial_status == 'PENDING' then $('input[name=review]:checked').val() else ''
+    customer_comment = $('.ce-customer-comment-textarea').val()
+    resolution = if initial_status != 'PENDING' then $('input[name=resolution]:checked').val() else ''
+    categories_selectize = $('#ce_categories_select')[0].selectize
+
+    if categories_selectize.items.length > 0
+      cat_ids = categories_selectize.items.join(',')
+
+    $('#ce_categories_select').next('.selectize-control').find('.item').each ->
+      category_names.push($(this).text())
+
+    entry_data = {
+      'id': entry_id,
+      'prefix': uri,
+      'categories': cat_ids,
+      'category_names': category_names.toString(),
+      'status': resolution,
+      'commit': commit,
+      'comment': internal_comment,
+      'resolution_comment': customer_comment,
+      'uri_as_categorized': uri
+    }
+
+    # check data here before submitting
+    # If resolution is set to fixed, make sure it has categories applied
+    if entry_data.categories == null && entry_data.status == 'FIXED'
+      std_msg_error('Must include at least one category.','', reload: false)
+      return
+    else if entry_data.resolution_comment == '' && entry_data.status == 'FIXED'
+      std_msg_error('Must have a message to the customer.','', reload: false)
+      return
+    else if entry_data.uri_as_categorized == '' && entry_data.status == 'FIXED'
+      std_msg_error('Must have an IP/URI.','', reload: false)
+      return
+    else if entry_data.status == 'INVALID' && entry_data.categories != null
+      std_msg_error('Cannot include categories with an INVALID resolution.', '', reload: false)
+      return
+
+    # need number of cols for replacement temp col
+    visible_cols = $('#complaints-index thead th').length
+
+    if initial_status == 'PENDING'
+      process_review(entry_data)
+    else
+      process_entry(entry_data)
+      # submit for real
+
+  # Sending individual entry info to the backend
+  process_entry = (entry_data) ->
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
+      method: 'POST'
+      headers: headers
+      data: entry_data
+      success: (response) ->
+        data = $.parseJSON(response)
+
+        if data.error?
+          show_message('error', "Submissions failed: #{data.error}", false, '#alert_message')
+        else
+          show_message('success', 'Submitted. Refreshing to see new results.', false, '#alert_message')
+          setTimeout ->
+            location.reload()
+          , 5000
+
+      error: (response) ->
+        msg = response.responseJSON.error
+
+        std_msg_error("Error submitting entry", msg, reload: false)
+        console.error(msg)
+    , this)
+
+  # Sending individual reviewed (PENDING) entry info to the backend
+  process_review = (entry_data) ->
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
+      method: 'POST'
+      headers: headers
+      data: {
+        data: [entry_data]
+      }
+      success: (response) ->
+        show_message('success', 'Submitted. Refreshing to see new results.', false, '#alert_message')
+        setTimeout ->
+          location.reload()
+        , 5000
+      error: (response) ->
+        msg = response.responseJSON.error
+        console.error(msg)
+        std_msg_error("Error submitting reviewed entries", msg, reload: false)
+    , this)
+
+  window.reopen_complaint = () ->
+    $('#reopen_loader').removeClass('hidden')
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
+      method: 'POST'
+      data: { 'complaint_entry_id': entry_id }
+      success: (response) ->
+        $('#reopen_loader').addClass('hidden')
+        show_message('success', 'Reopened. Refreshing to see new results.', false, '#alert_message')
+        setTimeout ->
+          location.reload()
+        , 2000
+      error: (response) ->
+        show_message('error', 'Could not reopen.', false, '#alert_message')
+        std_msg_error(response,"", reload: false)
+    )
+
+  $ ->
+    complaint_data = {}
+    current_user_id = Number($('input[name="current_user_id"]').val())
+    initial_status = $('#complaint_entry_status').text().trim()
+    entry_id = Number($('#complaint_entry_id')[0].innerText)
+    headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+    resolution_option = $('.resolution-radio-button:checked').val()
+    resolution_comment = $('.ce-customer-comment-textarea').val()
+    review_option = $('.review-radio-button:checked').val()
+    entry_type = $('#entry_type').text().trim()
+
+    get_current_categories(entry_type)
+    get_ce_show_entry_history()
+
+    $(document).on 'change', '.ce-ip-uri-input', ->
+      text = $(this).val()
+      check_ip_uri_input(text)
+
+    if resolution_option
+      get_resolution_templates(resolution_option, 'individual', [entry_id]).then () ->
+        $('.ce-customer-comment-textarea').val(resolution_comment) if resolution_comment != ''
+        $('.ce-submit-button').prop('disabled', !verify_submit())
+
+    $(document).on 'change', '.resolution-radio-button', ->
+      resolution_option = $(this).val()
+      toggleSubmitButton()
+
+    $(document).on 'change', '.review-radio-button', ->
+      review_option = $(this).val()
+      toggleSubmitButton()
+
+    $(document).on 'change', '.ce-input, #self_review', ->
+      # The onItemRemove and onItemAdd events for the selectize dropdowns will handle the submit button for categories
+      unless $(this).attr('id') == 'ce_categories_select'
+        disable_submit = !verify_submit()
+
+        $('.ce-submit-button').prop('disabled', disable_submit)

@@ -22,6 +22,7 @@ class Dispute < ApplicationRecord
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
   PROCESSING = 'PROCESSING'
+  PREPROCESSING = "PREPROCESSING"
 
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
@@ -1056,7 +1057,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
       new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
       new_dispute.channel = message_payload["payload"]["channel"]
-      new_dispute.status = PROCESSING
+      new_dispute.status = PREPROCESSING
 
       new_dispute.customer_id = customer&.id
       new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
@@ -1145,7 +1146,7 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
 
-          if new_dispute_entry.suggested_threat_category.blank?
+          if new_dispute_entry.suggested_threat_category.blank? || (new_dispute_entry.suggested_threat_category.present? && new_dispute_entry.suggested_disposition.present?)
             new_dispute_entry.status = DisputeEntry::PROCESSING
           else
             new_dispute_entry.status = DisputeEntry::NEW
@@ -1225,7 +1226,7 @@ For future Web categorization requests, please open a Web categorization ticket 
             new_dispute_entry.wbrs_score = (urs_stuff.reputation_score_x10 / 10.0).to_f rescue nil
           end
 
-          if new_dispute_entry.suggested_threat_category.blank?
+          if new_dispute_entry.suggested_threat_category.blank? || (new_dispute_entry.suggested_threat_category.present? && new_dispute_entry.suggested_disposition.present?)
             new_dispute_entry.status = DisputeEntry::PROCESSING
           else
             new_dispute_entry.status = DisputeEntry::NEW
@@ -1360,7 +1361,8 @@ For future Web categorization requests, please open a Web categorization ticket 
         dispute_entry.save!
 
       end
-
+      new_dispute.status = PROCESSING
+      new_dispute.save!
       ######record creation completed######
 
       new_dispute.reload
@@ -1625,13 +1627,13 @@ For future Web categorization requests, please open a Web categorization ticket 
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where.not(status: [STATUS_RESOLVED, PROCESSING]).where(user_id: user.id)
+        where.not(status: [STATUS_RESOLVED, PROCESSING, PREPROCESSING]).where(user_id: user.id)
       when 'my_disputes'
-        where.not(status: PROCESSING).where(user_id: user.id)
+        where.not(status: [PROCESSING, PREPROCESSING]).where(user_id: user.id)
       when 'team_disputes'
-        where.not(status: PROCESSING).where(user_id: user.my_team)
+        where.not(status: [PROCESSING, PREPROCESSING]).where(user_id: user.my_team)
       when 'unassigned'
-        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED,PROCESSING])
+        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED, PROCESSING, PREPROCESSING])
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
@@ -1642,8 +1644,10 @@ For future Web categorization requests, please open a Web categorization ticket 
         where(status: [CLOSED, STATUS_RESOLVED])
       when 'autoresolved_processing'
         where(status: PROCESSING)
+      when 'preprocessing'
+        where(status: PREPROCESSING)
       when 'all'
-        where.not(status: PROCESSING)
+        where.not(status: [PROCESSING, PREPROCESSING])
     else
         raise "No search named '#{search_name}' known."
     end

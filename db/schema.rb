@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022093018080800) do
+ActiveRecord::Schema.define(version: 2024_04_15_170056) do
+
+  create_table "abuse_records", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "complaint_entry_id"
+    t.string "source"
+    t.string "report_ident"
+    t.text "result"
+    t.text "report_submitted"
+    t.string "submitter"
+    t.text "url"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "alerts", charset: "utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -30,27 +42,17 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.text "notes"
     t.text "public_notes"
     t.string "contact"
+    t.integer "table_sequence"
     t.text "private_engine_description"
+    t.index ["table_sequence"], name: "index_amp_naming_conventions_on_table_sequence", unique: true
   end
 
-  create_table "attachment_links", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "ticket_id"
-    t.string "ticket_type"
-    t.bigint "attachment_id"
-    t.string "kind", default: "File"
-    t.string "attachment_type"
-    t.index ["attachment_id"], name: "index_attachment_links_on_attachment_id"
-    t.index ["ticket_type", "ticket_id"], name: "index_attachment_links_on_ticket_type_and_ticket_id"
-  end
-
-  create_table "attachments", charset: "utf8mb3", force: :cascade do |t|
+  create_table "attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "bugzilla_attachment_id"
     t.string "file_name"
     t.string "summary"
-    t.string "content_type"
-    t.string "direct_upload_url"
+    t.string "content_type", limit: 80, collation: "ascii_general_ci"
+    t.string "direct_upload_url", collation: "ascii_general_ci"
     t.integer "size", default: 0
     t.integer "creator"
     t.boolean "is_obsolete", default: false
@@ -61,19 +63,19 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.integer "bug_id"
     t.integer "unused_rule_id"
     t.integer "task_id"
-    t.string "rule_test_id"
+    t.string "rule_test_id", collation: "ascii_general_ci"
     t.bigint "rule_test_api_id"
-    t.string "direct_file_path"
+    t.string "direct_file_path", collation: "ascii_general_ci"
     t.boolean "pcap_flag", default: false, null: false
     t.bigint "jira_attachment_id"
-    t.string "stored_file_name"
-    t.string "stored_file_key"
-    t.string "content_type_group", default: "application/octet-stream"
-    t.string "sequestration", default: "unrecognized"
+    t.string "stored_file_name", collation: "ascii_general_ci"
+    t.string "stored_file_key", collation: "ascii_general_ci"
+    t.string "content_type_group", limit: 80, default: "application/octet-stream", collation: "ascii_general_ci"
+    t.string "sequestration", limit: 40, default: "unrecognized", collation: "ascii_general_ci"
     t.bigint "ticket_id"
-    t.string "ticket_type"
-    t.string "file_source_category", default: "research"
-    t.string "file_source_record_type"
+    t.string "ticket_type", collation: "ascii_general_ci"
+    t.string "file_source_category", limit: 40, default: "research", collation: "ascii_general_ci"
+    t.string "file_source_record_type", collation: "ascii_general_ci"
     t.bigint "file_source_record_id"
     t.string "rule_test_api_hash", collation: "ascii_general_ci"
     t.index ["bug_id"], name: "index_attachments_on_bug_id"
@@ -92,11 +94,12 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
   end
 
   create_table "bug_jira_labels", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "bug_id"
+    t.bigint "jira_label_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "bug_id"
-    t.integer "jira_label_id"
-    t.index ["bug_id", "jira_label_id"], name: "index_bug_jira_labels_on_bug_id", unique: true
+    t.index ["bug_id", "jira_label_id"], name: "index_bug_jira_labels_on_bug_id_and_jira_label_id", unique: true
+    t.index ["bug_id"], name: "index_bug_jira_labels_on_bug_id"
     t.index ["jira_label_id"], name: "index_bug_jira_labels_on_jira_label_id"
   end
 
@@ -234,7 +237,11 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.integer "platform_id"
     t.integer "reviewer_id"
     t.integer "second_reviewer_id"
-    t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
+    t.text "abuse_information"
+    t.integer "canonical_id"
+    t.index ["complaint_id", "created_at"], name: "index_complaint_entries_on_complaint_id_created_at"
+    t.index ["complaint_id", "domain"], name: "index_complaint_entries_on_complaint_id_and_domain"
+    t.index ["created_at"], name: "index_complaint_entries_on_created_at"
     t.index ["status", "created_at"], name: "index_complaint_entries_on_status_and_created_at"
     t.index ["status", "domain"], name: "index_complaint_entries_on_status_and_domain"
     t.index ["user_id", "status"], name: "index_complaint_entries_on_user_id_and_status"
@@ -446,6 +453,8 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.integer "platform_id"
     t.text "suggested_threat_category", size: :medium
     t.string "auto_resolve_category"
+    t.string "claim"
+    t.integer "retries", default: 0
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
 
@@ -736,14 +745,6 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.string "verdict_reason"
   end
 
-  create_table "jira_import_jobs", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "jira_issue_key"
-    t.integer "status", default: 0
-    t.integer "bast_status"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "jira_import_tasks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "issue_key", null: false
     t.string "status"
@@ -758,22 +759,13 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.string "issue_platform"
     t.string "issue_status"
     t.string "issue_type"
-  end
-
-  create_table "jira_issue_domains", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "domain"
-    t.integer "domain_type"
-    t.bigint "jira_import_job_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["jira_import_job_id"], name: "index_jira_issue_domains_on_jira_import_job_id"
+    t.index ["issue_key"], name: "index_jira_import_tasks_on_complaint_id_created_at"
   end
 
   create_table "jira_labels", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name", limit: 256
-    t.index ["name"], name: "index_jira_labels_on_name", unique: true
   end
 
   create_table "meraki_clusters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -846,7 +838,7 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
   end
 
   create_table "notes", charset: "utf8mb3", force: :cascade do |t|
-    t.text "comment", size: :medium
+    t.text "comment", size: :medium, collation: "utf8mb4_0900_ai_ci"
     t.string "note_type"
     t.string "author"
     t.integer "notes_bugzilla_id"
@@ -918,11 +910,11 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "status", default: 0
-    t.string "ticket_type"
+    t.integer "status"
     t.string "resolution_type"
     t.bigint "creator_id"
-    t.integer "editor_id"
+    t.bigint "editor_id"
+    t.string "ticket_type"
   end
 
   create_table "roles", charset: "utf8mb3", force: :cascade do |t|
@@ -983,13 +975,13 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.integer "rule_id", null: false
     t.integer "rule_vulnerability_id"
     t.text "trigger"
-    t.text "explanation", null: false
+    t.text "explanation"
     t.text "refs"
     t.integer "false_positive_selection_id", null: false
     t.text "false_positive_blurb"
     t.text "contributors"
     t.boolean "seen_in_wild"
-    t.string "snort_doc_status", default: "NOTYET", null: false
+    t.string "snort_doc_status"
     t.string "mitre_category"
     t.string "mitre_sub_category"
     t.string "known_usage"
@@ -1164,6 +1156,14 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "service_statuses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "model"
+    t.integer "exception_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "sessions", charset: "utf8mb3", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data"
@@ -1189,7 +1189,7 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
   end
 
   create_table "snort_escalation_email_templates", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "template_name"
+    t.string "template_name", collation: "ascii_general_ci"
     t.text "description"
     t.text "body"
     t.datetime "created_at", null: false
@@ -1231,6 +1231,7 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.datetime "updated_at", null: false
     t.string "summary"
     t.text "description"
+    t.string "status", limit: 80, default: "NEW", null: false, collation: "ascii_general_ci"
     t.bigint "assignee_id"
     t.string "snort_version"
     t.string "ruleset"
@@ -1244,15 +1245,14 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.string "ti_status"
     t.integer "researcher_id"
     t.string "lookup_item"
-    t.string "status", default: "NEW", null: false, collation: "ascii_general_ci"
     t.text "status_comment"
-    t.string "resolution"
     t.text "resolution_comment"
     t.text "auto_resolve_log", size: :medium
     t.string "auto_resolve_code"
     t.text "bridge_packet", size: :medium
     t.string "submitted_snort_rule"
     t.string "component", limit: 80, collation: "ascii_general_ci"
+    t.string "resolution"
   end
 
   create_table "snort_escalations_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -1309,20 +1309,6 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
-  create_table "telemetry_histories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.float "wbrs_score"
-    t.float "sbrs_score"
-    t.float "multi_ip_score"
-    t.text "rule_hits"
-    t.text "multi_rule_hits"
-    t.text "threat_categories"
-    t.text "multi_threat_categories"
-    t.integer "dispute_entry_id"
-    t.boolean "original_snapshot"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "test_queue_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1365,12 +1351,12 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "umbrella_clusters", charset: "utf8mb3", force: :cascade do |t|
+  create_table "umbrella_clusters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "domain", limit: 191
     t.integer "platform_id"
     t.string "category_ids"
     t.integer "status", default: 0
-    t.bigint "traffic_hits", default: 0
+    t.bigint "traffic_hits"
     t.string "comment"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1477,8 +1463,8 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.string "domain"
     t.integer "platform_id"
     t.string "category_ids"
-    t.integer "status"
-    t.integer "traffic_hits"
+    t.integer "status", default: 0
+    t.integer "traffic_hits", default: 0
     t.string "comment"
     t.string "cluster_type"
     t.datetime "created_at", precision: 6, null: false
@@ -1495,6 +1481,8 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.string "type"
     t.string "domain", limit: 191
     t.index ["complaint_entry_id"], name: "index_complaint_entry_credits_on_user_id"
+    t.index ["user_id", "created_at"], name: "index_webcat_credits_on_user_id_created_at"
+    t.index ["user_id", "credit", "created_at"], name: "index_webcat_credits_on_user_id_credit_created_at"
     t.index ["user_id"], name: "index_complaint_entry_credits_on_complient_entry_id"
   end
 
@@ -1505,5 +1493,4 @@ ActiveRecord::Schema.define(version: 2022093018080800) do
     t.index ["name"], name: "index_whiteboards_on_name"
   end
 
-  add_foreign_key "jira_issue_domains", "jira_import_jobs"
 end

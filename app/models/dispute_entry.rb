@@ -293,8 +293,8 @@ class DisputeEntry < ApplicationRecord
   end
 
 
-  def self.is_ip?(ip)
-    !!IPAddr.new(ip) rescue false
+  def self.is_ip?(ip_url)
+    (ip_url =~ Resolv::IPv4::Regex) || (ip_url =~ Resolv::IPv6::Regex) ? true : false
   end
 
   def self.new_from_wlbl(wlbl)
@@ -482,7 +482,12 @@ class DisputeEntry < ApplicationRecord
 
     unless @virustotals
       if dispute_entry_preload.present? && dispute_entry_preload.virustotal.present?
-        virustotal_data = Virustotal::GetVirustotal.load_from_prefetch(dispute_entry_preload.virustotal)
+        begin
+          virustotal_data = Virustotal::GetVirustotal.load_from_prefetch(dispute_entry_preload.virustotal)
+        rescue
+          virustotal_data = {"scans" => []}
+        end
+
       else
         begin
           virustotal_data = Virustotal::GetVirustotal.by_domain(hostlookup)
@@ -766,7 +771,7 @@ class DisputeEntry < ApplicationRecord
 
 
     if extra_wbrs_stuff.present?
-      self.score = extra_wbrs_stuff.dig("wbrs", "score")
+      self.score = extra_wbrs_stuff.dig("wbrs", "score") rescue nil
       th_packet[:multi_ip_score] = self.score rescue nil
       threat_cats = extra_wbrs_stuff["threat_cats"]
 

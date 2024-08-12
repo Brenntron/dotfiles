@@ -18,7 +18,7 @@ class JiraImportTask < ApplicationRecord
   STATUS_GENERATING_TICKETS = "Generating Tickets"
 
   VALID_FILE_TYPE = "text/csv"
-  
+
   EXPORT_FIELD_NAMES = {
     'ISSUE_KEY' => 'Jira Ticket ID',
     'SUBMITTED_URL' => 'Submitted URL',
@@ -33,6 +33,13 @@ class JiraImportTask < ApplicationRecord
     'STATUS' => 'Ticket Import Status',
     'IMPORTED_AT' => 'Imported At',
     'BAST_COMMENT' => 'BAST comment'
+  }
+
+  #Platforms that have different names in Jira
+  PLATFORM_MAP = {
+    'Secure Email' => 'Email Security Appliance',
+    'Secure Firewall' => 'FirePower',
+    'Secure Web' => 'Web Security Appliance',
   }
 
   CACHE_LIFESPAN = 30
@@ -170,13 +177,14 @@ class JiraImportTask < ApplicationRecord
                   ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
                 end
               else
+                platform = PLATFORM_MAP[issue_platform].present? ? PLATFORM_MAP[issue_platform] : issue_platform
                 complaint_options = [
                   EscalationTicket,
                   ticketable_urls.first.submitted_url,
                   description,
                   Customer::JIRA_GENERATED,
                   nil,                     # tags
-                  nil,                     # platform
+                  platform,                # platform
                   Complaint::NEW,          # status
                   nil,                     # categories
                   nil,                     # user email
@@ -254,6 +262,22 @@ class JiraImportTask < ApplicationRecord
     count
   end
 
+  def self.opendns_ticket_count
+    filters = ['status != Resolved', "issuetype != 'Question / Assistance'", "cf[20425] = 'OpenDNS'"]
+    project_key = Rails.configuration.jira.project_key
+
+    stored_count = JSON.parse(Rails.cache.read("opendns_count") || "{}")
+    if stored_count.blank? || stored_count['last_queried'] < 15.minutes.ago
+      project = JiraRest::Project.new(project_key)
+      issues = project.issues(filters)
+      count = issues.count
+      Rails.cache.write("opendns_count", {'count' => count, 'last_queried' => Time.now}.to_json)
+    else
+      count = stored_count['count']
+    end
+    count
+  end
+
   def self.export_xlsx(issue_keys='')
     issue_keys = issue_keys.split(',')
 
@@ -324,4 +348,5 @@ class JiraImportTask < ApplicationRecord
   def has_open_complaints?
     self.import_urls.joins(:complaint).where.not(complaint: {status: [Complaint::COMPLETED, Complaint::RESOLVED]}).any?
   end
+
 end

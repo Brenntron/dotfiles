@@ -94,9 +94,8 @@ class ComplaintEntry < ApplicationRecord
     distance_of_time_in_words(value)
   end
 
-  def self.is_ip?(ip)
-    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
-    !!IPAddr.new(ip) rescue false
+  def self.is_ip?(ip_url)
+    (ip_url =~ Resolv::IPv4::Regex) || (ip_url =~ Resolv::IPv6::Regex) ? true : false
   end
 
   def self.manipulate_changeset(changeset)
@@ -154,16 +153,16 @@ class ComplaintEntry < ApplicationRecord
 
     if assignment_type == 'assignee' && [reviewer&.id, second_reviewer&.id].include?(current_user.id)
       return('A Reviewer cannot also be the Assignee.')
-    elsif assignment_type == 'assignee' && (self.user.nil? || self.user.display_name == 'Vrt Incoming')
+    elsif assignment_type == 'assignee' && (user.nil? || user&.display_name == 'Vrt Incoming')
       update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
       complaint.set_status("ASSIGNED")
-    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id
+    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && user&.id == current_user.id && !user&.enabled_self_review
       return('The Assignee cannot also be a Reviewer.')
-    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id
+    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == current_user&.id && !user&.enabled_self_review
       return('The Reviewer cannot also be the Second Reviewer.')
     elsif assignment_type == 'reviewer' && reviewer.nil?
       update(reviewer: current_user)
-    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id
+    elsif assignment_type == 'second_reviewer' && second_reviewer.nil? && reviewer&.id == current_user&.id && !user&.enabled_self_review
       return('The Second Reviewer cannot also be the Reviewer.')
     elsif assignment_type == 'second_reviewer' && second_reviewer.nil?
       update(second_reviewer: current_user)
@@ -239,9 +238,9 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def reassign(assignee, assignment_type)
-    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
-    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
-    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
+    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee && assignment_type == 'assignee'
+    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer && assignment_type == 'reviewer'
+    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer && assignment_type == 'second_reviewer'
     raise "Already completed" if status == "COMPLETED"
 
     case assignment_type
@@ -422,11 +421,13 @@ class ComplaintEntry < ApplicationRecord
         return post_categorize(current_user)
       end
 
+      #commenting this out for now even though this represents how change_category was written before R-ACE project. looks like things might have
+      # been broken and wasn't caught, but this is causing behavior that SDO wasn't expecting.
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if current_user.enabled_self_review
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
-        return post_categorize(current_user)
-      end
+      #if current_user.enabled_self_review
+      #  categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
+      #  return post_categorize(current_user)
+      #end
 
       #################
 
@@ -464,19 +465,19 @@ class ComplaintEntry < ApplicationRecord
 
       ## call guardrails
 
-      #begin
+      begin
         category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
         verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
 
         verdict_pass = verdict_results[:verdict_pass]
         verdict_reasons = verdict_results[:verdict_reasons]
-        #binding.pry
-      #rescue Exception => e
-      #  Rails.logger.error(e.message)
-      #  verdict_pass = false
-      #  verdict_reasons << "there was an api call failure, erring to manager review"
-      #end
+
+      rescue Exception => e
+        Rails.logger.error(e.message)
+        verdict_pass = false
+        verdict_reasons << "there was an api call failure, erring to manager review"
+      end
 
       ## if verdict does not pass and is not a webcat manager then kickback to manager with why it failed
       if verdict_pass == false
@@ -883,7 +884,7 @@ class ComplaintEntry < ApplicationRecord
     when 'named'
       named_search(search_name, user: user)
     when 'standard'
-      standard_search(search_name, user: user)
+      standard_search(search_name, user: user, params: params)
     when 'contains'
       contains_search(params['value'])
     else
@@ -923,7 +924,7 @@ class ComplaintEntry < ApplicationRecord
   # Searches specific to quick generic button filters.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name, user:)
+  def self.standard_search(search_name, user:, params: {})
     case search_name
     when "NEW"
       new_entries
@@ -932,7 +933,12 @@ class ComplaintEntry < ApplicationRecord
     when "ACTIVE"
       open.where.not(status:"NEW")
     when "REVIEW"
-      where(status: "PENDING")
+      if params[:allow_self_review]
+       where(status: "PENDING")
+      else
+        where(status: "PENDING").where.not(user_id: user.id)
+      end
+
     when "MY COMPLAINTS"
       where(user_id: user.id)
     when "MY OPEN COMPLAINTS"

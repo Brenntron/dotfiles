@@ -40,7 +40,7 @@ When(/^I click "(.*?)"$/) do |target|
     begin
       click_on(target)
     rescue Capybara::ElementNotFound => e
-      page.find("#{target}").click
+      page.find(target).click
     end
 end
 
@@ -131,7 +131,7 @@ end
 
 When(/^I click \(within\) "(.*?)" within "(.*?)"$/) do |target, context|
   within(context) do
-    page.click_link(target)
+    page.click(target)
   end
 end
 
@@ -199,7 +199,6 @@ Then(/^Element with id "(.*?)" should have class "(.*?)"$/) do |id_name, class_n
   find(:xpath, "//*[contains(@id, '#{id_name}')][contains(@class, '#{class_name}')]")
 end
 
-
 Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
   element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
   unless element.has_content?
@@ -207,8 +206,19 @@ Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
   end
 end
 
+Then(/^Element with id "(.*?)" should not be empty$/) do |id_name|
+  element = find(:xpath, "//*[contains(@id, '#{id_name}')]")
+  unless element.has_content?
+    raise "content not found when it should have been found"
+  end
+end
+
 Then(/^Input with id "(.*?)" should be empty$/) do |id_name|
   find(:xpath, "//*[@id='#{id_name}']")[:value] == ""
+end
+
+Then(/^Input with id "(.*?)" should have value "(.*?)$/) do |id, value|
+  find("##{id}").value == value
 end
 
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
@@ -240,6 +250,12 @@ end
 
 Then(/^I click checkbox with name "(.*?)"$/) do |checkbox_name|
   checkbox = page.find(:xpath, "//input[@type='checkbox' and @name='#{checkbox_name}']")
+  checkbox.click
+  checkbox.should be_checked
+end
+
+When(/^I click checkbox with id "(.*?)"$/) do |id|
+  checkbox = page.find(:xpath, "//input[@type='checkbox' and @id='#{id}']")
   checkbox.click
   checkbox.should be_checked
 end
@@ -297,6 +313,7 @@ When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   end
   select(option, :from => select)
 end
+
 When(/^I can not select "(.*?)" from "(.*?)"$/) do |option, select|
   this_is_true = false
   begin
@@ -322,6 +339,10 @@ Then(/^I should see element "(.*?)"$/) do |element|
   rescue Capybara::ElementNotFound => e
     raise "element not found: #{element}"
   end
+end
+
+And(/^I should see an element "(.*?)" with text "(.*?)"$/) do |element, text|
+  page.find(element.to_s).assert_text(text)
 end
 
 Then(/^I should not see element "(.*?)"$/) do |element|
@@ -404,6 +425,14 @@ Then(/^I should not see button with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
 
+Then(/^I should see button with id "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//button[contains(@id, '#{element}')]")
+end
+
+Then(/^I should not see button with id "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//button[contains(@id, '#{element}')]")
+end
+
 Then(/^I should see link with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//a[contains(@class, '#{element}')]")
 end
@@ -454,6 +483,10 @@ end
 
 And(/^"(.*?)" should be in the "(.*?)" dropdown list$/) do |value, field|
   find_field(field).all('option').collect(&:text).include?(value).should == true
+end
+
+And(/^I select "(.*?)" from the "(.*?)" dropdown list$/) do |value, field|
+  find_field(field).find("option[value='#{value}']").click
 end
 
 And(/^"(.*?)" should not be in the "(.*?)" dropdown list$/) do |value, field|
@@ -600,6 +633,10 @@ Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, val
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
 end
 
+When(/^I remove item "(.*?)" from the selectized of element "(.*?)"$/) do |item, element|
+  page.execute_script("$('#{element}')[0].selectize.removeItem(#{item}, false)")
+end
+
 Then(/^I should see at least these selectized item "(.*?)" within "(.*?)"$/) do |content, element|
   page.has_select?(element, with_selected: content)
 end
@@ -655,6 +692,10 @@ end
 
 And(/the table "(.*?)" should have "(.*?)" number of rows/) do | table, number_of_rows|
   page.all("table##{table} tbody tr").count.should == Integer(number_of_rows)
+end
+
+Then(/^I should see alert$/) do
+  page.is_alert_present.should be_true
 end
 
 Then(/^I accept the user prompt$/) do

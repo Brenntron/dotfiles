@@ -2,6 +2,8 @@ require 'service-tess-internal_services_pb'
 
 class Tess::Whois
 
+  TEST_DOMAIN = 'google.com'
+
   def self.hostport
     @hostport ||= "#{Rails.configuration.tess.host}:#{Rails.configuration.tess.port || 80}"
   end
@@ -65,6 +67,45 @@ class Tess::Whois
     end
 
     response.result
+  end
+
+  def self.health_check
+    health_report = {}
+
+    times_to_try = 3
+    times_tried = 0
+    times_successful = 0
+    times_failed = 0
+    is_healthy = false
+
+    (1..times_to_try).each do |i|
+      begin
+
+        result = whois_query(TEST_DOMAIN)
+
+        if result.present?
+          times_successful += 1
+        else
+          times_failed += 1
+        end
+        times_tried += 1
+      rescue
+        times_failed += 1
+        times_tried += 1
+      end
+
+    end
+
+    if times_successful > times_failed
+      is_healthy = true
+    end
+
+    health_report[:times_tried] = times_tried
+    health_report[:times_successful] = times_successful
+    health_report[:times_failed] = times_failed
+    health_report[:is_healthy] = is_healthy
+
+    health_report
   end
 end
 

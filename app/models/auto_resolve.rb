@@ -33,6 +33,8 @@ class AutoResolve
             if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
               AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
               dispute_entry.reload
+            else
+              dispute_entry.update(status: DisputeEntry::NEW)
             end
           end
           if sugg_disposition == "false negative"
@@ -260,7 +262,7 @@ class AutoResolve
 
     rescue Exception => e
 
-      morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+      morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{entry}:\n\n"
       morsel_output += e.message + "\n"
       morsel_output += e.backtrace.join("\n")
 

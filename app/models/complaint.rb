@@ -390,7 +390,7 @@ For future web and email reputation requests, please open a web and email reputa
       customer = Customer.process_and_get_customer(message_payload)
       new_complaint.customer_id = customer&.id
       new_complaint.status = NEW
-      new_complaint.channel = message_payload["payload"]["channel"] || TI_CHANNEL
+      new_complaint.channel = message_payload["payload"]["channel"].blank? ? TI_CHANNEL : message_payload["payload"]["channel"]
 
       new_complaint.platform_id = platform.id unless platform.blank?
       new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
@@ -1200,4 +1200,11 @@ For future web and email reputation requests, please open a web and email reputa
 
   end
 
+  def customer_org
+    if customer.nil?
+      ''
+    else
+      customer.company.nil? ? '' : customer.company.name
+    end
+  end
 end

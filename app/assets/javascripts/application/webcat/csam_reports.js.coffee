@@ -149,6 +149,8 @@ build_csam_reports_table = () ->
       {
         data: 'complaint_entry_id'
         className: 'report-entry-id-col'
+        render: (data) ->
+          "<a href='complaint_entries/#{data}'>#{data}</a>"
       }
       {
         data: 'date_resolved'

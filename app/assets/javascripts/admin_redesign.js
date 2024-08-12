@@ -22,6 +22,7 @@
 //= require admin/std_api
 //= require admin/std_msg
 //= require application/custom
+//= require application/webcat/complaint_entries
 //= require application/webcat/complaints-support
 //= require application/webcat/categorize_dropdown
 //= require application/webrep/disputes-support
@@ -61,7 +62,7 @@
 //= require application/webcat/csam_reports
 //= require application/webcat/bulk_resolution_tool
 //= require application/escalations_users
-//= require application/webcat/webCatRepLookup
+//= require application/webcat/whois
 //= require application/webrep/webrep-report-engine
 //= require application/webrep/autoresolve_disputes
 //= require application/file_rep/file_rep

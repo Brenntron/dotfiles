@@ -1,0 +1,74 @@
+.row.ce-history-tab
+  .col-xs-12.ce-history-column
+    %h1.ce-tab-title
+      History
+
+    %h2
+      Domain History:
+      %span.submitted-entry-header= @submitted_ip_uri
+    %table.data-report-table.ce-history-dt#ce_domain_history_table
+      %thead
+        %tr
+          %th Action
+          %th Confidence
+          %th Description
+          %th Time
+          %th User
+          %th Category
+      %tbody
+    .loader-div#ce_domain_history_loader
+      .gear-loader-wrapper
+        = inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading...
+
+    %hr.thin
+
+    %h2 Entry History
+    %table.data-report-table.ce-history-dt#ce_entry_history_table
+      %thead
+        %tr
+          %th Time
+          %th User
+          %th Changes
+      %tbody
+    .loader-div#ce_entry_history_loader
+      .gear-loader-wrapper
+        = inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading...
+
+    %hr.thin
+
+    %h2
+      XBRS Timeline:
+      %span.submitted-entry-header= @submitted_ip_uri
+    %table.data-report-table.ce-history-dt#ce_xbrs_history_table
+      %thead
+        %tr
+          %th Timestamp
+          %th Score
+          %th V2 Content Cats
+          %th V3 Content Cats
+          %th Threat Cats
+          %th Rule Hits
+      %tbody
+    .loader-div#ce_xbrs_history_loader
+      .gear-loader-wrapper
+        = inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading...
+
+    -# THIS DOES NOT YET EXIST
+    -#%h2 Related History
+    -#%table.data-report-table#ce_related_history_table
+    -#  %thead
+    -#    %tr
+    -#      %th Subdomain
+    -#      %th Domain
+    -#      %th Path
+    -#      %th Categories
+    -#      %th User/Source
+    -#      %th Last Modified
+    -#  %tbody
+    -#.loader-div#ce_related_history_loader
+    -#  .gear-loader-wrapper
+    -#    = inline_svg 'icon_gears_loader.svg'
+    -#  %span.loader-msg Loading...

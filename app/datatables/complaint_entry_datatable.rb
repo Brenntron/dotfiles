@@ -6,6 +6,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     @search_type = initialize_params['search_type']
     @search_name = initialize_params['search_name']
     @search_conditions = initialize_params['search_conditions']
+    @allow_self_review = params['allow_self_review'] == 'true'
     super(params, {})
   end
 
@@ -28,7 +29,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         wbrs_score:         {source: "ComplaintEntry.wbrs_score", data: :wbrs_score, cond: :eq},
         customer_name:      {source: "ComplaintEntry.customer_name", data: :customer_name, cond: :like},
         company_name:       {source: "ComplaintEntry.company_name", data: :company_name, cond: :like},
-        assigned_to:        {source: "ComplaintEntry.assigned_to", data: :assigned_to, cond: :date_range},
+        assigned_to:        {source: "ComplaintEntry.assigned_to", data: :assigned_to, cond: :like},
         reviewer:           {source: "ComplaintEntry.reviewer", data: :reviewer, cond: :like},
         second_reviewer:    {source: "ComplaintEntry.second_reviewer", data: :second_reviewer, cond: :like},
         uri:                {source: "ComplaintEntry.uri", data: :uri, cond: :like},
@@ -84,8 +85,11 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           customer_email:   complaint.customer&.email,
           complaint_source: complaint.ticket_source || 'Internal',
           assigned_to:      complaint_entry.user&.display_name,
+          assigned_to_id:   complaint_entry.user_id,
           reviewer:         complaint_entry.reviewer&.display_name,
+          reviewer_id:      complaint_entry.reviewer_id,
           second_reviewer:  complaint_entry.second_reviewer&.display_name,
+          second_reviewer_id:  complaint_entry.second_reviewer_id,
           uri:              complaint_entry.uri,
           resolution:       complaint_entry.resolution,
           internal_comment: complaint_entry.internal_comment,
@@ -116,13 +120,13 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   def filter_records(records)
     base_search =
         if @search_string.present?
-          ComplaintEntry.robust_search('contains', params: { 'value' => @search_string }, user: @user)
+          ComplaintEntry.robust_search('contains', params: { 'value' => @search_string, allow_self_review: @allow_self_review }, user: @user)
         else
           super
         end
 
     if @search_type
-      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions || {allow_self_review: @allow_self_review}, user: @user)
     else
       base_search
     end
