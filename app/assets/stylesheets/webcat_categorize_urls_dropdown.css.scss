@@ -62,23 +62,24 @@
     margin: 3px 2px 0 !important; // override needed
   }
 
+}
+
+// Form with 5 diff url inputs
+#categorize-diff-form {
   .webcat-loader {
-    margin-top: -10px;
+    margin-top: 38px;
     position: absolute;
   }
   .loader-msg{
     width: 90px;
-    margin-top: 6px;
-    margin-left: 0;
+    margin-top: -6px;
+    margin-left: 5px;
     font-weight: 400;
   }
 
-}
-
-// Form with 5 diff url inputs and settings for each
-#categorize-diff-form {
   .toolbar {
     margin-top: 4px;
+    margin-bottom: 28px;
     .toolbar-button {
       background-size: 16px 16px;
       background-position: 5px center;
@@ -95,7 +96,6 @@
   }
 
   .form-group {
-    margin-bottom: -7px;
 
     .content-label-sm {
       display: inline-block;
@@ -113,6 +113,10 @@
       width: 360px;
       padding-left: 2px;
 
+    }
+    input.cat-url-input-error {
+      border-width: 2px;
+      border-color: #E47433;
     }
 
     .form-col-wrapper {
@@ -152,6 +156,17 @@
 #categorize-same-form {
   display: none;
 
+  .webcat-loader {
+    margin-top: -10px;
+    position: absolute;
+  }
+  .loader-msg{
+    width: 90px;
+    margin-top: 6px;
+    margin-left: 0;
+    font-weight: 400;
+  }
+
   label.content-label-sm {
     padding-top: 5px;
     display: block;
@@ -179,26 +194,21 @@
   color: #000;
   font-size: 11px;
   font-weight: normal;
+  margin: -16px 0 2px 68px;
+  padding-left: 20px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 15px;
   display: none;
+  span {
+    margin-top: -2px;
+    padding-bottom: 2px;
+  }
 }
 
-.categorize-urls-warning-icon{
-  width: 15px;
-  height: 15px;
-  background-image: url(image_path('icon_warning_orange.svg'));
-  background-repeat: no-repeat;
-  background-position: center center;
-  border:0;
-}
+.cat-url-error   { background-image: url(image_path('icon_warning_orange.svg')); }
+.cat-url-success { background-image: url(image_path('icon_success.svg'));}
 
-.categorize-urls-success-icon{
-  width: 15px;
-  height: 15px;
-  background-image: url(image_path('icon_success.svg'));
-  background-repeat: no-repeat;
-  background-position: center center;
-  border:0;
-}
 
 #cat_multiple_urls, #cat_dif_submit{
   margin-top: 20px;

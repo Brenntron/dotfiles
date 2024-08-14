@@ -88,14 +88,12 @@ $ ->
 
 # Lookup current categories of input urls
 window.lookup_prefix = () ->
-  $('.lookup-drop-loader').removeClass('hidden')
+  $('#categorize-diff-form .webcat-loader').removeClass('hidden')
 
   urls = []
-  for i in [1 .. 5]
-    $select= $('#cat_new_url_' + i).selectize()
-    selectize = $select[0].selectize
-    selectize.clear()
-    urls.push($("#url_" + i ).val())
+  url_inputs = $('#categorize-diff-form .url-input')
+  url_inputs.each ->
+    urls.push($(this).val())
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
@@ -103,21 +101,23 @@ window.lookup_prefix = () ->
     data: { 'urls': urls }
 
     success: (response) ->
-      i = 1
-      for [i .. 5]
+      domi = 0
+      for [domi .. 4]
         j = 0
         try
-          for [j .. Object.keys(response.json[i]).length]
-            selector = '#cat_new_url_' + i.toString()
+          # DOM index starts at 0, json response index starts at 1
+          responsei = domi + 1
+          for [j .. Object.keys(response.json[responsei]).length]
+            selector = '#cat_new_url_' + domi.toString()
             $select= $(selector).selectize()
             selectize = $select[0].selectize
-            selectize.addItem(response.json[i][j])
+            selectize.addItem(response.json[responsei][j])
             j++
         catch
-          i++
+          domi++
           continue
-        i++
-      $('.lookup-drop-loader').addClass('hidden')
+        domi++
+      $('#categorize-diff-form .webcat-loader').addClass('hidden')
   )
 
 
@@ -169,14 +169,15 @@ window.drop_current_categories = () ->
 
 
 window.retrieve_history = (position) ->
-  $(".cat-url-error").hide()
   loader = $('.lookup-drop-loader')
   loader.removeClass('hidden')
-  for url_position in [1..5]
-    $("#url_#{url_position}").css("border-width", "")
-    $("#url_#{url_position}").css("border-color", "")
 
   url = $("#url_" + position).val()
+  msg = $('#cat-url-msg-' + position)
+  url_input = $(msg[0]).next().next('.url-input')
+
+  $(msg).empty().hide()
+  $(url_input).removeClass('cat-url-input-error')
 
   if url.length > 0
     std_msg_ajax(
@@ -256,17 +257,26 @@ window.retrieve_history = (position) ->
             $('dialog_tabs').tabs();
 
       error: (response) ->
-        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
         loader.addClass('hidden')
-        $("#cat-url-#{position}").show()
-        $("#url_#{position}").css("border-width", "2px")
-        $("#url_#{position}").css("border-color", "#E47433")
+        $(msg).addClass('cat-url-error')
+        $(msg).text("No history associated with this url")
+        $(msg).show()
+        $(url_input).addClass('cat-url-input-error')
+
+#        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
+
+#        $("#cat-url-#{position}").show()
+#        $("#url_#{position}").css("border-width", "2px")
+#        $("#url_#{position}").css("border-color", "#E47433")
     , this)
   else
-    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
-    $("#cat-url-#{position}").show()
-    $("#url_#{position}").css("border-width", "2px")
-    $("#url_#{position}").css("border-color", "#E47433")
+    loader.addClass('hidden')
+    $(msg).addClass('cat-url-error')
+    $(msg).text("Not a valid url")
+    $(msg).show()
+#    debugger
+    $(url_input).addClass('cat-url-input-error')
+
 
 
 window.cat_new_url = ()->
