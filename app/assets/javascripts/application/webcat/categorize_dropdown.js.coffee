@@ -354,7 +354,7 @@ window.cat_new_url = ()->
         )
       )
     error: (response) ->
-      std_api_error(response, "Unable to categorize url.", reload: false)
+      std_api_error(response, "Unable to categorize url", reload: false)
   )
 
 
