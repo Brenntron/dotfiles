@@ -32,7 +32,7 @@
               %div.cat-url-msg{id: "cat-url-msg-#{i}"}
               %label.content-label-sm URL
               %input.url-input.inline-input.form-control{id: "url_#{i}", type: "text", :value => "", placeholder: "URL", autofocus: 'true', tabindex: '1' }
-              %button.inline-button.history-button.esc-tooltipped#history-1{type: 'button', onclick: "retrieve_history(#{i})", title: 'Entry Category History'}
+              %button.inline-button.history-button.esc-tooltipped{id: "history-#{i}", type: 'button', onclick: "retrieve_history(#{i})", title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control.cat_new_url.selectize{id: "cat_new_url_#{i}", multiple: "multiple", placeholder: "Enter up to 5 categories", style: "display: none;", tabindex: "2" }
               .form-col-wrapper
