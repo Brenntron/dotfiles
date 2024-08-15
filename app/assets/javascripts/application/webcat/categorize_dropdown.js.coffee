@@ -446,8 +446,6 @@ window.drop_multiple_url_categories = () ->
       method: 'POST'
       data: { 'urls': urls }
       success: (response) ->
-        debugger
-        # GETTING ERROR IN HERE
         popular_entries = []
         non_pop_entries = []
         pending_message = ""
