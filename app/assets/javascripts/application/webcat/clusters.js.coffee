@@ -457,16 +457,7 @@ window.populate_cat_select = ->
   ), 2000
 
 window.copy_domain = (domain, element) ->
-  copyToClipboard(domain)
-  html = "<div class='copied-container'>
-            <div class ='copied-check'></div>
-            <p id='copiedAlert'>Copied to clipboard</p>
-          </div>"
-  $(element).after( html )
-  $('.copied-container').delay(1000).fadeOut(1000);
-  setTimeout (->
-    $(".copied-container").remove()
-  ), 2000
+  navigator.clipboard.writeText(domain)
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
