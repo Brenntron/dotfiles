@@ -310,20 +310,22 @@ window.check_enable_toolbar_buttons = () ->
 
 window.open_selected_urls = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  #copy url to clipboard if only one row is checked
+  if selected_rows[0].length == 1 then clipboard = "true" else clipboard = "false"
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_selected(selected_rows, "true")
+    open_selected(selected_rows, "true", clipboard)
 
 
 window.open_all = () ->
   open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
   if (open_all == true)
     selected_rows = $('#complaints-index').DataTable().rows()
-    open_selected(selected_rows, "true")
+    open_selected(selected_rows, "true", "false")
 
 
-open_selected = (selected_rows, toggle) ->
+open_selected = (selected_rows, toggle, clipboard) ->
   low_rep_entries = []
   error_message = ''
 
@@ -341,15 +343,21 @@ open_selected = (selected_rows, toggle) ->
         new_subdomain = subdomain + "."
       if domain
         new_domain = domain
+        if clipboard == "true"
+          navigator.clipboard.writeText(new_subdomain + new_domain + new_path)
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
         ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
 
         # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
         if ipv4_regex.test(selected_row.ip_address)
+          if clipboard == "true"
+            navigator.clipboard.writeText(selected_row.ip_address)
           window.open("http://#{selected_row.ip_address}")
         else
           console.log "Opening #{selected_row.ip_address}"
+          if clipboard == "true"
+            navigator.clipboard.writeText(selected_row.ip_address)
           window.open("http://[#{selected_row.ip_address}]")
 
   if low_rep_entries.length >= 10

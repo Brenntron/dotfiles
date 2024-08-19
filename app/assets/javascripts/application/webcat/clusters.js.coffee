@@ -311,10 +311,12 @@ window.collapse_selected_clusters = (tableId) ->
 # open selected funtionality
 window.open_selected_clusters = () ->
   selected_rows = $('#clusters-index').DataTable().rows('.selected')
+  #copy url to clipboard if only one row is checked
+  if selected_rows[0].length == 1 then clipboard = true else clipboard = false
   if selected_rows[0].length == 0
     std_msg_error('no rows selected', ['Please select at least one row.'])
   else
-    open_selected_tabs(selected_rows, true)
+    open_selected_tabs(selected_rows, true, clipboard)
 
 
 # open all functionality
@@ -323,7 +325,7 @@ window.open_all_clusters = () ->
   open_selected_tabs(selected_rows, true)
 
 # This is here because of weird namespace problems over at `complaints.js.coffee`
-open_selected_tabs = (selected_rows, toggle) ->
+open_selected_tabs = (selected_rows, toggle, clipboard) ->
   for row, i in selected_rows[0]
     subdomain = ""
     domain = ""
@@ -335,8 +337,12 @@ open_selected_tabs = (selected_rows, toggle) ->
     if selected_rows.data()[i].path
       path = selected_rows.data()[i].path
     if selected_rows.data()[i].domain
+      if clipboard == true
+        navigator.clipboard.writeText(subdomain + domain + path)
       window.open("http://"+ subdomain + domain + path)
     else
+      if clipboard == true
+        navigator.clipboard.writeText(selected_rows.data()[i].ip_address)
       window.open("http://"+selected_rows.data()[i].ip_address)
 
 window.copycat_dialog = () ->
