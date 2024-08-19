@@ -308,6 +308,13 @@ window.collapse_selected_clusters = (tableId) ->
     if $(row).hasClass('shown')
       $(row).find('.expand-row-button-inline').click()
 
+#open clusters link
+window.open_cluster_link = (url) ->
+  copy_url = url.replace('https://www.google.com/search?q=', '')
+  copy_url = copy_url.replace('https://', '')
+  navigator.clipboard.writeText(copy_url)
+  window.open(url, "_blank")
+
 # open selected funtionality
 window.open_selected_clusters = () ->
   selected_rows = $('#clusters-index').DataTable().rows('.selected')
@@ -1152,8 +1159,8 @@ $ ->
           else
             html += "<button type='button' class='whois-btn right-margin'></button>"
 
-          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
-                  <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
+          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick=open_cluster_link('https://www.google.com/search?q=#{domain}')></button>
+                  <button type='button' onclick=open_cluster_link(\"https://#{domain}\") class='open-in-tab-btn  right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
           
           if window.htmlEntitiesDecode(duplicates) != '[]'
             html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"
