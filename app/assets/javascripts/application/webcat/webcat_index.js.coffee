@@ -437,7 +437,7 @@ window.build_complaints_table = (url) ->
 
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address
           lookup_button =
-            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url +
+            '<a class="button-wrapper-link" onclick="copy_webcat_index_url(\'' + lookup_url + '\')" href="https://www.google.com/search?q=site%3A' + lookup_url +
               '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button esc-tooltipped" ' +
               'title="Google Search"></button></a>'
 
@@ -447,7 +447,7 @@ window.build_complaints_table = (url) ->
               '<button id="open-' + full.entry_id + '" class="open-all" disabled></button>'
           else
             visit_button =
-              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id +
+              '<a class="button-wrapper-link" onclick="copy_webcat_index_url(\'' + visit_url + '\')" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id +
                 '" class="open-all esc-tooltipped" title="Open in New Tab"></button></a>'
 
           return history_button + whois_button + lookup_button + visit_button
@@ -937,3 +937,10 @@ window.get_last_sort_order = () ->
   else
     webcat_sort_order = [10, 'desc']
   return webcat_sort_order
+
+window.copy_webcat_index_url = (url) ->
+  # trim off preceeding period if at first character
+  if url.charAt(0) == '.'
+    url.slice(0,1)
+    url = url.substring(1)
+  navigator.clipboard.writeText(url)
