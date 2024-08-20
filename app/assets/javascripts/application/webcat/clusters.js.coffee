@@ -294,7 +294,7 @@ window.get_data_for_clusters  = (selectedRows, clusterIds) ->
       for row in selectedRows
         cluster_id = $(row).find('td.cluster_identifier').text()
         if !$(row).hasClass('shown') && clustersData[parseInt(cluster_id)]
-          window.expandSingleRow(row, clustersData[parseInt(cluster_id)])
+          window.expand_single_cluster_row(cluster_id, clustersData[parseInt(cluster_id)])
       $('.cluster-mgt-loader-wrapper').addClass('hidden')
 
     error: (response) ->
@@ -486,13 +486,9 @@ $ ->
   $("#clusters-index").on 'draw.dt order.dt', ->
     selectize_category_inputs()
     populate_cat_select()
-# 
-  #  Expand cluster rows
-  $('#clusters-index tbody').on 'click', '.expand-row-button-inline, .entry-count', ->
-    expandSingleRow(this)
 
-window.expandSingleRow = (currentRow, preloadedData=[])->
-  tr = $(currentRow).closest('tr')
+window.expand_single_cluster_row = (cluster_id, preloadedData=[])->
+  tr = $(".expand-row-button-#{cluster_id}").closest('tr')
   row = window.clusters_table.row(tr)
   if row.child.isShown()
     # This row is already open - close it
@@ -1108,7 +1104,7 @@ $ ->
         className: 'expandable-row-column'
         'render':(data,type,full,meta)->
           if full.platform == 'WSA'
-            return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
+            return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}' onClick='expand_single_cluster_row(#{data.cluster_id})'></button>"
           else
             return "<span />"
       }
