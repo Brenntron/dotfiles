@@ -1,0 +1,215 @@
+// WEBCAT CATEGORIZE URLS DROPDOWN - FEATURE FOR CATEGORIZING URLS ON THE FLY W/OUT CREATING A TICKET FIRST
+
+// CATEGORIZE URLs dropdown - overall wrapper
+.nav-tools-dropdown[aria-labelledby='categorize-urls'] {
+  padding-top: 5px;
+  h3 {
+    padding: 6px 5px 9px;
+  }
+}
+
+.categorize-radio-wrapper {
+  line-height: initial;
+  background-color: #f2f2f2;
+  padding: 5px 6px 10px;
+
+  .radio-label {
+    font-size: 8pt;
+    padding-left: 4px;
+    vertical-align: middle;
+  }
+
+  .cat-url-radio {
+    border: none !important;
+    margin-top: 1px;
+    outline: none !important;
+    vertical-align: middle;
+  }
+}
+
+// This id wraps both below forms, includes styles tweaks that affect both forms
+#categorize-urls-form-wrapper {
+  width: 500px;
+  padding: 10px 15px;
+
+  input[type='text'],
+  select,
+  .form-control.selectize {
+    min-height: 28px !important;
+  }
+
+  input,
+  select {
+    display: block;
+    font-size: 8pt;
+    line-height: 12pt;
+    margin-bottom: 4px;
+  }
+
+  .form-control.selectize {
+    margin-bottom: 4px;
+    border-width: 3px;
+
+    .selectize-input {
+      margin-top: -3px !important;
+      padding-top: 0 !important;
+    }
+  }
+
+  .item {
+    font-size: 8pt;
+    line-height: 12pt;
+    margin: 3px 2px 0 !important; // override needed
+  }
+
+}
+
+// Form with 5 diff url inputs
+#categorize-diff-form {
+  .webcat-loader {
+    margin-top: 38px;
+    position: absolute;
+  }
+  .loader-msg{
+    width: 90px;
+    margin-top: -6px;
+    margin-left: 5px;
+    font-weight: 400;
+  }
+
+  .toolbar {
+    margin-top: 4px;
+    margin-bottom: 28px;
+    .toolbar-button {
+      background-size: 16px 16px;
+      background-position: 5px center;
+
+      &.current-categories-button {
+        margin-right: 3px;
+      }
+
+      span {
+        font-size: 8pt;
+        line-height: 12pt;
+      }
+    }
+  }
+
+  .form-group {
+
+    .content-label-sm {
+      display: inline-block;
+      float: left;
+      width: 60px;
+      padding-top: 6px;
+      padding-left: 2px;
+      margin-bottom: 0;
+    }
+
+    input,
+    .form-control.cat_new_url,
+    select {
+      display: inline-block;
+      width: 360px;
+      padding-left: 2px;
+
+    }
+    input.cat-url-input-error {
+      border-width: 2px;
+      border-color: #E47433;
+    }
+
+    .form-col-wrapper {
+      display: flex;
+      margin-bottom: 15px;
+
+      select, .form-control {
+        width: 162px;
+      }
+      .tags-label {
+        width: 23px;
+        margin-left: 7px;
+      }
+    }
+  }
+
+  .history-button {
+    margin-left: 4px;
+  }
+  // FF needs a tiny alignment correction
+  @-moz-document url-prefix() {
+    .history-button.inline-button {
+      position: relative;
+      bottom: 2px;
+    }
+  }
+
+  #cat_dif_submit {
+    font-size: 9pt;
+    line-height: 14pt;
+    margin: 20px 10px 10px;
+    padding: 12px 30px;
+  }
+
+}
+
+#categorize-same-form {
+  display: none;
+
+  .webcat-loader {
+    margin-top: -10px;
+    position: absolute;
+  }
+  .loader-msg{
+    width: 90px;
+    margin-top: 6px;
+    margin-left: 0;
+    font-weight: 400;
+  }
+
+  label.content-label-sm {
+    padding-top: 5px;
+    display: block;
+    width: 90%;
+  }
+  .form-group {
+    margin-bottom: 10px;
+  }
+  .form-col-wrapper {
+    display: flex;
+
+    .form-group:first-of-type {
+      margin-right: 10px;
+    }
+    select, .form-control {
+      width: 230px;
+      &.selectize {
+        height: auto;
+      }
+    }
+  }
+}
+
+.cat-url-msg {
+  color: #000;
+  font-size: 11px;
+  font-weight: normal;
+  margin: -16px 0 2px 68px;
+  padding-left: 20px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 15px;
+  display: none;
+  span {
+    margin-top: -2px;
+    padding-bottom: 2px;
+  }
+}
+
+.cat-url-error   { background-image: url(image_path('icon_warning_orange.svg')); }
+.cat-url-success { background-image: url(image_path('icon_success.svg'));}
+
+
+#cat_multiple_urls, #cat_dif_submit{
+  margin-top: 20px;
+}

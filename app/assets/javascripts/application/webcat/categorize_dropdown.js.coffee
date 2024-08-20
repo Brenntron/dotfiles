@@ -1,32 +1,77 @@
 ## WEBCAT CATEGORIZE URLS DROPDOWN FUNCTIONS ##
 $ ->
 
-  # Populate the category selectizes on the dropdown
-  new_url_cats = $('select.cat_new_url')
-  for select in new_url_cats
-    $(select).selectize {
-      persist: true,
-      create: false,
-      maxItems: 5,
-      closeAfterSelect: true,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions("##{select.id}")
-      score: (input) ->
-        #  Adding some customization for autofill
-        #  restricting on certain cats to avoid accidental categorization
-        #  (replaces selectize's built-in `getScoreFunction()` with our own)
-        (item) ->
-          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
-            item.category_code == input ? 1 : 0
-          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-            1
-          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
-            0.9
-          else
-            0
-    }
+  $('#categorize-urls').on 'click', ->
+
+    # Populate the category selectizes on the dropdown
+    new_url_cats = $('select.cat_new_url')
+    for select in new_url_cats
+      $(select).selectize {
+        persist: true,
+        create: false,
+        maxItems: 5,
+        closeAfterSelect: true,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions("##{select.id}")
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
+      }
+
+    # Populate the platform selects
+    AC.DataLoaders.load_plaforms().then( (platforms) =>
+      $('#multiurl_platform_select').empty()
+      $('.platform-new-url').empty()
+
+      platform_options = ''
+      for platform in platforms.data
+        platform_options += '<option value="' + platform.public_name + '">' + platform.public_name + '</option>'
+
+      $('#multiurl_platform_select').append platform_options
+      $('.platform-new-url').each ->
+        $(this).append platform_options
+    )
+
+    # Populate the tag selects
+    $('.tags-new-url').each ->
+      $(this).selectize {
+        persist: false,
+        create: (input) ->
+          {name: input}
+        maxItmes: null
+        valueField: 'name'
+        labelField: 'name'
+        searchField: 'name'
+        options: tag_select_options()
+        onFocus: () ->
+          window.toggle_selectize_layer(this, 'true')
+        onBlur: () ->
+          window.toggle_selectize_layer(this, 'false')
+      }
+
+
+  # there is a hidden input already on the page that has all existing tags
+  tag_select_options = ->
+    tags = $('#complaint_tag_list')[0]
+    if tags
+      tag_list = tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
 
   # Switch which form type is shown
   $('#cat-urls-diff').click ->
@@ -43,14 +88,12 @@ $ ->
 
 # Lookup current categories of input urls
 window.lookup_prefix = () ->
-  $('.lookup-drop-loader').removeClass('hidden')
+  $('#categorize-diff-form .webcat-loader').removeClass('hidden')
 
   urls = []
-  for i in [1 .. 5]
-    $select= $('#cat_new_url_' + i).selectize()
-    selectize = $select[0].selectize
-    selectize.clear()
-    urls.push($("#url_" + i ).val())
+  url_inputs = $('#categorize-diff-form .url-input')
+  url_inputs.each ->
+    urls.push($(this).val())
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
@@ -72,57 +115,75 @@ window.lookup_prefix = () ->
           i++
           continue
         i++
-      $('.lookup-drop-loader').addClass('hidden')
+      $('#categorize-diff-form .webcat-loader').addClass('hidden')
   )
 
 
 
 window.drop_current_categories = () ->
-  $(".cat-url-error").hide()
-  $(".cat-url-success").hide()
-  $('.lookup-drop-loader').removeClass('hidden')
-  $("#url_#{i}").css("border-width", "")
-  $("#url_#{i}").css("border-color", "")
+  loader = $('#categorize-diff-form .webcat-loader')
+  $(loader).removeClass('hidden')
+  $(".cat-url-msg").hide()
 
   urls = {}
 
   for i in [1 .. 5]
+    $("#url_#{i}").removeClass('cat-url-input-error')
     if $("#url_" + i ).val() != ""
-      urls[i] = $("#url_" + i ).val()
+      url_data = {
+        url: $("#url_" + i ).val(),
+        platform: $("#platform_new_url_" + i).val(),
+        tags: $("#tags_new_url_" + i).val()
+    }
+      urls[i] = url_data
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
+
+      message = ""
       for key, value of response.json
-        if value && value.code == 200
-          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
-          $("#cat-url-success-#{key}").show()
+        # clear any residual classes on the msg wrapper
+        msg_wrapper = $("#cat-url-msg-#{key}")
+        $(msg_wrapper).removeClass('cat-url-error')
+        $(msg_wrapper).removeClass('cat-url-success')
+
+        if value && (value.popular || value.code == 200)
+          if value.popular == true
+            message = "Pending complaint entry has been created."
+          else
+            message = "Categories successfully dropped."
+          $(msg_wrapper).text(message)
+          $(msg_wrapper).addClass('cat-url-success')
+          $(msg_wrapper).show()
           select= $("#cat_new_url_#{key}").selectize()
           selectize = select[0].selectize
           selectize.clear()
         else
-          $("#url_#{key}").css("border-width", "2px")
-          $("#url_#{key}").css("border-color", "#E47433")
-          $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
-          $("#cat-url-#{key}").show()
-      $('.lookup-drop-loader').addClass('hidden')
+          $("#url_#{key}").addClass('cat-url-input-error')
+          $(msg_wrapper).text("Unable to drop categories.")
+          $(msg_wrapper).addClass('cat-url-error')
+          $(msg_wrapper).show()
+
+      $(loader).addClass('hidden')
     error: (response) ->
-      $('.lookup-drop-loader').addClass('hidden')
+      $(loader).addClass('hidden')
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
   )
 
 
 window.retrieve_history = (position) ->
-  $(".cat-url-error").hide()
-  loader = $('.lookup-drop-loader')
+  loader = $('#categorize-diff-form .webcat-loader')
   loader.removeClass('hidden')
-  for url_position in [1..5]
-    $("#url_#{url_position}").css("border-width", "")
-    $("#url_#{url_position}").css("border-color", "")
 
   url = $("#url_" + position).val()
+  msg = $('#cat-url-msg-' + position)
+  url_input = $(msg[0]).next().next('.url-input')
+
+  $(msg).empty().hide()
+  $(url_input).removeClass('cat-url-input-error')
 
   if url.length > 0
     std_msg_ajax(
@@ -202,20 +263,24 @@ window.retrieve_history = (position) ->
             $('dialog_tabs').tabs();
 
       error: (response) ->
-        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
         loader.addClass('hidden')
-        $("#cat-url-#{position}").show()
-        $("#url_#{position}").css("border-width", "2px")
-        $("#url_#{position}").css("border-color", "#E47433")
+        $(msg).addClass('cat-url-error')
+        $(msg).text("No history associated with this url")
+        $(msg).show()
+        $(url_input).addClass('cat-url-input-error')
     , this)
   else
-    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
-    $("#cat-url-#{position}").show()
-    $("#url_#{position}").css("border-width", "2px")
-    $("#url_#{position}").css("border-color", "#E47433")
+    loader.addClass('hidden')
+    $(msg).addClass('cat-url-error')
+    $(msg).text("Not a valid url")
+    $(msg).show()
+    $(url_input).addClass('cat-url-input-error')
+
 
 
 window.cat_new_url = ()->
+  loader = $('#categorize-diff-form .webcat-loader')
+  loader.removeClass('hidden')
   categorizations_to_submit = {}
 
   $('#categorize-diff-form .individual-url').each ->
@@ -223,11 +288,13 @@ window.cat_new_url = ()->
     cats_input_ids = $($(this).find('.cat_new_url')[0]).val()
     cats_input_names = []
     url_index = $($(this).find('.url-input')[0]).attr('id').split('_').pop()
+    platform = $(this).find('.platform-new-url').val()
+    tags = $(this).find('.tags-new-url').val()
 
     if url_input == '' || cats_input_ids == ''
       return
     else
-      $(this).find('.selectize-input .item').each ->
+      $(this).find('.cat_new_url .item').each ->
         cat_name = $(this).text()
         cats_input_names.push(cat_name)
 
@@ -235,84 +302,136 @@ window.cat_new_url = ()->
         'url': url_input,
         'category_names': cats_input_names,
         'category_ids': cats_input_ids
+        'platform': platform
+        'tags': tags
       }
 
-  #remove this console log when ready
-  console.log categorizations_to_submit
+  data = {data: categorizations_to_submit}
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
     method: 'POST'
-    data: {data: categorizations_to_submit}
+    data: data
     success: (response) ->
+      loader.addClass('hidden')
       popular_entries = []
+      non_pop_entries = []
+      pending_message = ""
       message = ""
+
       for key, val of response
         if val.popular == true
           popular_entries.push(val.url)
+        else
+          non_pop_entries.push(val.url)
 
       if popular_entries.length > 0
-         message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        pending_message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        if non_pop_entries.length > 0
+          message = "All other entries have been submitted directly to WBRS."
       else
-         message = "No pending complaint entries have been created"
+         message = "Entries have been submitted directly to WBRS."
 
-      reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
+
       std_msg_success(
         'URLs categorized successfully',
-        [message, "All other entries have been submitted directly to WBRS.", reload_message],
+        [pending_message, message],
         reload: false,
         complete: (->
           # clear url inputs
           $('.url-input').val('')
-          # clear categories inputs
-          $('#cat_new_url_1')[0].selectize.clear()
-          $('#cat_new_url_2')[0].selectize.clear()
-          $('#cat_new_url_3')[0].selectize.clear()
-          $('#cat_new_url_4')[0].selectize.clear()
-          $('#cat_new_url_5')[0].selectize.clear()
+
+          for i in [1 .. 5]
+            # clear categories inputs & tags
+            $("#cat_new_url_#{i}")[0].selectize.clear()
+            $("#tags_new_url_#{i}")[0].selectize.clear()
+            # clear residual msg & error class
+            msg = $("#cat-url-msg-#{i}")
+            url_input = $(msg[0]).next().next('.url-input')
+            $(msg).empty().hide()
+            $(url_input).removeClass('cat-url-input-error')
+
         )
       )
     error: (response) ->
-      # TODO - Find out where this response text is generated and fix, it makes no sense
-      if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-        std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
-      else
-        std_api_error(response, "Unable to categorize url.", reload: false)
+      std_api_error(response, "Unable to categorize url", reload: false)
   )
 
 
 
 window.multiple_url_categorization = () ->
-  loader = $('.lookup-drop-loader')
+  loader = $('#bulk_cat_url_loader')
   loader.removeClass('hidden')
 
+  categorizations_to_submit = {}
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
+  platform = $("#multiurl_platform_select").val()
+  tags = $("#multiurl_tag_select").val()
+
   for category in $("#multi_cat_url_cats")
     for i in [0..5] by 1
       if category[i]
         category_names.push(category[i].text)
 
+  $(urls).each (i) ->
+    categorizations_to_submit[i] = {
+      'url': this,
+      'category_names': category_names,
+      'category_ids': category_ids,
+      'platform': platform,
+      'tags': tags
+    }
+
+  data = {data: categorizations_to_submit}
+  console.log data
   if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
     std_msg_ajax(
-      url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
+      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
-      data: {urls: urls, category_names: category_names, category_ids: category_ids}
+      data: data
       success: (response) ->
-        loader.addClass('hidden')
-        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: false)
+        popular_entries = []
+        non_pop_entries = []
+      pending_message = ""
+      message = ""
+
+      for key, val of response
+        if val.popular == true
+          popular_entries.push(val.url)
+        else
+          non_pop_entries.push(val.url)
+
+      if popular_entries.length > 0
+        pending_message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        if non_pop_entries.length > 0
+          message = "All other entries have been submitted directly to WBRS."
+      else
+        message = "Entries have been submitted directly to WBRS."
+
+        std_msg_success(
+          'URLs categorized successfully',
+          [message, pending_message],
+          reload: false,
+          complete: (->
+            # clear form inputs
+            $('#categorize_urls').val('')
+            $('#multi_cat_url_cats')[0].selectize.clear()
+            $('#multiurl_tag_select')[0].selectize.clear()
+            loader.addClass('hidden')
+          )
+        )
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
-
     )
   else
-    std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+    std_msg_error('Error', ['Please check that a URL/IP has been entered and that at least one category was selected.'], reload: false)
 
 
 window.drop_multiple_url_categories = () ->
-  loader = $('.lookup-drop-loader')
+  loader = $('#bulk_cat_url_loader')
   urls = {}
 
   for url, index in $("#categorize_urls").val().trim().split(/\s+/)
@@ -327,16 +446,54 @@ window.drop_multiple_url_categories = () ->
       method: 'POST'
       data: { 'urls': urls }
       success: (response) ->
+        popular_entries = []
+        non_pop_entries = []
+        pending_message = ""
+        message = ""
+        successed_response = true
+
         for key, value of response.json
-          if value && value.code == 200
-            loader.addClass('hidden')
-            std_msg_success('Success', ["URLs/IPs categories successfully dropped."], reload: true)
+          if value && value.popular == true
+            popular_entries.push(value.url)
+          else if value && value.popular != true
+            non_pop_entries.push(val.url)
+          if value && !(value.popular || value.code == 200)
+            success_response = false
+
+        if success_response
+          if popular_entries.length > 0
+            pending_message = "Pending complaint entries have been created for #{popular_entries.join(', ')}"
+            if non_pop_entries.length > 0
+              message = "All other entries have been submitted directly to WBRS."
           else
-            std_msg_error('Error', ['Unable to drop categories.'], reload: false)
+            message = "Entries have been submitted directly to WBRS."
+
+          std_msg_success(
+            'URLs categories successfully dropped',
+            [pending_message, message],
+            reload: false,
+            complete: (->
+              # clear form inputs
+              $('#categorize_urls').val('')
+              $('#multi_cat_url_cats')[0].selectize.clear()
+              loader.addClass('hidden')
+            )
+          )
+
+        else
+          std_msg_error(
+            "Error dropping categories", '',
+            reload: false,
+            complete: (->
+              loader.addClass('hidden')
+            )
+          )
+
+
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error("Error #{response.responseJSON.message}", '', reload: false)
     )
   else
-    std_msg_error('Error', ['Please check that a URL/IP has been inputted.'], reload: false)
+    std_msg_error('Error', ['Please check that a URL/IP has been entered.'], reload: false)
 

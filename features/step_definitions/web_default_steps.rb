@@ -534,6 +534,10 @@ And(/^I resize the browser to "(.*?)" X "(.*?)"$/) do |x,y|
   page.current_window.resize_to(x, y)
 end
 
+And(/^I expand the browser window$/) do
+  page.current_window.resize_to(1400, 1400)
+end
+
 Then(/^open inspector$/) do
   page.driver.debug
 end

@@ -20,6 +20,7 @@
  *= require webcat_clusters
  *= require webcat_bulk_resolution_dialog
  *= require webcat_csam_reports
+ *= require webcat_categorize_urls_dropdown
  *= require tooltipster.bundle.min
  *= require tooltipster-sideTip-borderless.min
  *= require daterangepicker

@@ -141,38 +141,20 @@ module API
             end
             post 'cat_new_url' do
               std_api_v2 do
-                params["data"].each do |item, prefix|
+                params["data"].each do |_, prefix|
                   if prefix["url"].present?
                     prefix["popular"] = Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
                                                        category_ids_string: prefix["category_ids"].join(','),
                                                        category_names_string: prefix["category_names"].join(','),
                                                        description: '',
+                                                       tags: prefix["tags"],
+                                                       platform: prefix["platform"],
                                                        user: current_user.email,
                                                        bugzilla_rest_session: bugzilla_rest_session)
 
                   end
                 end
               end
-            end
-
-            desc 'categorize multiple urls without complaint'
-            params do
-              requires :urls, type: Array[String], desc: "URLS for categorization"
-              requires :category_names, type: Array[String], desc: "Categories to apply to WBRS"
-              requires :category_ids, type: Array[String], desc: "Categories to apply to complaint entry"
-            end
-            post 'multi_cat_new_url' do
-              std_api_v2 do
-                permitted_params['urls'].each do |prefix|
-                  Complaint.commit_without_complaint(ip_or_uri: prefix,
-                                                     category_ids_string: permitted_params["category_ids"].join(','),
-                                                     category_names_string: permitted_params["category_names"].join(','),
-                                                     description: '',
-                                                     user: current_user.email,
-                                                     bugzilla_rest_session: bugzilla_rest_session)
-                end
-              end
-              render json: 'Success'
             end
 
             post 'fetch' do
@@ -247,16 +229,17 @@ module API
               paper_trail_urls = {}
               urls.each do |key, value|
                 begin
-                  if !Wbrs::Prefix.where(:urls => [value]).empty?
-                    prefix_ids[key] = Wbrs::Prefix.where(:urls => [value]).first.prefix_id
-                    top_url = Wbrs::TopUrl.check_urls([value]).first.is_important
-                    description = "Dropping all current categories for #{value}"
+                  if !Wbrs::Prefix.where(:urls => [value['url']]).empty?
+                    prefix_ids[key] = Wbrs::Prefix.where(:urls => [value['url']]).first.prefix_id
+                    top_url = Wbrs::TopUrl.check_urls([value['url']]).first.is_important
+                    description = "Dropping all current categories for #{value['url']}"
                     if top_url
                       description += " Moving to peer review as attempt of category drop is on an important url"
-                      Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
+                      Complaint.create_complaint_paper_trail(EscalationTicket, value['url'], description, nil, value['tags'], value['platform'], nil, nil, current_user)
+                      response[key] = { url: value['url'], popular: top_url }
                     else
                       response[key] = Wbrs::Prefix.disable(prefix_ids[key], current_user.email)
-                      Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
+                      Complaint.create_complaint_paper_trail(EscalationTicket, value['url'], description, nil, value['tags'], value['platform'], nil, nil, current_user)
                     end
 
                   else
