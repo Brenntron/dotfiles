@@ -487,7 +487,7 @@ $ ->
     selectize_category_inputs()
     populate_cat_select()
 
-window.expand_single_cluster_row = (cluster_id, preloadedData=[])->
+window.expand_single_cluster_row = (cluster_id, preloaded_data=[])->
   tr = $(".expand-row-button-#{cluster_id}").closest('tr')
   row = window.clusters_table.row(tr)
   if row.child.isShown()
@@ -501,8 +501,8 @@ window.expand_single_cluster_row = (cluster_id, preloadedData=[])->
 
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
-    if preloadedData.length != 0
-      entry = preloadedData
+    if preloaded_data.length != 0
+      entry = preloaded_data
       total_shown_entries = 0
       total_entries = $($(tr[0]).find('.entry-count')[0]).text()
 
@@ -538,10 +538,10 @@ window.expand_single_cluster_row = (cluster_id, preloadedData=[])->
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'nested-complaint-data-wrapper'
 
-      #         Expanding to maximum preview rows
+      # Expanding to maximum preview rows
       $('.expand-cluster-entries').click ->
         expand_table_row = this
-        expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
+        expand_cluster_entry_preview(cluster, expand_table_row, max_viewable_entries)
 
       # subrow icons on clusters DT need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
       $('#clusters-index .reputation-icon').tooltipster
@@ -597,7 +597,7 @@ window.expand_single_cluster_row = (cluster_id, preloadedData=[])->
           #         Expanding to maximum preview rows
           $('.expand-cluster-entries').click ->
             expand_table_row = this
-            expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
+            expand_cluster_entry_preview(cluster, expand_table_row, max_viewable_entries)
 
           # subrow icons on clusters DT need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
           $('#clusters-index .reputation-icon').tooltipster
@@ -612,7 +612,7 @@ window.expand_single_cluster_row = (cluster_id, preloadedData=[])->
         )
   return
 
-window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entries) ->
+window.expand_cluster_entry_preview = (cluster, expand_table_row, max_viewable_entries) ->
   $('.cluster-mgt-loader-wrapper').removeClass('hidden')
   entry_rows = []
   table_footer_cell = $(expand_table_row).parent()[0]
