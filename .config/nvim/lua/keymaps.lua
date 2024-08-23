@@ -15,6 +15,7 @@ local sections = {
   p = { desc = "  Pomodoro" },
   r = { desc = "🧪 Tests" },
   s = { desc = "󱙝  Spectre" },
+  t = { desc = "  ToggleTerm"},
   u = { "<cmd>UndotreeToggle", desc = "󰕍  Undo History"},
   v = { desc = "  Vim"}
 }
@@ -44,10 +45,16 @@ maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
 maps.n["<leader>fc"] = { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_word_under_cursor", desc = "Find word under cursor" }
 maps.n["<leader>ff"] = { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
+maps.n["<leader>fs"] = { "<cmd>Telescope session-lens", desc = "Find session" }
 maps.n["<leader>ft"] = { "<cmd>Telescope toggleterm_manager<cr>", desc = "List Terminals" }
 maps.n["<leader>fv"] = { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_visual_selection", desc = "Find visual selection" }
 maps.n["<leader>fw"] = { "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>", desc = "Find words" }
 maps.n["<leader>fz"] = { "<cmd>Telescope zoxide list<cr>", desc = "List directories" }
+
+-- ToggleTerm commands
+maps.n["<leader>t"] = sections.t
+maps.n["<leader>tv"] = { "<cmd>ToggleTerm direction=vertival<cr>", desc = "ToggleTerm vertically" }
+maps.n["<leader>tg"] = { "<cmd>ToggleTerm direction=horizontal<cr>", desc = "ToggleTerminal horizontally" }
 
 -- Navigate buffers
 maps.n["<S-l>"] = { "<cmd>bnext<cr>", desc = "Next buffer" }
@@ -95,19 +102,23 @@ maps.n["<leader>cco"] = { "<cmd>CopilotChatOpen<cr>", desc = "Open Copilot Chat 
 maps.n["<leader>ccr"] = { "<cmd>CopilotChatReset<cr>", desc = "Reset Copilot Chat" }
 maps.n["<leader>ccs"] = { "<cmd>CopilotChatStop<cr>", desc = "Stop Copilot Chat" }
 maps.n["<leader>ccp"] = { desc = "Commands coming from default prompts" }
+maps.n["<leader>ccpf"] = { "<cmd>CopilotChatFixDiagnostic<cr>", desc = "Fix the diagnostic issue in file" }
 maps.n["<leader>ccpc"] = { "<cmd>CopilotChatCommit<cr>", desc = "Write commit message for the change" }
-maps.n["<leader>ccpd"] = { "<cmd>CopilotChatDocs<cr>", desc = "Document the active select" }
-maps.n["<leader>ccpe"] = { "<cmd>CopilotChatExplain<cr>", desc = "Explain the active select" }
-maps.n["<leader>ccpf"] = { "<cmd>CopilotChatFix<cr>", desc = "Fix the active select" }
 maps.n["<leader>ccpo"] = { "<cmd>CopilotChatOptimize<cr>", desc = "Optimize the active select" }
-maps.n["<leader>ccpr"] = { "<cmd>CopilotChatReview<cr>", desc = "Review the selected code" }
-maps.n["<leader>ccpt"] = { "<cmd>CopilotChatTests<cr>", desc = "Generate tests" }
 maps.n["<leader>cd"] = { "<cmd>Copilot disable<cr>", desc = "Disable Copilot" }
 maps.n["<leader>ce"] = { "<cmd>Copilot enable<cr>", desc = "Enable Copilot" }
 maps.n["<leader>ch"] = { "<cmd>Copilot help<cr>", desc = "Display Copilot help page" }
 maps.n["<leader>cp"] = { "<cmd>Copilot panel<cr>", desc = "Display up to 10 Copilot completions for current buffer."}
 maps.n["<leader>csi"] = { "<cmd>Copilot signout<cr>", desc = "Signout of Copilot" }
 maps.n["<leader>cst"] = { "<cmd>Copilot status<cr>", desc = "Display Copilot status" }
+
+maps.v["<leader>gc"] = { desc = "Github Copilot Chat" }
+maps.v["<leader>gce"] = { "<cmd>CopilotChatExplain<cr>", desc = "Explain the selection" }
+maps.v["<leader>gcf"] = { "<cmd>CopilotChatFix<cr>", desc = "Fix the selection" }
+maps.v["<leader>gcr"] = { "<cmd>CopilotChatReview<cr>", desc = "Review the selection" }
+maps.v["<leader>gco"] = { "<cmd>CopilotChatOptimize<cr>", desc = "Optimize the selection" }
+maps.v["<leader>gcd"] = { "<cmd>CopilotChatDocs<cr>", desc = "Generate Documentation for the selection" }
+maps.v["<leader>gct"] = { "<cmd>CopilotChatTests<cr>", desc = "Generate Tests for the selection" }
 
 -- Dad Bod UI
 maps.n["<leader>db"] = sections.db

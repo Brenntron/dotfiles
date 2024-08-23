@@ -69,7 +69,13 @@ function M.config()
   end
 
   require("toggleterm").setup {
-    size = 20,
+    size = function(term)
+      if term.direction == "horizontal" then
+        return 60
+      elseif term.direction == "vertical" then
+        return vim.o.columns * 0.4
+      end
+    end,
     open_mapping = [[<c-\>]],
     hide_numbers = true, -- hide the number column in toggleterm buffers
     shade_filetypes = {},

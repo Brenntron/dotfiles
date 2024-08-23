@@ -29,6 +29,9 @@ function M.config()
       hint = icons.diagnostics.Hinta,
     }
   }
+  local sessions = function()
+    return require('auto-session.lib').current_session_name(true)
+  end
 
   require("lualine").setup {
     options = {
@@ -43,7 +46,7 @@ function M.config()
     sections = {
       lualine_a = { "mode" },
       lualine_b = { "branch", diff, diagnostics },
-      lualine_c = { "filename" },
+      lualine_c = { "filename", sessions },
       lualine_x = {
         "copilot",
         function()
