@@ -411,7 +411,7 @@ window.build_complaints_table = (url) ->
               '</div>' +
               '</td>' +
               '<td class="edit-uri-col non-selectable">' +
-              '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
+              '<input class="nested-table-input complaint-uri-input" onkeyup="update_webcat_index_uri_link(' + full.entry_id + ')" id="edit_uri_input_' +
               full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + input_uri + '"' + input_status + '/>' +
               '</td></tr>' +
               '</tbody>' +
@@ -435,9 +435,23 @@ window.build_complaints_table = (url) ->
               'onclick="whois_dialog(\'' + whois_url + '\')"' +
               'title="Whois Information"></button>'
 
+          #get data of uri/domain text input for links
+          entry = data || full.ip_address
+          domain = full.domain || full.ip_address
+
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.status == 'REOPENED')
+            if full.uri_as_categorized? && full.uri_as_categorized != ''
+              input_uri = full.uri_as_categorized
+            else
+              input_uri = domain
+          else if domain? && domain != ''
+            input_uri = domain
+          else
+            input_uri = entry
+
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address
           lookup_button =
-            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url +
+            '<a class="button-wrapper-link" id="google-webcat-link-' + full.entry_id + '" onclick="copy_webcat_index_url(\'' + full.entry_id + '\')" href="https://www.google.com/search?q=site%3A' + input_uri +
               '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button esc-tooltipped" ' +
               'title="Google Search"></button></a>'
 
@@ -447,7 +461,7 @@ window.build_complaints_table = (url) ->
               '<button id="open-' + full.entry_id + '" class="open-all" disabled></button>'
           else
             visit_button =
-              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id +
+              '<a class="button-wrapper-link" id="open-webcat-link-' + full.entry_id + '" onclick="copy_webcat_index_url(\'' + full.entry_id + '\')" href="http://' + input_uri + '" target="_blank"><button id="open-' + full.entry_id +
                 '" class="open-all esc-tooltipped" title="Open in New Tab"></button></a>'
 
           return history_button + whois_button + lookup_button + visit_button
@@ -937,3 +951,17 @@ window.get_last_sort_order = () ->
   else
     webcat_sort_order = [10, 'desc']
   return webcat_sort_order
+
+window.copy_webcat_index_url = (entry_id) ->
+  url = $("#edit_uri_input_#{entry_id}").val()
+  # trim off preceeding period if at first character
+  if url.charAt(0) == '.'
+    url.slice(0,1)
+    url = url.substring(1)
+  navigator.clipboard.writeText(url)
+
+#update IP/URI links when input field is edited
+window.update_webcat_index_uri_link = (entry_id) ->
+  val = $("#edit_uri_input_#{entry_id}").val()
+  $("#google-webcat-link-#{entry_id}").attr('href', "https://www.google.com/search?q=site%3A#{val}")
+  $("#open-webcat-link-#{entry_id}").attr('href', "http://#{val}")

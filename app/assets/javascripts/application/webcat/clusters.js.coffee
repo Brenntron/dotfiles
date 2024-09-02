@@ -308,13 +308,22 @@ window.collapse_selected_clusters = (tableId) ->
     if $(row).hasClass('shown')
       $(row).find('.expand-row-button-inline').click()
 
+#open clusters link
+window.open_cluster_link = (url) ->
+  copy_url = url.replace('https://www.google.com/search?q=', '')
+  copy_url = copy_url.replace('https://', '')
+  navigator.clipboard.writeText(copy_url)
+  window.open(url, "_blank")
+
 # open selected funtionality
 window.open_selected_clusters = () ->
   selected_rows = $('#clusters-index').DataTable().rows('.selected')
+  #copy url to clipboard if only one row is checked
+  if selected_rows[0].length == 1 then clipboard = true else clipboard = false
   if selected_rows[0].length == 0
     std_msg_error('no rows selected', ['Please select at least one row.'])
   else
-    open_selected_tabs(selected_rows, true)
+    open_selected_tabs(selected_rows, true, clipboard)
 
 
 # open all functionality
@@ -323,7 +332,7 @@ window.open_all_clusters = () ->
   open_selected_tabs(selected_rows, true)
 
 # This is here because of weird namespace problems over at `complaints.js.coffee`
-open_selected_tabs = (selected_rows, toggle) ->
+open_selected_tabs = (selected_rows, toggle, clipboard) ->
   for row, i in selected_rows[0]
     subdomain = ""
     domain = ""
@@ -335,8 +344,12 @@ open_selected_tabs = (selected_rows, toggle) ->
     if selected_rows.data()[i].path
       path = selected_rows.data()[i].path
     if selected_rows.data()[i].domain
+      if clipboard == true
+        navigator.clipboard.writeText(subdomain + domain + path)
       window.open("http://"+ subdomain + domain + path)
     else
+      if clipboard == true
+        navigator.clipboard.writeText(selected_rows.data()[i].ip_address)
       window.open("http://"+selected_rows.data()[i].ip_address)
 
 window.copycat_dialog = () ->
@@ -451,16 +464,7 @@ window.populate_cat_select = ->
   ), 2000
 
 window.copy_domain = (domain, element) ->
-  copyToClipboard(domain)
-  html = "<div class='copied-container'>
-            <div class ='copied-check'></div>
-            <p id='copiedAlert'>Copied to clipboard</p>
-          </div>"
-  $(element).after( html )
-  $('.copied-container').delay(1000).fadeOut(1000);
-  setTimeout (->
-    $(".copied-container").remove()
-  ), 2000
+  navigator.clipboard.writeText(domain)
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
@@ -1155,8 +1159,8 @@ $ ->
           else
             html += "<button type='button' class='whois-btn right-margin'></button>"
 
-          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
-                  <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
+          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick=open_cluster_link('https://www.google.com/search?q=#{domain}')></button>
+                  <button type='button' onclick=open_cluster_link(\"https://#{domain}\") class='open-in-tab-btn  right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
           
           if window.htmlEntitiesDecode(duplicates) != '[]'
             html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"

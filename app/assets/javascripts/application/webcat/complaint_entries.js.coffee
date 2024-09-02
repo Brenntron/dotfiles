@@ -673,18 +673,23 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         { viewable, uri, wbrs_score, ip_address } = data.complaint_entry
         ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
         path = ''
+        copy_path = ''
 
         unless ip_address
           path = "http://#{uri}"
+          copy_path = uri
         else if ipv4_regex.test(ip_address)
           # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
           path = "http://#{ip_address}"
+          copy_path = ip_address
         else
           path = "http://[#{ip_address}]"
+          copy_path = ip_address
 
         if parseInt(wbrs_score) <= -6
           show_message('error', "#{path} could not open due to low WBRS Scores.", false, '#alert_message')
         else if viewable
+          navigator.clipboard.writeText(copy_path)
           window.open(path, '_blank')
         else
           show_message('error', 'Complaint Address is not viewable.', false, '#alert_message')
@@ -706,6 +711,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         else
           path = ip_address
 
+        navigator.clipboard.writeText(path)
         window.open("https://www.google.com/search?q=#{path}", '_blank')
     )
 
