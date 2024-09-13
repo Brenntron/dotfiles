@@ -760,6 +760,15 @@ module API
               { status: 'success', data: formatted_data }
             end
 
+            desc "Get Related History via WBRS."
+            params do
+              requires :lookup, type: String
+            end
+
+            get 'related_history' do
+            Wbrs::ManualWlbl.where({ url: params['lookup'] }).to_json
+            end
+
             desc "Reopen a complaint entry"
             params do
               requires :complaint_entry_id, type: Integer

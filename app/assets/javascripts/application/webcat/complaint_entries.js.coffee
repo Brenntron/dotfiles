@@ -234,7 +234,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   window.set_lookup = (lookup) ->
     get_ce_show_domain_history(lookup)
-#    get_related_history(lookup)
+    get_related_history(lookup)
     render_whois_table(lookup)
     get_ce_show_xbrs_history(lookup)
 
@@ -621,37 +621,61 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         $('#ce_xbrs_history_loader').hide()
     )
 
-#  get_related_history = (domain) ->
-#    # TODO: implement this when the related history endpoint exists.
-#    $('#ce_related_history_loader').hide()
-#    $('#ce_related_history_table').DataTable({
-#      data: {}
-#      ordering: true
-#      info: false
-#      paging: false
-#      searching: false
-#      stateSave: false
-#      columns: [
-#        {
-#          data: 'subdomain'
-#        }
-#        {
-#          data: 'domain'
-#        }
-#        {
-#          data: 'path'
-#        }
-#        {
-#          data: 'categories'
-#        }
-#        {
-#          data: 'user/source'
-#        }
-#        {
-#          data: 'last modified'
-#        }
-#      ]
-#    })
+  format_related_history = (data) ->
+    data.forEach (entry) ->
+      entry['subdomain'] = entry['url'].split('.')[0]
+      entry['domain'] = entry['url'].split('.')[1]
+      entry['path'] = entry['url'].split('/')[1]
+
+    return data
+
+  get_related_history = (lookup) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/related_history'
+      method: 'GET'
+      headers: headers
+      data:
+        lookup: lookup
+      success: (response) ->
+        parsed_response = $.parseJSON(response)
+        console.log 'related history response: ', parsed_response
+
+        formatted_data = format_related_history(parsed_response)
+
+        $('#ce_related_history_loader').hide()
+        $('#ce_related_history_table').DataTable({
+          data: formatted_data
+          ordering: true
+          info: false
+          paging: false
+          searching: false
+          stateSave: false
+          columns: [
+            {
+              data: 'subdomain'
+            }
+            {
+              data: 'domain'
+            }
+            {
+              data: 'path'
+            }
+            {
+              data: 'threat_cats'
+            }
+            {
+              data: 'username'
+            }
+            {
+              data: 'mjtime'
+            }
+          ]
+        })
+      error: (error) ->
+        console.error(error)
+        std_msg_error(error.statusText, [error.responseText.split('\n')])
+        $('#ce_related_history_loader').hide()
+    )
 
   check_for_customer_show_page_webcat = () ->
     submitter_type = $(".submitter-type-wrapper p").text().toLowerCase()
