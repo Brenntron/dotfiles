@@ -22,7 +22,6 @@ source ~/.config/asdf/asdf_setup.zsh
 # obsidianmd-cli completions
 source ~/.config/completions/obsidianmd.zsh
 
-
 # Customer syntax highlighting must come before activating zsh-syntax-highlighting
 source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
 
