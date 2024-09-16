@@ -25,7 +25,7 @@ blocks:
         foreground: p:terminal-blue
         template: '{{.Icon}} '
         properties:
-          debian:  # Pop Os is picked up as debian.
+          debian:   # Pop Os is picked up as debian.
           macos: 
       - type: text
         style: plain
