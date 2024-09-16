@@ -101,7 +101,7 @@ function M.config()
       number = true,
       relativenumber = true,
       side = "left",
-      width = 30,
+      width = 50,
     },
   }
 end
