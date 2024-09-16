@@ -16,7 +16,7 @@ M.server_list = {
   "solargraph",
   "somesass_ls",
   "sqlls",
-  "stylelint_lsp",
+  "stylelint",
   "tsserver",
   "typos_lsp",
   "volar",
