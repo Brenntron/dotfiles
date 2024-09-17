@@ -762,11 +762,12 @@ module API
 
             desc "Get Related History via WBRS."
             params do
-              requires :lookup, type: String
+              requires :id, type: String
             end
 
             get 'related_history' do
-            Wbrs::ManualWlbl.where({ url: params['lookup'] }).to_json
+              complaint_entry = ComplaintEntry.find(params['id'])
+              Wbrs::ManualWlbl.where({ url: complaint_entry.domain }).to_json
             end
 
             desc "Reopen a complaint entry"

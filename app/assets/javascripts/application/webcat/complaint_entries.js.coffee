@@ -234,7 +234,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   window.set_lookup = (lookup) ->
     get_ce_show_domain_history(lookup)
-    get_related_history(lookup)
     render_whois_table(lookup)
     get_ce_show_xbrs_history(lookup)
 
@@ -623,19 +622,26 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   format_related_history = (data) ->
     data.forEach (entry) ->
-      entry['subdomain'] = entry['url'].split('.')[0]
-      entry['domain'] = entry['url'].split('.')[1]
-      entry['path'] = entry['url'].split('/')[1]
+      split_domain = entry['url'].split('.')
+      path = if split_domain.length > 2
+               split_domain[2].split('/')[1]
+             else
+               ''
+      split_domain = split_domain.slice(0, 3)
+
+      entry['subdomain'] = split_domain[0]
+      entry['domain'] = split_domain[1] + split_domain[2]
+      entry['path'] = path
 
     return data
 
-  get_related_history = (lookup) ->
+  get_related_history = () ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/related_history'
       method: 'GET'
       headers: headers
       data:
-        lookup: lookup
+        id: entry_id
       success: (response) ->
         parsed_response = $.parseJSON(response)
         console.log 'related history response: ', parsed_response
@@ -891,6 +897,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
     get_current_categories(entry_type)
     get_ce_show_entry_history()
+    get_related_history()
 
     $(document).on 'change', '.ce-ip-uri-input', ->
       text = $(this).val()
