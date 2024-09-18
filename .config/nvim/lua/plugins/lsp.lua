@@ -3,8 +3,9 @@ local M = {
   lazy = false,
   event = { "BufReadPre" },
   dependencies = {
-    { "folke/neodev.nvim" },
-    { "SmiteshP/nvim-navic" },
+    "folke/neodev.nvim",
+    "SmiteshP/nvim-navic",
+    "SmiteshP/nvim-navbuddy",
   },
 }
 
@@ -29,10 +30,10 @@ function M.config()
 
   local function on_attach(client, bufnr)
     if client.server_capabilities.documentSymbolProvider then
-      local status_ok, navic = pcall(require, "nvim-navic")
+      local status_ok, navbuddy = pcall(require, "nvim-navbuddy")
 
       if status_ok then
-        return navic.attach(client, bufnr)
+        return navbuddy.attach(client, bufnr)
       end
     end
   end
