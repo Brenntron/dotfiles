@@ -1,8 +1,7 @@
 _ASDF_PREFIX="$(brew --prefix asdf)"
-export ASDF_DIR="${_ASDF_PREFIX}/libexec"
 ASDF_COMPLETIONS="${_ASDF_PREFIX}/share/zsh/site-functions"
 
-source "$ASDF_DIR/asdf.sh"
+source "${_ASDF_PREFIX}/libexec/asdf.sh"
 
 unset _ASDF_PREFIX
 
