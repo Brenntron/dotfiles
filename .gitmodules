@@ -1,9 +1,0 @@
-[submodule "zsh-syntax-highlighting"]
-	path = zsh-syntax-highlighting
-	url = git@github.com:catppuccin/zsh-syntax-highlighting.git
-[submodule "/home/brenntron/.config/catppuccin/zsh-syntax-highlighting"]
-	path = /home/brenntron/.config/catppuccin/zsh-syntax-highlighting
-	url = git@github.com:catppuccin/zsh-syntax-highlighting.git
-[submodule ".config/catppuccin/fzf"]
-	path = .config/catppuccin/fzf
-	url = git@github.com:catppuccin/fzf.git
