@@ -623,14 +623,21 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   format_related_history = (data) ->
     data.forEach (entry) ->
       split_domain = entry['url'].split('.')
-      path = if split_domain.length > 2
-               split_domain[2].split('/')[1]
+      split_path = entry['url'].split('/')
+
+      path = if split_path.length > 1
+               split_path[1]
              else
                ''
-      split_domain = split_domain.slice(0, 3)
 
-      entry['subdomain'] = split_domain[0]
-      entry['domain'] = split_domain[1] + split_domain[2]
+      entry['subdomain'] = if split_domain.length > 2
+                             split_domain[0]
+                           else
+                             ''
+      entry['domain'] = if split_domain.length > 2
+                          split_domain.slice(1).join('.')
+                        else
+                          split_domain.join('.')
       entry['path'] = path
 
     return data
@@ -644,7 +651,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         id: entry_id
       success: (response) ->
         parsed_response = $.parseJSON(response)
-        console.log 'related history response: ', parsed_response
 
         formatted_data = format_related_history(parsed_response)
 
@@ -673,7 +679,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
               data: 'username'
             }
             {
-              data: 'mjtime'
+              data: 'mtime'
             }
           ]
         })
