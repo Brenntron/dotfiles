@@ -23,8 +23,8 @@ source ~/.config/asdf/asdf_setup.zsh
 source ~/.config/completions/obsidianmd.zsh
 
 # Customer syntax highlighting must come before activating zsh-syntax-highlighting
-source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
-
+# source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
+source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-zsh-syntax-highlighting.zsh
 source $(brew --prefix)/share/antigen/antigen.zsh
 
 antigen use oh-my-zsh
@@ -63,7 +63,10 @@ fi
 antigen apply
 
 # oh-my-posh theme
-eval "$(oh-my-posh init zsh --config ~/.config/tokyonight/oh-my-posh/tokyonight_moon.omp.yaml)"
+# tokyonight_moon
+# eval "$(oh-my-posh init zsh --config ~/.config/tokyonight/oh-my-posh/tokyonight_moon.omp.yaml)"
+# Catppuccin Macchiato
+eval "$(oh-my-posh init zsh --config ~/.config/catppuccin/oh-my-posh/catppuccin_macchiato.omp.yaml)"
 
 eval $(thefuck --alias)
 
@@ -206,3 +209,8 @@ source $(brew --prefix autoenv)/activate.sh
 
 # kitty completeions
 __kitty_complete
+
+# use bat(cat) as a colorizing pager for man
+export MANPAGER="sh -c 'col -bx | cat -1 man -p'"
+# Uncomment below if you experience formatting problems
+# export MANROFFOPT="-c"

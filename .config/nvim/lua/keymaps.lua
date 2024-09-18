@@ -44,6 +44,8 @@ maps.n["<leader>f"] = sections.f
 maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
 maps.n["<leader>fc"] = { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_word_under_cursor", desc = "Find word under cursor" }
 maps.n["<leader>ff"] = { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
+maps.n["<leader>fh"] = { "<cmd>toggle_telescope", desc = "Open harpoon window" }
+maps.n["<leader>fn"] = { "<cmd>Navbuddy", desc = "Open Navbuddy" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
 maps.n["<leader>fs"] = { "<cmd>Telescope session-lens", desc = "Find session" }
 maps.n["<leader>ft"] = { "<cmd>Telescope toggleterm_manager<cr>", desc = "List Terminals" }
