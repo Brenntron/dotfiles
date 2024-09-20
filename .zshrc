@@ -5,7 +5,6 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
-source ~/code/tools/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linuxbrew.zsh
@@ -81,9 +80,7 @@ fi
 # start zoxide before zsh-autcomplete
 eval "$(zoxide init zsh)"
 
-# enable autocomplete function
-autoload -U compinit
-compinit
+source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -131,6 +128,8 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
+# Colorls setup
+
 source $(dirname $(gem which colorls))/tab_complete.sh
 
 alias lc="colorls --dark"
@@ -141,6 +140,9 @@ alias lt="colorls -lt --dark"
 alias lS="colorls -lS --dark"
 alias lr="colorls --tree=5 --dark"
 alias lx="colorls -lAX --dark"
+
+# Tre setup
+tre() { command tre "$@" -e && source "/tmp/tre_aliases_$USER" 2>/dev/null; }
 
 alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
 
