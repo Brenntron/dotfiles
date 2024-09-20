@@ -6,5 +6,7 @@ export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 
 alias cat="batcat"
-alias yadev='yad'
+alias yadev='yarn add -D'
 unalias yad
+
+skip_global_compinit=1
