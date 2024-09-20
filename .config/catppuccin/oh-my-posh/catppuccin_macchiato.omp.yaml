@@ -22,7 +22,7 @@ blocks:
       macos: 
   - foreground: p:blue
     style: plain
-    template: "{{ .UserName }}@{{ .HostName }} "
+    template: " {{ .UserName }}@{{ .HostName }} "
     type: session
   - foreground: p:pink
     properties:
@@ -83,3 +83,4 @@ blocks:
   type: prompt
 final_space: true
 version: 2
+auto_upgrade: true
