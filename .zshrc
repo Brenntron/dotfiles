@@ -30,6 +30,7 @@ antigen use oh-my-zsh
 
 antigen bundle alias-finder
 antigen bundle aliases
+antigen bundle atuinsh/atuin@main
 antigen bundle autoenv
 antigen bundle bundler
 antigen bundle command-not-found
@@ -50,8 +51,10 @@ antigen bundle ruby
 antigen bundle ssh-agent
 antigen bundle yarn
 antigen bundle redxtech/zsh-kitty
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle zsh-users/zsh-completions
+# zsh-syntax-highlighting must be the last plugin
 antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle atuinsh/atuin@main
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_zsh_plugins.zsh
