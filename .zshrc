@@ -80,7 +80,7 @@ else
   source ~/.config/osx/osx.zsh
 fi
 
-# start zoxide before zsh-autcomplete
+# start zoxide before zsh-autocomplete
 eval "$(zoxide init zsh)"
 
 source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
