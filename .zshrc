@@ -18,6 +18,9 @@ source ~/.fzf.zsh
 # asdf setup
 source ~/.config/asdf/asdf_setup.zsh
 
+# zsh autocomplete setup
+source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+
 # obsidianmd-cli completions
 source ~/.config/completions/obsidianmd.zsh
 
@@ -52,7 +55,6 @@ antigen bundle ssh-agent
 antigen bundle yarn
 antigen bundle redxtech/zsh-kitty
 antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zsh-users/zsh-completions
 # zsh-syntax-highlighting must be the last plugin
 antigen bundle zsh-users/zsh-syntax-highlighting
 
