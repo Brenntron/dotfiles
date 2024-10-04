@@ -1,6 +1,6 @@
 local M = {
   "nvimtools/none-ls.nvim",
-  event = "BufReadPre",
+  event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     {
       "nvim-lua/plenary.nvim",
@@ -41,7 +41,6 @@ function M.config()
       },
       diagnostics.erb_lint,
       diagnostics.haml_lint,
-      diagnostics.rubocop,
       diagnostics.spectral,
       diagnostics.stylelint,
       diagnostics.zsh,
@@ -52,7 +51,6 @@ function M.config()
         extra_filetypes = { "toml" },
         extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
       },
-      formatting.rubocop,
       formatting.sqlfluff.with({
         extra_args = { "--dialect", "mysql" }
       }),
