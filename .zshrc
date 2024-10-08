@@ -18,15 +18,14 @@ source ~/.fzf.zsh
 # asdf setup
 source ~/.config/asdf/asdf_setup.zsh
 
-# zsh autocomplete setup
-source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
 # obsidianmd-cli completions
 source ~/.config/completions/obsidianmd.zsh
 
-# Customer syntax highlighting must come before activating zsh-syntax-highlighting
+# Custom syntax highlighting must come before activating zsh-syntax-highlighting
 # source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
 source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-zsh-syntax-highlighting.zsh
+
+# Antigen plugins
 source $(brew --prefix)/share/antigen/antigen.zsh
 
 antigen use oh-my-zsh
@@ -37,6 +36,7 @@ antigen bundle atuinsh/atuin@main
 antigen bundle autoenv
 antigen bundle bundler
 antigen bundle command-not-found
+antigen bundle compleat
 antigen bundle containers
 antigen bundle copybuffer
 antigen bundle copyfile
@@ -54,9 +54,11 @@ antigen bundle ruby
 antigen bundle ssh-agent
 antigen bundle yarn
 antigen bundle redxtech/zsh-kitty
+
+# Load order matters; must be last
+antigen bundle zdharma-continuum/fast-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
-# zsh-syntax-highlighting must be the last plugin
-antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle marlonrichert/zsh-autocomplete@main
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_zsh_plugins.zsh
@@ -82,10 +84,8 @@ else
   source ~/.config/osx/osx.zsh
 fi
 
-# start zoxide before zsh-autocomplete
-eval "$(zoxide init zsh)"
-
-source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# enable autocomplete function
+source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -221,3 +221,6 @@ __kitty_complete
 export MANPAGER="sh -c 'col -bx | cat -1 man -p'"
 # Uncomment below if you experience formatting problems
 # export MANROFFOPT="-c"
+
+# Zoxide setup
+eval "$(zoxide init zsh)"
