@@ -222,5 +222,8 @@ export MANPAGER="sh -c 'col -bx | cat -1 man -p'"
 # Uncomment below if you experience formatting problems
 # export MANROFFOPT="-c"
 
+# Ripgrep config
+export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/.ripgreprc"
+
 # Zoxide setup
 eval "$(zoxide init zsh)"
