@@ -227,3 +227,6 @@ export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/.ripgreprc"
 
 # Zoxide setup
 eval "$(zoxide init zsh)"
+
+# Enable vi mode
+bindkey -v
