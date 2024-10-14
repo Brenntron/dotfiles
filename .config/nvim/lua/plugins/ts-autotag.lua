@@ -1,5 +1,6 @@
 local M = {
   "windwp/nvim-ts-autotag",
+  lazy = false,
 }
 
 function M.config()
