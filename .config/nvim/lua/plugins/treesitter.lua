@@ -27,7 +27,6 @@ function M.config()
   vim.g.skip_ts_context_commenstring_module = true
 
   require("nvim-treesitter.configs").setup {
-    autotag = { enable = true },
     ensure_installed = {
       "bash",
       "c",
