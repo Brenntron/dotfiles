@@ -2,22 +2,22 @@ local utils = require "utils.keymaps-helpers"
 local maps = utils.empty_map_table()
 
 local sections = {
-  b = { desc = "﬘ Buffer"},
-  c = { desc = "  Copilot"},
+  b = { desc = "﬘ Buffer" },
+  c = { desc = "  Copilot" },
   d = { desc = "  Dadbod UI" },
   e = { desc = "  DAP" },
   f = { desc = "  Find" },
   g = { desc = "󰊢  Git" },
   l = { desc = "  LSP" },
-  m = { desc = "🏗  Mason"},
+  m = { desc = "🏗  Mason" },
   n = { desc = "󰟢  Null-Ls" },
   o = { desc = "  Obsidian" },
   p = { desc = "  Pomodoro" },
   r = { desc = "🧪 Tests" },
   s = { desc = "󱙝  Spectre" },
-  t = { desc = "  ToggleTerm"},
-  u = { "<cmd>UndotreeToggle", desc = "󰕍  Undo History"},
-  v = { desc = "  Vim"}
+  t = { desc = "  ToggleTerm" },
+  u = { "<cmd>UndotreeToggle", desc = "󰕍  Undo History" },
+  v = { desc = "  Vim" },
 }
 
 -- Normal --
@@ -37,20 +37,25 @@ maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 
 -- Comment
 maps.n["<leader>/"] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", desc = "Toggle comment line" }
-maps.v["<leader>/"] = { "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", desc = "Toggle comment line" }
+maps.v["<leader>/"] =
+  { "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", desc = "Toggle comment line" }
 
 -- Find commands
 maps.n["<leader>f"] = sections.f
 maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
-maps.n["<leader>fc"] = { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_word_under_cursor", desc = "Find word under cursor" }
-maps.n["<leader>ff"] = { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
+maps.n["<leader>fc"] =
+  { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_word_under_cursor", desc = "Find word under cursor" }
+maps.n["<leader>ff"] =
+  { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
 maps.n["<leader>fh"] = { "<cmd>toggle_telescope<cr>", desc = "Open harpoon window" }
 maps.n["<leader>fn"] = { "<cmd>Navbuddy<CR>", desc = "Open Navbuddy" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
 maps.n["<leader>fs"] = { "<cmd>Telescope session-lens", desc = "Find session" }
 maps.n["<leader>ft"] = { "<cmd>Telescope toggleterm_manager<cr>", desc = "List Terminals" }
-maps.n["<leader>fv"] = { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_visual_selection", desc = "Find visual selection" }
-maps.n["<leader>fw"] = { "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>", desc = "Find words" }
+maps.n["<leader>fv"] =
+  { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_visual_selection", desc = "Find visual selection" }
+maps.n["<leader>fw"] =
+  { "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>", desc = "Find words" }
 maps.n["<leader>fz"] = { "<cmd>Telescope zoxide list<cr>", desc = "List directories" }
 
 -- ToggleTerm commands
@@ -78,12 +83,22 @@ maps.n["<leader>wq"] = { "<cmd>wq!<cr>", desc = "Write to file and quit" }
 -- Miscellaneous Vim commands
 maps.n["<leader>v"] = sections.v
 maps.n["<leader>va"] = { "<cmd>Alpha<cr>", desc = "Dashboard" }
-maps.n["<leader>vl"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
+maps.n["<leader>vl"] = {
+  function()
+    require("trouble").toggle "loclist"
+  end,
+  desc = "LocationList",
+}
 maps.n["<leader>vm"] = { "<cmd>messages<cr>", desc = "Open messages" }
 maps.n["<leader>vn"] = { "<cmd>Telescope notify<cr>", desc = "Open notifications history" }
 maps.n["<leader>vp"] = { "<cmd>Telescope lazy<cr>", desc = "Plugin info" }
-maps.n["<leader>vq"] = { function() require("trouble").toggle("quickfix") end, desc = "QuickFix" }
-maps.n["<leader>vw"] = { "<cmd>Twilight<cr>", desc = "Toggle Twilight"}
+maps.n["<leader>vq"] = {
+  function()
+    require("trouble").toggle "quickfix"
+  end,
+  desc = "QuickFix",
+}
+maps.n["<leader>vw"] = { "<cmd>Twilight<cr>", desc = "Toggle Twilight" }
 maps.n["<leader>vz"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
 
 -- Visual --
@@ -99,14 +114,22 @@ maps.v[">"] = { ">gv", desc = "Indent to the right" }
 maps.n["<leader>c"] = sections.c
 maps.n["<leader>cc"] = { desc = "Copilot Chat" }
 maps.n["<leader>ccc"] = { "<cmd>CopilotChatClose<cr>", desc = "Close Copilot Chat Window" }
-maps.n["<leader>ccd"] = { "<cmd>CopilotChatDebugInfo<cr>", desc = "Show debug information" }
+maps.n["<leader>cch"] = {
+  function()
+    local actions = require "CopilotChat.actions"
+    require("CopilotChat.integrations.telescope").pick(actions.help_actions())
+  end,
+  desc = "CopilotChat - Help actions",
+}
+maps.n["<leader>ccp"] = {
+  function()
+    local actions = require "CopilotChat.actions"
+    require("CopilotChat.integrations.telescope").pick(actions.prompt_actions())
+  end,
+  desc = "CopilotChat - Prompt actions",
+}
 maps.n["<leader>cco"] = { "<cmd>CopilotChatOpen<cr>", desc = "Open Copilot Chat Window"}
-maps.n["<leader>ccr"] = { "<cmd>CopilotChatReset<cr>", desc = "Reset Copilot Chat" }
-maps.n["<leader>ccs"] = { "<cmd>CopilotChatStop<cr>", desc = "Stop Copilot Chat" }
-maps.n["<leader>ccp"] = { desc = "Commands coming from default prompts" }
-maps.n["<leader>ccpf"] = { "<cmd>CopilotChatFixDiagnostic<cr>", desc = "Fix the diagnostic issue in file" }
-maps.n["<leader>ccpc"] = { "<cmd>CopilotChatCommit<cr>", desc = "Write commit message for the change" }
-maps.n["<leader>ccpo"] = { "<cmd>CopilotChatOptimize<cr>", desc = "Optimize the active select" }
+maps.n["<leader>cct"] = { "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat Window"}
 maps.n["<leader>cd"] = { "<cmd>Copilot disable<cr>", desc = "Disable Copilot" }
 maps.n["<leader>ce"] = { "<cmd>Copilot enable<cr>", desc = "Enable Copilot" }
 maps.n["<leader>ch"] = { "<cmd>Copilot help<cr>", desc = "Display Copilot help page" }
@@ -114,13 +137,14 @@ maps.n["<leader>cp"] = { "<cmd>Copilot panel<cr>", desc = "Display up to 10 Copi
 maps.n["<leader>csi"] = { "<cmd>Copilot signout<cr>", desc = "Signout of Copilot" }
 maps.n["<leader>cst"] = { "<cmd>Copilot status<cr>", desc = "Display Copilot status" }
 
-maps.v["<leader>gc"] = { desc = "Github Copilot Chat" }
-maps.v["<leader>gce"] = { "<cmd>CopilotChatExplain<cr>", desc = "Explain the selection" }
-maps.v["<leader>gcf"] = { "<cmd>CopilotChatFix<cr>", desc = "Fix the selection" }
-maps.v["<leader>gcr"] = { "<cmd>CopilotChatReview<cr>", desc = "Review the selection" }
-maps.v["<leader>gco"] = { "<cmd>CopilotChatOptimize<cr>", desc = "Optimize the selection" }
-maps.v["<leader>gcd"] = { "<cmd>CopilotChatDocs<cr>", desc = "Generate Documentation for the selection" }
-maps.v["<leader>gct"] = { "<cmd>CopilotChatTests<cr>", desc = "Generate Tests for the selection" }
+-- Copilot Chat visual selection
+maps.v["<leader>cc"] = { desc = "Copilot Chat" }
+maps.v["<leader>cce"] = { "<cmd>CopilotChatExplain<cr>", desc = "Explain the selection" }
+maps.v["<leader>ccf"] = { "<cmd>CopilotChatFix<cr>", desc = "Fix the selection" }
+maps.v["<leader>ccr"] = { "<cmd>CopilotChatReview<cr>", desc = "Review the selection" }
+maps.v["<leader>cco"] = { "<cmd>CopilotChatOptimize<cr>", desc = "Optimize the selection" }
+maps.v["<leader>ccd"] = { "<cmd>CopilotChatDocs<cr>", desc = "Generate Documentation for the selection" }
+maps.v["<leader>cct"] = { "<cmd>CopilotChatTests<cr>", desc = "Generate Tests for the selection" }
 
 -- Dad Bod UI
 maps.n["<leader>db"] = sections.db
@@ -131,7 +155,7 @@ maps.n["<leader>dba"] = { "<cmd>DBUIAddConnection<cr>", desc = "Add Dad Bod UI c
 maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer" }
 
 -- DAP
-maps.n["<leader>dap"] = { desc = 'DAP' }
+maps.n["<leader>dap"] = { desc = "DAP" }
 maps.n["<leader>dapb"] = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", desc = "Toggle breakpoint" }
 maps.n["<leader>dapc"] = { "<cmd>lua require'dap'.continue()<cr>", desc = "Continue" }
 maps.n["<leader>dapcm"] = { "<cmd>Telescope dap commands<cr>", desc = "Commands" }
@@ -162,9 +186,14 @@ maps.n["[g"] = { "<cmd>lua require('gitsigns').prev_hunk()<cr>", desc = "Previou
 
 -- Lsp
 maps.n["<leader>l"] = sections.l
-maps.n["<leader>ld"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
-maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info"}
-maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log"}
+maps.n["<leader>ld"] = {
+  function()
+    require("trouble").toggle "document_diagnostics"
+  end,
+  desc = "Diagnostics",
+}
+maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info" }
+maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log" }
 maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms = 5000 }<cr>", desc = "Format file" }
 maps.n["<leader>lg"] = { desc = "GoTo" }
 maps.n["<leader>lgD"] = { "<cmd>lua vim.lsp.buf.declaration()<CR>", desc = "GoTo declaration" }
@@ -177,10 +206,25 @@ maps.n["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code 
 maps.n["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", desc = "Next diagnostic" }
 maps.n["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", desc = "Previous diagnostic" }
 maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" }
-maps.n["<leader>lw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
+maps.n["<leader>lw"] = {
+  function()
+    require("trouble").toggle "workspace_diagnostics"
+  end,
+  desc = "Workspace Diagnostics",
+}
 maps.n["<leader>lsh"] = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", desc = "Signature help" }
-maps.n["<leader>lsr"] = { function() require("trouble").toggle("lsp_references") end, desc = "Show References" }
-maps.n["<leader>lsd"] = { function() require("trouble").toggle("lsp_definitions") end, desc = "Show Definitions" }
+maps.n["<leader>lsr"] = {
+  function()
+    require("trouble").toggle "lsp_references"
+  end,
+  desc = "Show References",
+}
+maps.n["<leader>lsd"] = {
+  function()
+    require("trouble").toggle "lsp_definitions"
+  end,
+  desc = "Show Definitions",
+}
 maps.n["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<CR>", desc = "Setloclist" }
 
 -- Mason
@@ -191,7 +235,7 @@ maps.n["<leader>ml"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
 -- None-Ls
 maps.n["<leader>n"] = sections.n
 maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
-maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log"}
+maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log" }
 
 -- Obsidian.md
 maps.n["<leader>o"] = sections.o
