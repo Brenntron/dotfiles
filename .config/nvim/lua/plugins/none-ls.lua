@@ -41,7 +41,6 @@ function M.config()
       },
       diagnostics.erb_lint,
       diagnostics.haml_lint,
-      diagnostics.spectral,
       diagnostics.stylelint,
       diagnostics.zsh,
       -- formatters
