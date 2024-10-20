@@ -52,7 +52,6 @@ antigen bundle rails
 antigen bundle rsync
 antigen bundle ruby
 antigen bundle ssh-agent
-antigen bundle yarn
 antigen bundle redxtech/zsh-kitty
 
 # Load order matters; must be last
@@ -125,7 +124,6 @@ export PATH="$(brew --prefix imagemagick@6)/bin:$PATH"
 export PATH="$(brew --prefix openssl@3)/bin:$PATH"
 export PATH="$(brew --prefix make)/libexec/gnubin:$PATH"
 
-export PATH="$PATH::$(yarn global bin)"
 export PATH="${HOME}/.local/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 
