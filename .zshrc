@@ -53,6 +53,7 @@ antigen bundle rsync
 antigen bundle ruby
 antigen bundle ssh-agent
 antigen bundle redxtech/zsh-kitty
+antigen bundle yarn
 
 # Load order matters; must be last
 antigen bundle zdharma-continuum/fast-syntax-highlighting
