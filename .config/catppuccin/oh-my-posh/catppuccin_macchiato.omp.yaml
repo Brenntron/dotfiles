@@ -1,86 +1,104 @@
-"$schema": https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
+
 palette:
-  os: "#ACB0BE"
-  closer: p:os
-  text: "#cad3f5"
   blue: "#8AADF4"
+  closer: p:os
   green: "#a6da95"
   lavender: "#B7BDF8"
   mauve: "#c6a0f6"
+  os: "#ACB0BE"
   pink: "#F5BDE6"
   red: "#ed8796"
+  text: "#cad3f5"
   yellow: "#eed49f"
 blocks:
-- alignment: left
+- type: prompt
+  alignment: left
   segments:
-  - foreground: p:os
-    style: plain
-    template: "{{.Icon}} "
-    type: os
-    properties:
-      debian:   # Pop Os is picked up as debian.
+  - properties:
+      cache_duration: none
+      debian: 
       macos: 
-  - foreground: p:blue
+    template: "{{.Icon}} "
+    foreground: p:os
+    type: os
     style: plain
+  - properties:
+      cache_duration: none
     template: " {{ .UserName }}@{{ .HostName }} "
+    foreground: p:blue
     type: session
-  - foreground: p:pink
-    properties:
-      folder_icon: "...."
+    style: plain
+  - properties:
+      cache_duration: none
+      folder_icon: ....
       home_icon: "~"
       style: agnoster_short
-    style: plain
     template: "{{ .Path }} "
+    foreground: p:pink
     type: path
-  - foreground: p:lavender
-    properties:
-      branch_icon: " "
-      cherry_pick_icon: " "
-      commit_icon: " "
+    style: plain
+  - properties:
+      branch_icon: "\ue725 "
+      cache_duration: none
+      cherry_pick_icon: "\ue29b "
+      commit_icon: "\uf417 "
       fetch_status: false
       fetch_upstream_icon: false
-      merge_icon: " "
-      no_commits_icon: " "
-      rebase_icon: " "
-      revert_icon: " "
-      tag_icon: " "
+      merge_icon: "\ue727 "
+      no_commits_icon: "\uf0c3 "
+      rebase_icon: "\ue728 "
+      revert_icon: "\uf0e2 "
+      tag_icon: "\uf412 "
     template: "{{ .HEAD }} "
-    style: plain
+    foreground: p:lavender
     type: git
-  - style: plain
+    style: plain
+  - properties:
+      cache_duration: none
+    template: 
     foreground: p:closer
-    template: ""
     type: text
-  type: prompt
-- alignment: right
+    style: plain
+- type: prompt
+  alignment: right
   overflow: hide
   segments:
-    - type: node
-      style: plain
-      foreground: p:green
-      template: '  {{ .Full }} '
-    - type: python
-      style: plain
-      foreground: p:yellow
-      template:   {{ .Full }}
-    - type: ruby
-      style: plain
-      foreground: p:red
-      template:   {{ .Full}}
-    - type: command
-      style: plain
-      foreground: p:mauve
-      properties:
-        command: git log --pretty=format:%cr -1 || date +%H:%M:%S
-        shell: zsh
-    - type: ipify
-      style: plain
-      foreground: p:text
-      template: '{{ .IP }}'
-      properties:
-        cache_timeout: 5
-        http_timeout: 1000
-  type: prompt
-final_space: true
-version: 2
+  - properties:
+      cache_duration: none
+    template: "\ue718  {{ .Full }} "
+    foreground: p:green
+    type: node
+    style: plain
+  - properties:
+      cache_duration: none
+    template:   {{ .Full }}
+    foreground: p:yellow
+    type: python
+    style: plain
+  - properties:
+      cache_duration: none
+    template:   {{ .Full}}
+    foreground: p:red
+    type: ruby
+    style: plain
+  - properties:
+      cache_duration: none
+      command: git log --pretty=format:%cr -1 || date +%H:%M:%S
+      shell: zsh
+    foreground: p:mauve
+    type: command
+    style: plain
+  - properties:
+      cache_duration: none
+      http_timeout: 1000
+    cache:
+      duration: 5m0s
+      strategy: folder
+    template: "{{ .IP }}"
+    foreground: p:text
+    type: ipify
+    style: plain
+version: 3
 auto_upgrade: true
+final_space: true

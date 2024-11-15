@@ -17,7 +17,6 @@ M.server_list = {
   "sqlls",
   "ts_ls",
   "typos_lsp",
-  "volar",
   "yamlls",
 }
 
