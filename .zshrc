@@ -42,6 +42,7 @@ antigen bundle copybuffer
 antigen bundle copyfile
 antigen bundle copypath
 antigen bundle cp
+antigen bundle kazhala/dotbare
 antigen bundle fzf
 antigen bundle gh
 antigen bundle git
@@ -202,8 +203,12 @@ alias CC='gcc'
 # Podman Compose aliases
 alias pc='podman compose'
 
+# dotbare/dot files config
+export DOTBARE_DIR="$HOME/.cfg"
+export DOTBARE_TREE="$HOME"
+
 # Set alias for dotfiles config
-alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+alias config=dotbare
 
 # enable alias-finder
 zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
