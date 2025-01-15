@@ -2,10 +2,7 @@ local M = {
   "zbirenbaum/copilot.lua",
   cmd = 'Copilot',
   event = {"InsertEnter", "LspAttach" },
-}
-
-function M.config()
-  require('copilot').setup {
+  opts = {
     copilot_node_command = vim.fn.expand("$HOME") .. "/.asdf/shims/node",
     filetypes = {
       sh = function ()
@@ -17,7 +14,7 @@ function M.config()
     },
     suggestion = { enabled = false },
     panel = { enabled = false },
-  }
-end
+  },
+}
 
 return M

@@ -1,10 +1,9 @@
 local M = {
   "simrat39/symbols-outline.nvim",
-  lazy = true
+  lazy = true,
+  config = function()
+    require("symbols-outline").init()
+  end,
 }
-
-function M.config()
-  require("symbols-outline").init()
-end
 
 return M

@@ -1,10 +1,7 @@
 local M = {
   "rmagatti/goto-preview",
-  lazy = false
-}
-
-function M.config()
-  require("goto-preview").setup {
+  lazy = false,
+  opts = {
     width = 120, -- Width of the floating window
     height = 25, -- Height of the floating window
     default_mappings = false, -- Bind default mappings
@@ -16,7 +13,7 @@ function M.config()
     -- vim.cmd("nnoremap gpd <cmd>lua require('goto-preview').goto_preview_definition()<CR>")
     -- vim.cmd("nnoremap gpi <cmd>lua require('goto-preview').goto_preview_implementation()<CR>")
     -- vim.cmd("nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>")
-  }
-end
+  },
+}
 
 return M

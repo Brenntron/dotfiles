@@ -1,13 +1,10 @@
 local M = {
   "rcarriga/nvim-notify",
-  lazy = false
-}
-
-function M.config()
-  require("notify").setup({
+  lazy = false,
+  opts = {
     render = "minimal",
     stages = "slide",
-  })
-end
+  },
+}
 
 return M

@@ -1,6 +1,3 @@
-local M = { "stevearc/dressing.nvim", event = "VeryLazy" }
-
-function M.config()
-end
+local M = { "stevearc/dressing.nvim", event = "VeryLazy", opts = {} }
 
 return M

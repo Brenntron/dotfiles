@@ -6,23 +6,22 @@ local M = {
     { "zbirenbaum/copilot.lua" },
     { "nvim-lua/plenary.nvim" },
   },
-}
+  config = function()
+    require("CopilotChat.integrations.cmp").setup()
 
-function M.config()
-  require("CopilotChat.integrations.cmp").setup()
-
-  require("CopilotChat").setup {
-    debug = true,
-    mappings = {
-      complete = {
-        insert = '',
+    require("CopilotChat").setup {
+      debug = true,
+      mappings = {
+        complete = {
+          insert = '',
+        },
       },
-    },
-    window = {
-      layout = 'float',
-      title = 'Copilot Chat'
+      window = {
+        layout = 'float',
+        title = 'Copilot Chat'
+      }
     }
-  }
-end
+  end
+}
 
 return M

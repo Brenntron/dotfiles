@@ -1,10 +1,7 @@
 local M = {
   "prichrd/netrw.nvim",
   event = "VeryLazy",
-}
-
-function M.config()
-  require("netrw").setup {
+  opts = {
     icons = {
       symlink = " ",
       directory = " ",
@@ -12,7 +9,7 @@ function M.config()
     },
     use_devicons = true,
     mappings = {},
-  }
-end
+  },
+}
 
 return M

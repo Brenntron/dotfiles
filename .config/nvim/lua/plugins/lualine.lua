@@ -6,80 +6,79 @@ local M = {
     'nvim-tree/nvim-web-devicons',
   },
   lazy = false,
-}
-
-function M.config()
-  local icons = require "utils.icons"
-  local diff = {
-    "diff",
-    colored = true,
-    symbols = {
-      added = icons.git.LineAdded,
-      modified = icons.git.LineModified,
-      removed = icons.git.LineRemoved
-    }, -- Changes the symbols used by the diff.
-  }
-  local diagnostics = {
-    "diagnostics",
-    sources = { "nvim_diagnostic" },
-    symbols = {
-      error = icons.diagnostics.Error,
-      warn = icons.diagnostics.Warning,
-      info = icons.diagnostics.Information,
-      hint = icons.diagnostics.Hinta,
+  config = function()
+    local icons = require "utils.icons"
+    local diff = {
+      "diff",
+      colored = true,
+      symbols = {
+        added = icons.git.LineAdded,
+        modified = icons.git.LineModified,
+        removed = icons.git.LineRemoved
+      }, -- Changes the symbols used by the diff.
     }
-  }
-  local sessions = function()
-    return require('auto-session.lib').current_session_name(true)
-  end
+    local diagnostics = {
+      "diagnostics",
+      sources = { "nvim_diagnostic" },
+      symbols = {
+        error = icons.diagnostics.Error,
+        warn = icons.diagnostics.Warning,
+        info = icons.diagnostics.Information,
+        hint = icons.diagnostics.Hinta,
+      }
+    }
+    local sessions = function()
+      return require('auto-session.lib').current_session_name(true)
+    end
 
-  require("lualine").setup {
-    options = {
-      component_separators = { left = "|", right = "|" },
-      section_separators = { left = "", right = "" },
-      ignore_focus = { "NvimTree" },
-      -- theme = 'dracula-nvim',
-      -- theme = 'tokyonight',
-      theme = 'catppuccin',
-      icons_enabled = true,
-      always_divide_middle = true,
-    },
-    sections = {
-      lualine_a = { "mode" },
-      lualine_b = { "branch", diff, diagnostics },
-      lualine_c = { "filename", sessions },
-      lualine_x = {
-        "copilot",
-        function()
-          local ok, pomo = pcall(require, "pomo")
-
-          if not ok then
-            return ''
-          end
-
-          local timer = pomo.get_first_to_finish()
-
-          if timer == nil then
-            return ''
-          end
-
-          return " " .. tostring(timer)
-        end,
-        "filetype"
+    require("lualine").setup {
+      options = {
+        component_separators = { left = "|", right = "|" },
+        section_separators = { left = "", right = "" },
+        ignore_focus = { "NvimTree" },
+        -- theme = 'dracula-nvim',
+        -- theme = 'tokyonight',
+        theme = 'catppuccin',
+        icons_enabled = true,
+        always_divide_middle = true,
       },
-      lualine_y = { "progress" },
-      lualine_z = { "location" },
-    },
-    inactive_sections = {
-        lualine_a = {},
-        lualine_b = {},
-        lualine_c = { 'filename' },
-        lualine_x = { 'location' },
-        lualine_y = {},
-        lualine_z = {}
-    },
-    extensions = { "quickfix", "man", "fugitive" },
-  }
-end
+      sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch", diff, diagnostics },
+        lualine_c = { "filename", sessions },
+        lualine_x = {
+          "copilot",
+          function()
+            local ok, pomo = pcall(require, "pomo")
+
+            if not ok then
+              return ''
+            end
+
+            local timer = pomo.get_first_to_finish()
+
+            if timer == nil then
+              return ''
+            end
+
+            return " " .. tostring(timer)
+          end,
+          "filetype"
+        },
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+      },
+      inactive_sections = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { 'filename' },
+          lualine_x = { 'location' },
+          lualine_y = {},
+          lualine_z = {}
+      },
+      extensions = { "quickfix", "man", "fugitive" },
+    }
+  end
+}
 
 return M

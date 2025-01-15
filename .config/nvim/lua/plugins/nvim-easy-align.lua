@@ -1,5 +1,3 @@
-local M = { "junegunn/vim-easy-align", lazy = false }
-
-function M.config() end
+local M = { "junegunn/vim-easy-align", lazy = false, opts = {}, }
 
 return M

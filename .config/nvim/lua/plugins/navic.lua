@@ -1,9 +1,6 @@
 local M = {
   "SmiteshP/nvim-navic",
-}
-
-function M.config()
-  require("nvim-navic").setup {
+  opts = {
     icons = {
       File = "󰈙 ",
       Module= " ",
@@ -47,6 +44,6 @@ function M.config()
       return text
     end,
   }
-end
+}
 
 return M

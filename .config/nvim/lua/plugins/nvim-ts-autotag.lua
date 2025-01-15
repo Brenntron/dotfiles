@@ -1,10 +1,7 @@
 local M = {
   "windwp/nvim-ts-autotag",
   lazy = false,
+  opts = {}
 }
-
-function M.config()
-  require("nvim-ts-autotag").setup()
-end
 
 return M

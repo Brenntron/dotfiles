@@ -1,10 +1,7 @@
 local M = {
   "RRethy/vim-illuminate",
   event = "VeryLazy",
-}
-
-function M.config()
-  require("illuminate").configure {
+  opts = {
     filetypes_denylist = {
       "DiffviewFiles",
       "DressingInput",
@@ -25,7 +22,7 @@ function M.config()
       "spectre_panel",
       "toggleterm",
     },
-  }
-end
+  },
+}
 
 return M

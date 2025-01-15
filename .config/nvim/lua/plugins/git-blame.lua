@@ -1,11 +1,10 @@
 local M = {
-		"f-person/git-blame.nvim",
-		event = "BufRead",
-	}
-
-function M.config()
-  vim.cmd("highlight default link gitblame SpecialComment")
-  require("gitblame").setup({ enabled = true })
-end
+  "f-person/git-blame.nvim",
+  event = "BufRead",
+  init = function()
+    vim.cmd("highlight default link gitblame SpecialComment")
+  end,
+  opts = { enabled = true }
+}
 
 return M
