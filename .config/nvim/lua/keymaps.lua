@@ -16,7 +16,7 @@ local sections = {
   r = { desc = "🧪 Tests" },
   s = { desc = "󱙝  Spectre" },
   t = { desc = "  ToggleTerm" },
-  u = { "<cmd>UndotreeToggle", desc = "󰕍  Undo History" },
+  u = { "<cmd>UndotreeToggle<cr>", desc = "󰕍  Undo History" },
   v = { desc = "  Vim" },
 }
 
