@@ -9,10 +9,7 @@ local M = {
       "catppuccin/nvim",
     },
   },
-}
-function M.config()
-  local macchiato = require("catppuccin.palettes").get_palette "macchiato"
-  require("bufferline").setup {
+  opts = {
     options = {
       close_command = "Bdelete! %d", -- can be a string | function, see "Mouse actions"
       offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
@@ -30,6 +27,6 @@ function M.config()
       styles = { "italic", "bold" },
     },
   }
-end
+}
 
 return M

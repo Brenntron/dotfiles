@@ -1,9 +1,6 @@
 local M = {
-  'edluffy/hologram.nvim'
+  'edluffy/hologram.nvim',
+  opts = {},
 }
-
-function M.config()
-  require('hologram').setup {}
-end
 
 return M

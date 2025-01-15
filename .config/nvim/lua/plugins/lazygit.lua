@@ -5,6 +5,7 @@ local M = {
     "nvim-lua/plenary.nvim",
   },
   lazy = false,
+  opts = {},
 }
 
 return M

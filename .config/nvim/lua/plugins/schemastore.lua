@@ -1,8 +1,7 @@
 local M = {
   "b0o/schemastore.nvim",
   lazy = true,
+  opts = {},
 }
-
-function M.config() end
 
 return M

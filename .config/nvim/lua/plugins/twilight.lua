@@ -2,8 +2,7 @@ local M = {
   "folke/twilight.nvim",
   cmd = "Twilight",
   event = "Bufenter",
+  opts = {},
 }
-
-function M.config() end
 
 return M

@@ -1,10 +1,7 @@
 local M = {
   "windwp/nvim-autopairs",
   event = "InsertEnter",
-}
-
-function M.config()
-  require("nvim-autopairs").setup {
+  opts = {
     check_ts = true, -- treesitter integration
     disable_filetype = { "TelescopePrompt", "spectre_panel" },
     disable_in_macro = false,
@@ -35,7 +32,7 @@ function M.config()
       javascript = { "string", "template_string" },
       java = false,
     },
-  }
-end
+  },
+}
 
 return M

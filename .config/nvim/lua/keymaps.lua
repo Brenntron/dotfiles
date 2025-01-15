@@ -44,10 +44,8 @@ maps.v["<leader>/"] =
 -- normal
 maps.n["<leader>f"] = sections.f
 maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
-maps.n["<leader>fc"] =
-  { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_word_under_cursor<cr>", desc = "Find word under cursor" }
-maps.n["<leader>ff"] =
-  { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
+maps.n["<leader>fc"] = { "<cmd>lua require('telescope-live-grep-args.shortcuts').grep_word_under_cursor<cr>", desc = "Find word under cursor" }
+maps.n["<leader>ff"] = { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
 maps.n["<leader>fh"] = { "<cmd>toggle_telescope<cr>", desc = "Open harpoon window" }
 maps.n["<leader>fn"] = { "<cmd>Navbuddy<CR>", desc = "Open Navbuddy" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
@@ -155,8 +153,11 @@ maps.n["<leader>db"] = sections.db
 maps.n["<leader>dbi"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
 maps.n["<leader>dba"] = { "<cmd>DBUIAddConnection<cr>", desc = "Add Dad Bod UI connection" }
 
--- NvimTree/Explorer
-maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer" }
+-- Window Mover
+maps.n["<leader>em"] = { "<cmd>WinMover<cr>" }
+
+-- NvimTree/Explorer Window
+maps.n["<leader>ew"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer" }
 
 -- DAP
 maps.n["<leader>dap"] = { desc = "DAP" }

@@ -2,10 +2,7 @@ local M = {
   "lukas-reineke/indent-blankline.nvim",
   event = "BufReadPre",
   main = "ibl",
-}
-
-function M.config()
-  require("ibl").setup({
+  opts = {
     exclude = {
       filetypes = {
         "checkhealth",
@@ -19,7 +16,7 @@ function M.config()
         "TelescopeResults",
       },
     },
-  })
-end
+  },
+}
 
 return M

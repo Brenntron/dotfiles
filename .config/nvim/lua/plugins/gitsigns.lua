@@ -1,12 +1,10 @@
+local icons = require "utils.icons"
+
 local M = {
   "lewis6991/gitsigns.nvim",
   event = "Bufenter",
   cmd = "Gitsigns",
-}
-M.config = function()
-  local icons = require "utils.icons"
-
-  require("gitsigns").setup {
+  opts = {
     signs = {
       add = {
         hl = "GitSignsAdd",
@@ -54,7 +52,7 @@ M.config = function()
       row = 0,
       col = 1,
     },
-  }
-end
+  },
+}
 
 return M
