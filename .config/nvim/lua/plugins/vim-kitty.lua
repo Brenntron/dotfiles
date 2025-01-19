@@ -1,7 +1,7 @@
 local M = {
   "fladson/vim-kitty",
   event = "BufRead",
-  opts = {},
+  config = function () end,
 }
 
 return M

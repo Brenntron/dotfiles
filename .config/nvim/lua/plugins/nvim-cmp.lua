@@ -64,23 +64,49 @@ local M = {
     {
       "windwp/nvim-autopairs",
       event = "InsertEnter",
+      opts = {
+        check_ts = true, -- treesitter integration
+        disable_filetype = { "TelescopePrompt", "spectre_panel" },
+        disable_in_macro = false,
+        disable_in_visualblock = false,
+        enable_check_bracket_line = false,
+        enable_afterquote = true,
+        enable_moveright = true,
+        fast_wrap = {
+          chars = { "{", "[", "(", '"', "'" },
+          check_comma = true,
+          end_key = "$",
+          highlight = "Search",
+          highlight_grey = "Comment",
+          keys = "qwertyuiopzxcvbnmasdfghjkl",
+          map = "<M-e>",
+          offset = 0, -- Offset from pattern match
+          pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], "%s+", ""),
+        },
+        ignore_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
+        map_bs = true,
+        map_c_w = false,
+        map_char = {
+          all = "(",
+          text = "{",
+        },
+        ts_config = {
+          lua = { "string", "source" },
+          javascript = { "string", "template_string" },
+          java = false,
+        },
+      },
     },
   },
   event = { "InsertEnter", "LspAttach" },
   config = function()
     local cmp = require "cmp"
-    local autopoairs_rule = require "nvim-autopairs.rule"
     local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
     local ts_conds = require 'nvim-autopairs.ts-conds'
     local autopairs = require 'nvim-autopairs'
     local Rule = require 'nvim-autopairs.rule'
     local icons = require "utils.icons"
     local lspkind = require "lspkind"
-
-    local check_backspace = function()
-      local col = vim.fn.col "." - 1
-      return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
-    end
 
     local has_words_before = function()
       if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
@@ -190,7 +216,7 @@ local M = {
         priority_weight = 2,
         comparators = {
           require("copilot_cmp.comparators").prioritize,
-          -- Below is the default comparitor list and order for nvim-cmp
+          -- Below is the default comparator list and order for nvim-cmp
           cmp.config.compare.offset,
           -- cmp.config.compare.scopes, -- this is commented in nvim-cmp too
           cmp.config.compare.exact,
@@ -277,6 +303,5 @@ local M = {
     cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
   end,
 }
-
 
 return M

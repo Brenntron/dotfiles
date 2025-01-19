@@ -1,7 +1,7 @@
 local M = {
   "famiu/bufdelete.nvim",
   event = "VeryLazy",
-  opts = {},
+  config = function() end,
 }
 
 return M
