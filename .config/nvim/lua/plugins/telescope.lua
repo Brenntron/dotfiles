@@ -178,6 +178,10 @@ local M = {
             },
           },
         },
+        notify = {
+          render = "minimal",
+          stages = "slide",
+        },
         project = {
           base_dirs = {
             "~/.config/nvim",
