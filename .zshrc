@@ -133,6 +133,13 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
+# Homebrew aliases
+alias bsc="brew services cleanup"
+alias bsl="brew services list"
+alias bsp="brew services stop"
+alias bsr="brew services restart"
+alias bss="brew services start"
+
 # Colorls setup
 
 source $(dirname $(gem which colorls))/tab_complete.sh
