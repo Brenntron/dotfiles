@@ -1,3 +1,3 @@
-local M = { "kchmck/vim-coffee-script", ft = "coffee", lazy = true, opts = {} }
+local M = { "kchmck/vim-coffee-script", ft = "coffee", lazy = true, config = function () end }
 
 return M
