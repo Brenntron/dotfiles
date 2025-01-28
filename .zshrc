@@ -207,6 +207,12 @@ alias -s ace="unace l"
 alias cc='gcc'
 alias CC='gcc'
 
+# Lazygit setup
+
+# Lazydocker setup
+export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
+aliad docker='podman'
+
 # Podman Compose aliases
 alias pc='podman compose'
 
