@@ -2,9 +2,17 @@ local M = {
   "nvim-telescope/telescope.nvim",
   cmd = "Telescope",
   dependencies = {
-    {
-      "ahmedkhalf/project.nvim",
-      event = "VeryLazy",
+     {
+      "https://github.com/ahmedkhalf/project.nvim",
+      config = function()
+        require("project_nvim").setup({
+          exclude_dirs = {
+            "~/jewillin",
+            "Users/jewillin",
+          },
+          silent_chdir = false,
+        })
+      end,
     },
     { "nvim-lua/popup.nvim" },
     { "nvim-lua/plenary.nvim" },
@@ -16,6 +24,9 @@ local M = {
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "make",
+      cond = function()
+        return vim.fn.executable("make") == 1
+      end,
     },
     {
       "nvim-telescope/telescope-live-grep-args.nvim",
@@ -181,39 +192,6 @@ local M = {
         notify = {
           render = "minimal",
           stages = "slide",
-        },
-        project = {
-          base_dirs = {
-            "~/.config/nvim",
-            "~/.config/kitty",
-            "~/.config/solargraph",
-            "~/.config/rubocop",
-            "~/.config/tokyonight",
-            "~/.config/yamllint",
-            "~/Documents/Second Brain/"
-          },
-          exclude_dirs = {
-            "Users/jewillin"
-          },
-          hidden_files = false,
-          on_project_select = function(prompt_bufnr)
-            local project_actions = require "telescope._extensions.project.actions"
-            project_actions.change_working_directory(prompt_bufnr, false)
-          end,
-          order_by = "asc",
-          patterns = {
-            ".git",
-            "Dockerfile",
-            "Gemfile",
-            "Makefile",
-            "package.json",
-            ".obsidian",
-            ".tool-versions",
-            ".ruby-version"
-          },
-          search_by = "title",
-          sync_with_nvim = true,
-          theme = "dropdown",
         },
         zoxide = {
           keepinsert = true,

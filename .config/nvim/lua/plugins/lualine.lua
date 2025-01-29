@@ -76,7 +76,19 @@ local M = {
           lualine_y = {},
           lualine_z = {}
       },
-      extensions = { "quickfix", "man", "fugitive" },
+      extensions = {
+        "fugitive",
+        "fzf",
+        "lazy",
+        "man",
+        "mason",
+        "nvim-dap-ui",
+        "nvim-tree",
+        "quickfix",
+        "symbols-outline",
+        "toggletest",
+        "trouble",
+      },
     }
   end
 }
