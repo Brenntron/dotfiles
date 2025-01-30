@@ -226,6 +226,9 @@ alias config=dotbare
 # enable alias-finder
 zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
 
+# zsh-autocomplete config, Leave out _expand
+zstyle ':completion:*' completer _complete _complete:-fuzzy _correct _approximate _ignored
+
 alias spectral='spectral-language-server'
 
 # enable autoenv
