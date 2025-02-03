@@ -1,11 +1,11 @@
-local M = {
+return {
   "akinsho/toggleterm.nvim",
   event = "VeryLazy",
   config = function()
     local execs = {
-      { '/bin/zsh', "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
-      { '/bin/zsh', "<M-2>", "Vertical Terminal", "vertical", 0.4 },
-      { '/bin/zsh', "<M-3>", "Float Terminal", "float", nil },
+      { "/bin/zsh", "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
+      { "/bin/zsh", "<M-2>", "Vertical Terminal", "vertical", 0.4 },
+      { "/bin/zsh", "<M-3>", "Float Terminal", "float", nil },
     }
 
     local function get_buf_size()
@@ -33,19 +33,19 @@ local M = {
 
     local exec_toggle = function(opts)
       local Terminal = require("toggleterm.terminal").Terminal
-      local term = Terminal:new { cmd = opts.cmd, count = opts.count, direction = opts.direction }
+      local term = Terminal:new({ cmd = opts.cmd, count = opts.count, direction = opts.direction })
       term:toggle(opts.size, opts.direction)
     end
 
     local add_exec = function(opts)
-      local binary = opts.cmd:match "(%S+)"
+      local binary = opts.cmd:match("(%S+)")
       if vim.fn.executable(binary) ~= 1 then
         vim.notify("Skipping configuring executable " .. binary .. ". Please make sure it is installed properly.")
         return
       end
 
       vim.keymap.set({ "n", "t" }, opts.keymap, function()
-        exec_toggle { cmd = opts.cmd, count = opts.count, direction = opts.direction, size = opts.size() }
+        exec_toggle({ cmd = opts.cmd, count = opts.count, direction = opts.direction, size = opts.size() })
       end, { desc = opts.label, noremap = true, silent = true })
     end
 
@@ -66,7 +66,7 @@ local M = {
       add_exec(opts)
     end
 
-    require("toggleterm").setup {
+    require("toggleterm").setup({
       size = function(term)
         if term.direction == "horizontal" then
           return 20
@@ -84,7 +84,7 @@ local M = {
       persist_size = true,
       direction = "float",
       close_on_exit = true, -- close the terminal window when the process exits
-      shell = '/bin/zsh', -- change the default shell
+      shell = "/bin/zsh", -- change the default shell
       float_opts = {
         border = "rounded",
         winblend = 0,
@@ -99,18 +99,18 @@ local M = {
           return term.count
         end,
       },
-    }
-    vim.cmd [[
+    })
+    vim.cmd([[
     augroup terminal_setup | au!
     autocmd TermOpen * nnoremap <buffer><LeftRelease> <LeftRelease>i
     autocmd TermEnter * startinsert!
     augroup end
-    ]]
+    ]])
 
     vim.api.nvim_create_autocmd({ "TermEnter" }, {
       pattern = { "*" },
       callback = function()
-        vim.cmd "startinsert"
+        vim.cmd("startinsert")
       end,
     })
 
@@ -123,5 +123,3 @@ local M = {
     end
   end,
 }
-
-return M
