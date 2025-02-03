@@ -88,6 +88,10 @@ fi
 # enable autocomplete function
 source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
+# zsh-autocomplete config, Leave out _expand
+zstyle ':completion:*' completer _complete _complete:-fuzzy _correct _approximate _ignored
+
+
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -225,9 +229,6 @@ alias config=dotbare
 
 # enable alias-finder
 zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
-
-# zsh-autocomplete config, Leave out _expand
-zstyle ':completion:*' completer _complete _complete:-fuzzy _correct _approximate _ignored
 
 alias spectral='spectral-language-server'
 
