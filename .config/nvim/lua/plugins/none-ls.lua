@@ -42,7 +42,6 @@ return {
       nls.builtins.diagnostics.yamllint,
       nls.builtins.diagnostics.zsh,
       nls.builtins.formatting.fish_indent,
-      nls.builtins.formatting.stylua,
       nls.builtins.formatting.shfmt,
     })
   end,
