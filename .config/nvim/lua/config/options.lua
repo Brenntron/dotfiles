@@ -4,3 +4,10 @@
 
 -- Change picker
 vim.g.lazyvim_picker = "telescope"
+
+-- listchars
+vim.opt.listchars = {
+  tab = "> ",
+  trail = " ",
+  nbsp = "+",
+}
