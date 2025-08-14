@@ -5,6 +5,9 @@
 -- Change picker
 vim.g.lazyvim_picker = "telescope"
 
+-- autto format
+vim.g.autoformat = false
+
 -- listchars
 vim.opt.listchars = {
   tab = "> ",
