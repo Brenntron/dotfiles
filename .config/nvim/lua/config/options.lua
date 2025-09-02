@@ -5,7 +5,7 @@
 -- Change picker
 vim.g.lazyvim_picker = "telescope"
 
--- autto format
+-- auto format
 vim.g.autoformat = false
 
 -- listchars

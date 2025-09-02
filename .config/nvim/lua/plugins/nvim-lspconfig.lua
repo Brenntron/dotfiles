@@ -4,7 +4,6 @@ return {
     opts = {
       servers = {
         lua_ls = {},
-        coffeesence = {},
       }
     },
   },
