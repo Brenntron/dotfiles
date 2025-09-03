@@ -41,7 +41,7 @@ return {
       provider = "copilot",
       providers = {
         copilot = {
-          model = "claude-3.7-sonnet",
+          model = "claude-3.5-sonnet",
           extra_request_body = {
             temperature = 0,
             max_tokens = 8192,
@@ -51,8 +51,7 @@ return {
     },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
     -- dynamically build it, taken from astronvim
-    build = vim.fn.has("win32") == 1 and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
-      or "make",
+    build = "make",
     dependencies = {
       -- "stevearc/dressing.nvim",
       "nvim-lua/plenary.nvim",
