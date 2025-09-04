@@ -28,6 +28,7 @@ return {
       "scss",
       "ssh_config",
       "sql",
+      "svelte",
       "tsx",
       "typescript",
       "vim",
