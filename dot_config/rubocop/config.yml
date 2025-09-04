@@ -1,0 +1,14 @@
+inherit_from:
+  - https://relaxed.ruby.style/rubocop.yml
+AllCops:
+  NewCops: enable
+Layout/EmptyLineBetweenDefs:
+  Enabled: true
+  NumberOfEmptyLines: [1, 2]
+Style/Encoding:
+  Enabled: true
+Style/FrozenStringLiteralComment:
+  Enabled: false
+require:
+  - rubocop-performance
+  - rubocop-rails
