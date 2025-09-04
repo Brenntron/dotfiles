@@ -34,6 +34,7 @@ antigen bundle alias-finder
 antigen bundle aliases
 antigen bundle atuinsh/atuin@main
 antigen bundle autoenv
+antigen bundle brew
 antigen bundle bundler
 antigen bundle command-not-found
 antigen bundle compleat
@@ -42,24 +43,27 @@ antigen bundle copybuffer
 antigen bundle copyfile
 antigen bundle copypath
 antigen bundle cp
-antigen bundle kazhala/dotbare
 antigen bundle fzf
 antigen bundle gh
 antigen bundle git
 antigen bundle gpg-agent
+antigen bundle kazhala/dotbare
+antigen bundle npm
 antigen bundle pip
 antigen bundle podman
 antigen bundle rails
+antigen bundle redxtech/zsh-kitty
 antigen bundle rsync
 antigen bundle ruby
 antigen bundle ssh-agent
-antigen bundle redxtech/zsh-kitty
 antigen bundle yarn
 
 # Load order matters; must be last
 antigen bundle zdharma-continuum/fast-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle marlonrichert/zsh-autocomplete@main
+# redis-cli plugin relies on homebrew completion.
+antigen bundle redis-cli
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_zsh_plugins.zsh
