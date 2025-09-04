@@ -1,0 +1,45 @@
+# Main Colors
+unrecognized_file: '#f5a97f' # Peach
+recognized_file:   '#cad3f5' # Foreground
+executable_file:   '#a6da95' # Green
+dir:               '#c6a0f6' # Mauve
+
+# Link
+dead_link: '#ed8796'         # Red
+link:      '#8bd5ca'         # Teal
+
+# Special Files
+socket:    '#a6da95'         # Green
+blockdev:  '#a6da95'         # Green
+chardev:   '#a6da95'         # Green
+
+# Access Modes
+write:     '#f5bde6'         # Pink
+read:      '#c6a0f6'         # Mauve
+exec:      '#8bd5ca'         # Teal
+no_access: '#ed8796'         # Red
+
+# Age
+hour_old:    '#b8c0e0'       # Comment - 20% lighter
+day_old:     '#a5adcb'       # Comment
+no_modifier: '#cad3f5'       # Current Line
+
+# File Size
+file_large:  '#ed8796'       # Red
+file_medium: '#f5a97f'       # Peach
+file_small:  '#a6da95'       # Green
+
+# Random
+report: '#a6da95'            # Green
+user:   '#8bd5ca'            # Teal
+tree:   '#cad3f5'            # Current Line
+empty:  '#a5adcb'            # Comment
+error:  '#ed8796'            # Red
+normal: '#cad3f5'            # Foreground
+
+# Git
+addition:     '#a6da95'
+modification: '#8aad4'
+deletion:     '#ed8796'
+untracked:    '#f5a97f'
+unchanged:    '#eed49f'
