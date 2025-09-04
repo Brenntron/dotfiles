@@ -4,7 +4,6 @@ return {
   name = "catppuccin",
   opts = {
     auto_integrations = true,
-    colorscheme = "catppuccin-macchiato",
   },
   specs = {
     {
