@@ -1,0 +1,18 @@
+---
+include:
+- "**/*.rb"
+exclude:
+- features/**/*
+- spec/**/*
+- spec_ex/**/*
+- test/**/*
+- vendor/**/*
+- ".bundle/**/*"
+require: []
+domains: []
+reporters:
+- require_not_found
+formatter:
+plugins:
+- solargraph-rails
+max_files: 5000
