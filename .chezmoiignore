@@ -1,0 +1,44 @@
+.DS_Store
+README.md
+.assets # used to save symlink destinations files
+
+# Manage files that have different locations on different machines
+# https://www.chezmoi.io/user-guide/manage-machine-to-machine-differences/#ignore-files-or-a-directory-on-different-machines
+
+{{ if ne .chezmoi.os "darwin" }}
+Library/Application Support
+Library
+.config/applications
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+
+{{ end }}
+
+# Directories based on rules
+# ##################################################
+
+{{ if not (lookPath "secrets-sync") }}
+.config/secrets-sync
+{{ end }}
+
+{{ if not (or (lookPath "dcp") (lookPath "autopull") (lookPath "nd") (lookPath "brewup")) }}
+.config/usrbin
+{{ end }}
+
+{{ if not (lookPath "halp") }}
+.config/halp
+{{ end }}
+
+{{- if not (lookPath "npm") -}}
+.config/npm
+{{ end }}
+
+{{ if not (lookPath "vidcleaner") }}
+.config/vidcleaner
+.config/vid-cleaner
+{{ end }}
+
+{{ if not .dev_computer }}
+.local/share/git_stopwords
+{{ end }}

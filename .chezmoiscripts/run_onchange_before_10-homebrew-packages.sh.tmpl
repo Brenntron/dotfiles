@@ -1,0 +1,152 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+
+{{ template "shared_script_utils.bash" . }}
+
+export HOMEBREW_NO_INSTALL_UPGRADE=TRUE
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export HOMEBREW_NO_INSTALL_CLEANUP=1
+
+formulae=(
+    {{ range $package := .packages.homebrew.common.formulae }}
+    "{{ $package }}"
+    {{ end }}
+
+    {{ if .dev_computer }}
+    {{ range $package := .packages.homebrew.dev_computer.formulae }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .homelab_member }}
+    {{ range $package := .packages.homebrew.homelab_member.formulae }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .personal_computer }}
+    {{ range $package := .packages.homebrew.personal_computer.formulae }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+)
+
+casks=(
+    {{ range $package := .packages.homebrew.common.casks }}
+    "{{ $package }}"
+    {{ end }}
+
+    {{ if .dev_computer }}
+    {{ range $package := .packages.homebrew.dev_computer.casks }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .homelab_member }}
+    {{ range $package := .packages.homebrew.homelab_member.casks }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .personal_computer }}
+    {{ range $package := .packages.homebrew.personal_computer.casks }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+)
+
+currently_installed_formulae=($(brew list --formula -1))
+currently_installed_casks=($(brew list --cask -1))
+
+header "Install Homebrew packages"
+
+brew update
+
+BREW_DIR="$(brew --prefix)/bin/"
+
+for formula in ${formulae[@]}; do
+    if ! _inArray_ -i "${formula}" "${currently_installed_formulae[@]}"; then
+        if [[ ! -e "${BREW_DIR}/${formula}" ]]; then
+            brew install -q --formula ${formula}
+        fi
+
+        # https://github.com/microsoft/Git-Credential-Manager-for-Mac-and-Linux/blob/master/Install.md
+        if [[ ${formula} == "git-credential-manager" ]]; then
+            git-credential-manager install
+        fi
+
+    fi
+done
+
+{{ if not .is_ci_workflow }}
+for cask in ${casks[@]}; do
+    if ! _inArray_ -i "${cask}" "${currently_installed_casks[@]}"; then
+        brew install -q --cask ${cask}
+    fi
+
+done
+{{ end }}
+
+success "Homebrew packages installed"
+
+_safeExit_
+
+{{- else if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+
+{{ template "shared_script_utils.bash" . }}
+
+export HOMEBREW_NO_INSTALL_UPGRADE=TRUE
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export HOMEBREW_NO_INSTALL_CLEANUP=1
+
+formulae=(
+    {{ range $package := .packages.linuxbrew.common.formulae }}
+    "{{ $package }}"
+    {{ end }}
+
+    {{ if .dev_computer }}
+    {{ range $package := .packages.linuxbrew.dev_computer.formulae }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .homelab_member }}
+    {{ range $package := .packages.linuxbrew.homelab_member.formulae }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .personal_computer }}
+    {{ range $package := .packages.linuxbrew.personal_computer.formulae }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+)
+
+currently_installed_formulae=($(brew list --formula -1))
+
+header "Install Homebrew packages"
+
+brew update
+
+BREW_DIR="$(brew --prefix)/bin/"
+
+for formula in ${formulae[@]}; do
+    if ! _inArray_ -i "${formula}" "${currently_installed_formulae[@]}"; then
+        if [[ ! -e "${BREW_DIR}/${formula}" ]]; then
+            brew install -q --formula ${formula}
+        fi
+
+        # https://github.com/microsoft/Git-Credential-Manager-for-Mac-and-Linux/blob/master/Install.md
+        if [[ ${formula} == "git-credential-manager" ]]; then
+            git-credential-manager install
+        fi
+
+    fi
+done
+
+success "Homebrew packages installed"
+
+_safeExit_
+{{- end }}

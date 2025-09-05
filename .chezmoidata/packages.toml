@@ -1,0 +1,183 @@
+[packages.apt]
+  to_remove = ["btop", "htop"]
+  [packages.apt.common]
+    packages = [
+      "1password",
+      "apt-transport-https",
+      "build-essential",
+      "curl",
+      "file",
+      "git",
+      "git-extras",
+      "needrestart",
+      "net-tools",
+      "p7zip-full",
+      "procps",
+      "sudo",
+      "tzdata",
+      "unzip",
+      "wget",
+    ]
+  [packages.apt.dev_computer]
+    packages = []
+  [packages.apt.homelab_member]
+    packages = ["iperf"]
+  [packages.apt.personal_computer]
+    packages = []
+[packages.homebrew]
+  to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
+  [packages.homebrew.common]
+    casks = [
+      "1password",
+      "1password-cli",
+      "grandperspective", # Disk usage visualizer
+      "gpg",
+      "neovim",
+      "podman",           # open source container tools
+      "ripgrep",
+    ]
+    formulae = [
+      "asdf",            # Package manager that supports multiple runtimes
+      "atuin",           # Better shell history
+      "bash",
+      "bash-completion",
+      "bat",             # cat with syntax highlighting and Git integration
+      "bottom",          # Process/system monitor for the terminal.
+      "chezmoi",         # Dotfile manager
+      "coreutils",
+      "eza",             # ls replacement
+      "fastfetch",
+      "fd",              # fd-find
+      "findutils",       # GNU find, locate, updatedb, and xargs
+      "fzf",             # Fuzzy finder
+      "thefuck",         # Mistake corrector
+      "gawk",            # GNU awk
+      "gh",              # GitHub CLI
+      "git",
+      "git-delta",       # https://github.com/dandavison/delta
+      "git-extras",
+      "gnu-sed",         # GNU implementation of the famous stream editor
+      "gnu-tar",         # GNU version of the tar archiving utility
+      "gnutls",          # GNU Transport Layer Security (TLS) Library
+      "gping",           # Ping, but with a graph
+      "grep",
+      "jless",           # JSON viewer
+      "jq",              # Lightweight and flexible command-line JSON processor
+      "lazygit",         # simple terminal UI for git commands
+      "libpq",           # PostgreSQL utilities but not postgresql itself
+      "mas",             # Mac App Store command-line interface
+      "mc",              # Midnight Commander
+      "most",            # Pager
+      "nano",
+      "ncdu",            # NCurses Disk Usage
+      "ncurses",         # Text-based UI library
+      "openssl",         # SSL/TLS cryptography library
+      "postgresql",
+      "redis",
+      "rip2",            # A safer, rust-based rm
+      "ripgrep",         # search tool like grep and the silver searcher
+      "sqlite3",
+      "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
+      "tldr",            # TLDR man pages
+      "tre-command",      # Display directories as trees (with optional color/HTML output)
+      "vivid",           # https://github.com/sharkdp/vivid
+      "zoxide",          # A faster way to navigate your filesystem
+      "zsh",
+    ]
+  [packages.homebrew.dev_computer]
+    casks = [
+      "bruno",
+      "dbeaver-community",
+    ]
+    formulae = [
+      "act",        # runs GitHub Actions locally
+      "bats-core",
+      "doggo",      # DNS Client
+      "goaccess",
+    ]
+  [packages.homebrew.homelab_member]
+    casks    = []
+    formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
+  [packages.homebrew.personal_computer]
+    casks = []
+    formulae = []
+[packages.linuxbrew]
+  to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
+  [packages.linuxbrew.common]
+    formulae = [
+      "asdf",            # Package manager that supports multiple runtimes
+      "atuin",           # Better shell history
+      "bash",
+      "bat",             # cat with syntax highlighting and Git integration
+      "bottom",          # Process/system monitor for the terminal.
+      "chezmoi",         # Dotfile manager
+      "coreutils",
+      "eza",             # ls replacement
+      "fastfetch",
+      "fd",              # fd-find
+      "findutils",       # GNU find, locate, updatedb, and xargs
+      "fzf",             # Fuzzy finder
+      "gawk",            # GNU awk
+      "gh",              # GitHub CLI
+      "git",
+      "git-delta",       # https://github.com/dandavison/delta
+      "git-extras",
+      "gnu-sed",         # GNU implementation of the famous stream editor
+      "gnu-tar",         # GNU version of the tar archiving utility
+      "gnutls",          # GNU Transport Layer Security (TLS) Library
+      "gpg",
+      "gping",           # Ping, but with a graph
+      "grep",
+      "jless",           # JSON viewer
+      "jq",              # Lightweight and flexible command-line JSON processor
+      "lazygit",         # simple terminal UI for git commands
+      "libpq",           # PostgreSQL utilities but not postgresql itself
+      "mc",              # Midnight Commander
+      "most",            # Pager
+      "nano",
+      "ncdu",            # NCurses Disk Usage
+      "ncurses",         # Text-based UI library
+      "neovim",
+      "openssl",         # SSL/TLS cryptography library
+      "podman",           # open source container tools
+      "postgresql",
+      "redis",
+      "rip2",            # A safer, rust-based rm
+      "ripgrep",
+      "ripgrep",         # search tool like grep and the silver searcher
+      "sqlite3",
+      "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
+      "thefuck",         # Mistake corrector
+      "tldr",            # TLDR man pages
+      "tre-command",      # Display directories as trees (with optional color/HTML output)
+      "util-linux",
+      "vivid",           # https://github.com/sharkdp/vivid
+      "zoxide",          # A faster way to navigate your filesystem
+      "zsh",
+    ]
+  [packages.linuxbrew.dev_computer]
+    formulae = [
+      "act",        # runs GitHub Actions locally
+      "bats-core",
+      "bruno-cli",
+      "doggo",      # DNS Client
+      "goaccess",
+    ]
+  [packages.linuxbrew.homelab_member]
+    formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
+  [packages.linuxbrew.personal_computer]
+    formulae = []
+[packages.python]
+  to_remove = []
+  [packages.python.common]
+    packages = []
+  [packages.python.dev_computer]
+    packages = []
+  [packages.python.homelab_member]
+    packages = []
+  [packages.python.personal_computer]
+    packages = []
+[package.ruby]
+  to_remove = []
+  [packages.ruby.common]
+    packages = []
