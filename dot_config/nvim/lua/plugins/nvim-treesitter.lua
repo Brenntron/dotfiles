@@ -13,6 +13,7 @@ return {
       "git_config",
       "git_rebase",
       "gitignore",
+      "gotmpl",
       "gpg",
       "html",
       "http",
