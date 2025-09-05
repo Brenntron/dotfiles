@@ -1,5 +1,25 @@
+{{- $personal_computer := promptBoolOnce . "personal_computer" "Is this a personal computer for daily driving? (true/false)" -}}
+{{- $homelab_member := promptBoolOnce . "homelab_member" "Is this computer in the homelab? (true/false)" -}}
+{{- $dev_computer := promptBoolOnce . "dev_computer" "Do you do development on this computer? (true/false)" -}}
+
 [data]
+  dev_computer = {{ $dev_computer }}
+  email = "brennan.willingham@gmail.com"
+  github_user = "Brenntron"
+  homelab_member = {{ $homelab_member }}
   hostname = "{{ .chezmoi.hostname }}"
+  is_ci_workflow = false
   os = "{{ .chezmoi.os }}"
+  personal_computer = {{ $personal_computer }}
+  xdgConfigCache = "{{ .chezmoi.homeDir }}/.cache"
+  xdgConfigDir = "{{ .chezmoi.homeDir }}/.config"
+  xdgDataDir = "{{ .chezmoi.homeDir }}/.local/share"
+  xdgStateDir = "{{ .chezmoi.homeDir }}/.local/state"
+
+[diff]
+  {{ if lookPath "delta" -}} command = "delta"
+  {{ end -}}
+  exclude = ["scripts"]
+
 [git]
   autoPush = false
