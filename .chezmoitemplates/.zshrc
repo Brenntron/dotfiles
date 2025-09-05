@@ -6,11 +6,11 @@ export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
 
-if [[ $(uname) == "Linux" ]]; then
-  source ~/.config/linux/linuxbrew.zsh
-else
-  source ~/.config/osx/homebrew.zsh
-fi
+{{ if eq .chezmoi.os "linux" }}
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+{{ else if eq .chezmoi.os "darwin" }}
+  export PATH="/opt/homebrew/bin:$PATH"
+{{ end }}
 
 # FZF setup
 source ~/.fzf.zsh
@@ -65,11 +65,11 @@ antigen bundle marlonrichert/zsh-autocomplete@main
 # redis-cli plugin relies on homebrew completion.
 antigen bundle redis-cli
 
-if [[ $(uname) == "Linux" ]]; then
-  source ~/.config/linux/linux_zsh_plugins.zsh
-else
-  source ~/.config/osx/osx_zsh_plugins.zsh
-fi
+{{ if eq .chezmoi.os "linux" }}
+  antigen bundle ubuntu
+{{ else if eq .chezmoi.os "darwin" }}
+  antigen bundle macos
+{{ end }}
 
 antigen apply
 
@@ -83,11 +83,26 @@ eval $(thefuck --alias)
 
 # Source zsh config based on operating system used.
 
-if [[ $(uname) == "Linux" ]]; then
-  source ~/.config/linux/linux.zsh
-else
-  source ~/.config/osx/osx.zsh
-fi
+{{ if eq .chezmoi.os "linux" }}
+  export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib --enable-hipe --enable-sctp --enable-smp-support --enable-threads --enable-kernel-poll --enable-wx --enable-darwin-64bit --with-ssl=/usr/local/Cellar/openssl/1.0.2p"
+  export SSH_AUTH_SOCK=~/.1password/agent.sock
+
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+
+  alias yadev='yarn add -D'
+  unalias yad
+
+  skip_global_compinit=1
+{{ else if eq .chezmoi.os "darwin" }}
+  # Add ssh keys with keychain password manager
+  ssh-add --apple-use-keychain
+
+  export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
+  export NODE_OPTIONS="--max-old-space-size=8192"
+  export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+{{ end }}
 
 # enable autocomplete function
 source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
@@ -150,6 +165,13 @@ alias bss="brew services start"
 
 # Betterdiscord alias
 alias betterdiscord-update="DISC_CONFIG=\"\$HOME/.var/app/com.discordapp.Discord/config/discord\" && BD_ASAR=betterdiscord.asar && wget --timestamping -P \"\${DISC_CONFIG}/../BetterDiscord/data\" -- \"https://github.com/BetterDiscord/BetterDiscord/releases/latest/download/\${BD_ASAR}\" && DISC_VER=\"\$(ls --sort=time --time=creation \"\${DISC_CONFIG}\" | grep -E -m 1 '^[0-9]+\\.[0-9]+\\.[0-9]+\$')\" && echo -e \"require('../../../../BetterDiscord/data/\${BD_ASAR}');\\nmodule.exports = require('./core.asar');\" | tee \"\${DISC_CONFIG}/\${DISC_VER}/modules/discord_desktop_core/index.js\" && echo -e \"\\nBetterDiscord installed. Restart Discord if currently running.\" || echo -e \"\\nInstallation failed.\""
+
+# cat & bat setup
+{{ if eq .chezmoi.os "linux" }}
+  alias cat="batcat"
+{{ else if eq .chezmoi.os "darwin" }}
+  alias cat="bat"
+{{ end }}
 
 # Colorls setup
 
