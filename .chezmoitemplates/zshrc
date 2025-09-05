@@ -5,13 +5,11 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
-
 {{ if eq .chezmoi.os "linux" }}
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 {{ else if eq .chezmoi.os "darwin" }}
 export PATH="/opt/homebrew/bin:$PATH"
 {{ end }}
-
 # FZF setup
 source ~/.fzf.zsh
 
@@ -79,8 +77,6 @@ eval "$(oh-my-posh init zsh --config ~/.config/catppuccin/oh-my-posh/catppuccin_
 
 eval $(thefuck --alias)
 
-# Source zsh config based on operating system used.
-
 {{if eq .chezmoi.os "Linux" }}
 export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib --enable-hipe --enable-sctp --enable-smp-support --enable-threads --enable-kernel-poll --enable-wx --enable-darwin-64bit --with-ssl=/usr/local/Cellar/openssl/1.0.2p"
 export SSH_AUTH_SOCK=~/.1password/agent.sock
@@ -103,7 +99,6 @@ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
 alias cat="bat"
 {{end}}
-
 # enable autocomplete function
 source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
