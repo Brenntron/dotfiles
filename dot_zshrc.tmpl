@@ -41,6 +41,7 @@ antigen bundle copybuffer
 antigen bundle copyfile
 antigen bundle copypath
 antigen bundle cp
+antigen bundle eza-zsh
 antigen bundle fzf
 antigen bundle gh
 antigen bundle git
@@ -85,7 +86,6 @@ export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
-alias cat="batcat"
 alias yadev='yarn add -D'
 unalias yad
 
@@ -97,7 +97,6 @@ export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe -
 export NODE_OPTIONS="--max-old-space-size=8192"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
-alias cat="bat"
 {{end}}
 # enable autocomplete function
 source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
@@ -152,11 +151,10 @@ export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
 # cat and bat setup
-{{if eq .chezmoi.os "Linux" }}
-alias cat="batcat"
-{{ else if eq .chezmoi.os "darwin" }}
 alias cat="bat"
-{{end}}
+
+# vivid/colorls setup
+export LS_COLORS="$(vivid generate catppuccin-macchiato)"
 
 # Homebrew aliases
 alias bsc="brew services cleanup"
@@ -167,19 +165,6 @@ alias bss="brew services start"
 
 # Betterdiscord alias
 alias betterdiscord-update="DISC_CONFIG=\"\$HOME/.var/app/com.discordapp.Discord/config/discord\" && BD_ASAR=betterdiscord.asar && wget --timestamping -P \"\${DISC_CONFIG}/../BetterDiscord/data\" -- \"https://github.com/BetterDiscord/BetterDiscord/releases/latest/download/\${BD_ASAR}\" && DISC_VER=\"\$(ls --sort=time --time=creation \"\${DISC_CONFIG}\" | grep -E -m 1 '^[0-9]+\\.[0-9]+\\.[0-9]+\$')\" && echo -e \"require('../../../../BetterDiscord/data/\${BD_ASAR}');\\nmodule.exports = require('./core.asar');\" | tee \"\${DISC_CONFIG}/\${DISC_VER}/modules/discord_desktop_core/index.js\" && echo -e \"\\nBetterDiscord installed. Restart Discord if currently running.\" || echo -e \"\\nInstallation failed.\""
-
-# Colorls setup
-
-source $(dirname $(gem which colorls))/tab_complete.sh
-
-alias lc="colorls --dark"
-alias l="colorls -l --dark"
-alias ll="colorls -lA --dark"
-alias la="colorls -la --dark"
-alias lt="colorls -lt --dark"
-alias lS="colorls -lS --dark"
-alias lr="colorls --tree=5 --dark"
-alias lx="colorls -lAX --dark"
 
 # Tre setup
 tre() { command tre "$@" -e && source "/tmp/tre_aliases_$USER" 2>/dev/null; }
