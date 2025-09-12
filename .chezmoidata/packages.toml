@@ -3,6 +3,7 @@
   [packages.apt.common]
     packages = [
       "1password",
+      "1password-cli",
       "apt-transport-https",
       "build-essential",
       "curl",
@@ -29,12 +30,9 @@
   [packages.homebrew.common]
     casks = [
       "1password",
-      "1password-cli",
       "grandperspective", # Disk usage visualizer
-      "gpg",
-      "neovim",
-      "podman",           # open source container tools
-      "ripgrep",
+      "gpg-suite",
+      "podman-desktop",           # open source container tools
     ]
     formulae = [
       "asdf",            # Package manager that supports multiple runtimes
@@ -69,9 +67,12 @@
       "mc",              # Midnight Commander
       "most",            # Pager
       "nano",
+      "neovim",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
       "openssl",         # SSL/TLS cryptography library
+      "podman",
+      "podman-compose",
       "postgresql",
       "redis",
       "rip2",            # A safer, rust-based rm
@@ -92,6 +93,7 @@
     formulae = [
       "act",        # runs GitHub Actions locally
       "bats-core",
+      "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
     ]

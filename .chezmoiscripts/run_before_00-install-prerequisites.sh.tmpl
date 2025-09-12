@@ -3,21 +3,26 @@
 {{ template "shared_script_utils.bash" . }}
 
 {{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") }}
+if [[ ! $(command -v kitty) ]]; then
+  header " Installing Kitty terminal emulator"
+  curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+fi
+
 if [[ ! $(command -v brew) ]]; then
-    header "🍺  Installing Homebrew"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  header "🍺  Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 {{ end }}
 
 {{ if eq .chezmoi.os "darwin" }}
 if [[ -e "/opt/homebrew/bin/brew" && ! $(command -v brew) ]]; then
-    notice "Adding Homebrew to your PATH"
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+  notice "Adding Homebrew to your PATH"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 {{ else if eq .chezmoi.os "linux" }}
 if [[ -e "~/.linuxbrew/bin/brew" && ! $(command -v brew) ]]; then
-    notice "Adding Homebrew to your PATH"
-    eval "$(~/.linuxbrew/bin/brew shellenv)"
+  notice "Adding Homebrew to your PATH"
+  eval "$(~/.linuxbrew/bin/brew shellenv)"
 fi
 {{ end }}
 
@@ -27,30 +32,30 @@ install=false
 
 # Declare a regular array for the package names
 declare -a packages=(
-    "curl"
-    "unzip"
-    "wget"
+  "curl"
+  "unzip"
+  "wget"
 )
 
 to_install=()
 
 # Loop through the commands to check if they're installed
 for cmd in "${packages[@]}"; do
-    if ! command -v "${cmd}" &>/dev/null; then
-        install=true
-        to_install+=("${cmd}")
-    fi
+  if ! command -v "${cmd}" &>/dev/null; then
+      install=true
+      to_install+=("${cmd}")
+  fi
 done
 
 # Install missing packages
 if ${install}; then
-    header "Updating package list"
-    sudo apt update
+  header "Updating package list"
+  sudo apt update
 
-    for pkg in "${to_install[@]}"; do
-        header "Installing ${pkg}"
-        sudo apt install -y "${pkg}"
-    done
+  for pkg in "${to_install[@]}"; do
+      header "Installing ${pkg}"
+      sudo apt install -y "${pkg}"
+  done
 fi
 
 {{ end }}
