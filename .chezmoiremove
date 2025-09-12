@@ -7,7 +7,6 @@
 /.gitignore
 /.gitconfig
 /.nanorc
-/.lesshst
 /.digrc
 /.wget-hsts
 /.zcompdump
@@ -16,7 +15,6 @@
 /.sed/htmlDecode.sed
 /.sed/htmlEncode.sed
 /.sed/stopwords.sed
-/.zsh_history
 /.yamllint.yml
 /.git_stop_words
 /.config/jdfile/config.toml

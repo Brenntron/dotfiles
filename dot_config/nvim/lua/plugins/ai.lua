@@ -48,6 +48,10 @@ return {
           },
         },
       },
+      rules = {
+        project_dir = '.avante/rules',
+        global_dir = '~/.config/avante.nvim/rules',
+      },
     },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
     -- dynamically build it, taken from astronvim
