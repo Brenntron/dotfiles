@@ -7,7 +7,7 @@ lua 5.4.6
 java adoptopenjdk-jre-21.0.1+12.0.LTS
 lua-language-server 3.6.18
 rust 1.89.0
-golang 1.23.2
+golang 1.25.1
 julia 1.9.3
 1password-cli 2.25.0
 aria2 1.37.0
