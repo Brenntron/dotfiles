@@ -1,0 +1,47 @@
+if zstyle -T ':omz:plugins:yarn' global-path; then
+  # Skip yarn call if default global bin dir exists
+  [[ -d "$HOME/.yarn/bin" ]] && bindir="$HOME/.yarn/bin" || bindir="$(yarn global bin 2>/dev/null)"
+
+  # Add yarn bin directory to $PATH if it exists and not already in $PATH
+  [[ $? -eq 0 ]] \
+    && [[ -d "$bindir" ]] \
+    && (( ! ${path[(Ie)$bindir]} )) \
+    && path+=("$bindir")
+  unset bindir
+fi
+
+alias y="yarn"
+alias ya="yarn add"
+{{ if eq .chezmoi.os "linux" }}
+alias yadev="yarn add --dev"
+{{ else }}
+alias yad="yarn add --dev"
+{{ end }}
+alias yap="yarn add --peer"
+alias yb="yarn build"
+alias ycc="yarn cache clean"
+alias yd="yarn dev"
+alias ydlx="yarn dlx"
+alias yf="yarn format"
+alias yh="yarn help"
+alias yi="yarn init"
+alias yifl='yarn install --immutable'
+alias yii='yarn install --immutable'
+alias yin="yarn install"
+alias yln="yarn lint"
+alias ylnf="yarn lint --fix"
+alias yn="yarn node"
+alias yp="yarn pack"
+alias yrm="yarn remove"
+alias yrun="yarn run"
+alias ys="yarn serve"
+alias yst="yarn start"
+alias yt="yarn test"
+alias ytc="yarn test --coverage"
+alias yui="yarn upgrade-interactive"
+alias yuil='yui'
+alias yup="yarn upgrade"
+alias yv="yarn version"
+alias yw="yarn workspace"
+alias yws="yarn workspaces"
+alias yy="yarn why"
