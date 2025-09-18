@@ -14,3 +14,10 @@ vim.opt.listchars = {
   trail = " ",
   nbsp = "+",
 }
+
+-- filetype settings
+vim.filetype.add({
+  extension = {
+    avanterules = 'markdown'
+  }
+})
