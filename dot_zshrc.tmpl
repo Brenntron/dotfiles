@@ -110,8 +110,6 @@ HYPHEN_INSENSITIVE="true"
 
 # User configuration
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -239,8 +237,8 @@ source $(brew --prefix autoenv)/activate.sh
 # kitty completeions
 __kitty_complete
 
-# use bat(cat) as a colorizing pager for man
-export MANPAGER="sh -c 'col -bx | cat -1 man -p'"
+# use cat(bat) as a colorizing pager for man
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # Uncomment below if you experience formatting problems
 # export MANROFFOPT="-c"
 
