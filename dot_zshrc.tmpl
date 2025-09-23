@@ -247,6 +247,11 @@ export MANPAGER="sh -c 'col -bx | cat -1 man -p'"
 # Ripgrep config
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/.ripgreprc"
 
+{{ if eq .chezmoi.os "linux" }}
+export WINEPREFIX="${HOME}/.wine32 winecfg"
+export WINEARCH="win32"
+{{ end }}
+
 # Zoxide setup
 eval "$(zoxide init zsh)"
 
