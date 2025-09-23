@@ -30,6 +30,8 @@
   [packages.homebrew.common]
     casks = [
       "1password",
+      "font-geist",
+      "font-geist-mono",
       "grandperspective", # Disk usage visualizer
       "gpg-suite",
       "podman-desktop",           # open source container tools
@@ -156,6 +158,7 @@
       "tre-command",      # Display directories as trees (with optional color/HTML output)
       "util-linux",
       "vivid",           # https://github.com/sharkdp/vivid
+      "winetricks",
       "zoxide",          # A faster way to navigate your filesystem
       "zsh",
     ]
