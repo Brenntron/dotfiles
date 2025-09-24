@@ -4,8 +4,10 @@
 
 {{ template "shared_script_utils.bash" . }}
 
-curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
-sudo apt install ./keybase_amd64.deb
-run_keybase
+if [[ ! $(command -v brew) ]]; then
+  curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
+  sudo apt install ./keybase_amd64.deb
+  run_keybase
+fi
 
 {{- end }}
