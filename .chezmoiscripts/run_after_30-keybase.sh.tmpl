@@ -1,0 +1,11 @@
+{{- if eq .chezmoi.os "linux" -}}
+
+#!/usr/bin/env bash
+
+{{ template "shared_script_utils.bash" . }}
+
+curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
+sudo apt install ./keybase_amd64.deb
+run_keybase
+
+{{- end }}
