@@ -34,6 +34,7 @@
       "font-geist-mono",
       "grandperspective", # Disk usage visualizer
       "gpg-suite",
+      "keybase",
       "podman-desktop",           # open source container tools
     ]
     formulae = [
