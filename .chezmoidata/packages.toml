@@ -39,7 +39,6 @@
     ]
     formulae = [
       "asdf",            # Package manager that supports multiple runtimes
-      "autoenv",
       "atuin",           # Better shell history
       "bash",
       "bash-completion",
@@ -113,7 +112,6 @@
     formulae = [
       "asdf",            # Package manager that supports multiple runtimes
       "atuin",           # Better shell history
-      "autoenv",
       "bash",
       "bat",             # cat with syntax highlighting and Git integration
       "bottom",          # Process/system monitor for the terminal.
