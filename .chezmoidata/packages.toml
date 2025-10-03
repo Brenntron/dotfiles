@@ -20,7 +20,9 @@
       "wget",
     ]
   [packages.apt.dev_computer]
-    packages = []
+    packages = [
+      "podman"
+    ]
   [packages.apt.homelab_member]
     packages = ["iperf"]
   [packages.apt.personal_computer]
@@ -144,7 +146,6 @@
       "ncurses",         # Text-based UI library
       "neovim",
       "openssl",         # SSL/TLS cryptography library
-      "podman",           # open source container tools
       "postgresql",
       "redis",
       "rip2",            # A safer, rust-based rm
