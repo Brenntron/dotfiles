@@ -14,6 +14,7 @@
       "net-tools",
       "p7zip-full",
       "procps",
+      "snapd",
       "sudo",
       "tzdata",
       "unzip",
@@ -99,6 +100,7 @@
       "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
+      "oven-sh/bun/bun",
     ]
   [packages.homebrew.homelab_member]
     casks    = []
@@ -169,11 +171,17 @@
       "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
+      "oven-sh/bun/bun",
     ]
   [packages.linuxbrew.homelab_member]
     formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
   [packages.linuxbrew.personal_computer]
     formulae = []
+[packages.snap]
+  [packages.snap.dev_computer]
+    packages = [
+      "dbeaver-ce",  # Database management tool
+    ]
 [packages.python]
   to_remove = []
   [packages.python.common]
