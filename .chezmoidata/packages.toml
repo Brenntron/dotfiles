@@ -93,6 +93,7 @@
     casks = [
       "bruno",
       "dbeaver-community",
+      "httpie",
     ]
     formulae = [
       "act",        # runs GitHub Actions locally
@@ -171,6 +172,7 @@
       "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
+      "httpie",
       "oven-sh/bun/bun",
     ]
   [packages.linuxbrew.homelab_member]
