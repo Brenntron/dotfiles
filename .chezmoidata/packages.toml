@@ -45,8 +45,8 @@
       "bash-completion",
       "bat",             # cat with syntax highlighting and Git integration
       "bottom",          # Process/system monitor for the terminal.
-      "chezmoi",         # Dotfile manager
       "coreutils",
+      "exercism",
       "eza",             # ls replacement
       "fastfetch",
       "fd",              # fd-find
@@ -118,7 +118,6 @@
       "bash",
       "bat",             # cat with syntax highlighting and Git integration
       "bottom",          # Process/system monitor for the terminal.
-      "chezmoi",         # Dotfile manager
       "coreutils",
       "eza",             # ls replacement
       "fastfetch",
