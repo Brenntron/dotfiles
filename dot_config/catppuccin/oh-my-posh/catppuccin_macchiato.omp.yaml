@@ -82,42 +82,42 @@ blocks:
     background: p:mauve
     foreground: p:text
     style: plain
-    template:  {{ .Full }}
+    template: "  {{ .Full }} "
     type: elixir
   - properties:
       cache_duration: none
     background: p:sapphire
     foreground: p:text
     style: plain
-    template:  {{ .Full }}
+    template: "  {{ .Full }} "
     type: go
   - properties:
       cache_duration: none
     background: p:blue
     foreground: p:text
     style: plain
-    template: 󰢱 {{ .Full }}
+    template: " 󰢱 {{ .Full }} "
     type: lua
   - properties:
       cache_duration: none
     background: p:green
     foreground: p:text
     style: plain
-    template:  {{ .Full }}
+    template: "  {{ .Full }} "
     type: node
   - properties:
       cache_duration: none
     background: p:yellow
     foreground: p:text
     style: plain
-    template:   {{ .Full }}
+    template: "   {{ .Full }} "
     type: python
   - properties:
       cache_duration: none
     background: p:red
     foreground: p:text
     style: plain
-    template:   {{ .Full}}
+    template: "   {{ .Full}} "
     type: ruby
   - properties:
       cache_duration: none
