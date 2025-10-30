@@ -98,8 +98,7 @@ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # zsh-autocomplete config, Leave out _expand
-zstyle ':completion:*' completer _complete _complete:-fuzzy _correct _approximate _ignored
-
+zstyle ':completion:*' completer _expand_alias _complete _complete:-fuzzy _correct _approximate _ignored
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -144,9 +143,6 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
-# cat and bat setup
-alias cat="bat"
-
 # vivid/colorls setup
 export LS_COLORS="$(vivid generate catppuccin-macchiato)"
 
@@ -164,38 +160,6 @@ alias betterdiscord-update="DISC_CONFIG=\"\$HOME/.var/app/com.discordapp.Discord
 tre() { command tre "$@" -e && source "/tmp/tre_aliases_$USER" 2>/dev/null; }
 
 alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
-
-alias grep='grep --color'
-alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
-
-# Command line head / tail shortcuts
-alias -g H='| head'
-alias -g T='| tail'
-alias -g G='| grep'
-alias -g L="| less"
-alias -g M="| most"
-alias -g LL="2>&1 | less"
-alias -g CA="2>&1 | cat -A"
-alias -g NE="2> /dev/null"
-alias -g NUL="> /dev/null 2>&1"
-alias -g P="2>&1| pygmentize -l pytb"
-
-alias dud='du -d 1 -h'
-alias fdir='find -L . -type d | fzf > selected --height=100%'
-alias ffile='find -L . -type f | fzf > selected --height=100%'
-
-#read documents
-alias -s ps=gv
-alias -s dvi=xdvi
-alias -s chm=xchm
-alias -s djvu=djview
-
-#list whats inside packed file
-alias -s zip="unzip -l"
-alias -s rar="unrar l"
-alias -s tar="tar tf"
-alias -s tar.gz="echo "
-alias -s ace="unace l"
 
 alias cc='gcc'
 alias CC='gcc'
@@ -220,7 +184,7 @@ alias spectral='spectral-language-server'
 # kitty completeions
 __kitty_complete
 
-# use cat(bat) as a colorizing pager for man
+# use bat as a colorizing pager for man
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # Uncomment below if you experience formatting problems
 # export MANROFFOPT="-c"
@@ -238,8 +202,6 @@ eval "$(zoxide init zsh)"
 
 # Enable vi mode
 bindkey -v
-
-
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)

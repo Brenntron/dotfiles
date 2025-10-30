@@ -1,7 +1,9 @@
 _ASDF_PREFIX="$(brew --prefix asdf)"
 ASDF_COMPLETIONS="${_ASDF_PREFIX}/share/zsh/site-functions"
 
-source "${_ASDF_PREFIX}/libexec/asdf.sh"
+export ASDF_DATA_DIR="${HOME}/.asdf"
+export PATH="$ASDF_DATA_DIR/shims:$PATH"
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 
 unset _ASDF_PREFIX
 
