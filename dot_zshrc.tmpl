@@ -28,7 +28,6 @@ source $(brew --prefix)/share/antigen/antigen.zsh
 
 antigen use oh-my-zsh
 
-antigen bundle alias-finder
 antigen bundle aliases
 antigen bundle atuinsh/atuin@main
 antigen bundle brew
@@ -40,6 +39,7 @@ antigen bundle copybuffer
 antigen bundle copyfile
 antigen bundle copypath
 antigen bundle cp
+antigen bundle docker
 antigen bundle dotenv
 antigen bundle eza-zsh
 antigen bundle fzf
@@ -47,14 +47,26 @@ antigen bundle gh
 antigen bundle git
 antigen bundle gpg-agent
 antigen bundle kazhala/dotbare
+antigen bundle kitty
 antigen bundle npm
 antigen bundle pip
 antigen bundle podman
 antigen bundle rails
+antigen bundle rake-fast
+antigen bundle rake
+antigen bundle react-native
+antigen bundle rebar
 antigen bundle redxtech/zsh-kitty
 antigen bundle rsync
 antigen bundle ruby
+antigen bundle rust
+antigen bundle safe-paste
 antigen bundle ssh-agent
+antigen bundle ssh
+antigen bundle thefuck
+antigen bundle themes
+antigen bundle uv
+antigen bundle vi-mode
 
 # Load order matters; must be last
 antigen bundle zdharma-continuum/fast-syntax-highlighting
@@ -66,6 +78,7 @@ antigen bundle redis-cli
 antigen bundle ubuntu
 {{ else if eq .chezmoi.os "darwin" }}
 antigen bundle macos
+antigen bundle xcode
 {{ end }}
 antigen apply
 
@@ -197,7 +210,6 @@ export WINEPREFIX="${HOME}/.wine32 winecfg"
 export WINEARCH="win32"
 {{ end }}
 
-# Zoxide setup
 eval "$(zoxide init zsh)"
 
 # Enable vi mode

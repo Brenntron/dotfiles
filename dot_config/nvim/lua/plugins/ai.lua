@@ -38,7 +38,7 @@ return {
       behaviour = {
         auto_suggestions = false,
       },
-      provider = "copilot",
+      provider = "koboldcpp",
       providers = {
         copilot = {
           model = "claude-haiku-4.5",
@@ -47,6 +47,11 @@ return {
             max_tokens = 8192,
           },
         },
+        koboldcpp = {
+          __inherited_from = 'openai',
+          endpoint = "http://localhost:5001/v1/chat/completions",
+          model = "koboldcpp/Qwen3-Coder-30B-A3B-Instruct-1M-Q2_K",
+          api_key_name = "none",
       },
       rules = {
         project_dir = '.avante/rules',
