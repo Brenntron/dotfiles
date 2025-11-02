@@ -18,7 +18,7 @@ did_remove_package=false
     {{ end }}
 {{ end }}
 
-{{- if eq .chezmoi.os "linux" -}}
+{{- if eq .chezmoi.osRelease | inList "Pop" "Ubuntu" "Debian" -}}
     # header "removing python packages with uv"
     {{ range $package := .packages.python.to_remove }}
     if apt search "{{ $package }}" | grep "installed" &> /dev/null; then

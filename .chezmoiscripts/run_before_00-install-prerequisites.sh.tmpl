@@ -4,12 +4,12 @@
 
 {{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") }}
 if [[ ! $(command -v kitty) ]]; then
-  header " Installing Kitty terminal emulator"
+  header "😸 Installing Kitty terminal emulator"
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
 fi
 
 if [[ ! $(command -v brew) ]]; then
-  header "🍺  Installing Homebrew"
+  header "🍺 Installing Homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 {{ end }}
@@ -47,16 +47,29 @@ for cmd in "${packages[@]}"; do
   fi
 done
 
-# Install missing packages
-if ${install}; then
-  header "Updating package list"
-  sudo apt update
+{{   if .chezmoi.osRelease | inList "Pop" "Ubuntu" "Debian" -}}
+  # Install missing packages
+  if ${install}; then
+    header "Updating package list"
+    sudo apt update
 
-  for pkg in "${to_install[@]}"; do
-      header "Installing ${pkg}"
-      sudo apt install -y "${pkg}"
-  done
-fi
+    for pkg in "${to_install[@]}"; do
+        header "Installing ${pkg}"
+        sudo apt install -y "${pkg}"
+    done
+  fi
+{{   else if .chezmoid.osRelease | inList "EndeavourOS" "Arch" -}}
+  # Install missing packages
+  if ${install}; then
+    header "Updating package list"
+    sudo pacman -Sy
+
+    for pkg in "${to_install[@]}"; do
+        header "Installing ${pkg}"
+        sudo pacman -S --noconfirm "${pkg}"
+    done
+  fi
+{{   end }}
 
 {{ end }}
 

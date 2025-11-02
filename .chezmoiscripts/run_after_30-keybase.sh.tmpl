@@ -1,13 +1,13 @@
-{{- if eq .chezmoi.os "linux" -}}
-
 #!/usr/bin/env bash
 
 {{ template "shared_script_utils.bash" . }}
 
-if [[ ! $(command -v brew) ]]; then
-  curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
-  sudo apt install ./keybase_amd64.deb
-  run_keybase
-fi
+{{- if eq .chezmoi.osRelease "Pop" -}}
+
+curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
+sudo apt install ./keybase_amd64.deb
+run_keybase
+
+{{- else if eq .chezmoi.osRelease "EndeavourOS" -}}
 
 {{- end }}

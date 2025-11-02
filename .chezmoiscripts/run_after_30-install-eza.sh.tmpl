@@ -7,6 +7,7 @@
 if [[ ! $(command -v eza) ]]; then
     header "Installing Eza"
 
+    {{-   if .chezmoi.osRelease | inList "Pop" "Ubuntu" "Debian" -}}
     if [[ ! $(command -v gpg) ]]; then
         sudo apt update
         sudo apt install -y gpg
@@ -18,7 +19,8 @@ if [[ ! $(command -v eza) ]]; then
     sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
     sudo apt update
     sudo apt install -y eza
-
+    {{- else if eq .chezmoi.osRelease | inList "EndeavourOS" "Arch" -}}
+    {{   end }}
 fi
 
 _safeExit_

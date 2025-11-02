@@ -26,6 +26,24 @@
     packages = ["iperf"]
   [packages.apt.personal_computer]
     packages = []
+[packages.asdf]
+  plugins = [
+    "aria2",
+    "bun",
+    "chezmoi",
+    "elixir",
+    "erlang",
+    "gleam",
+    "golang",
+    "lua",
+    "nodejs",
+    "python",
+    "rebar",
+    "ruby",
+    "rust",
+    "uv",
+    "v",
+  ]
 [packages.homebrew]
   to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
   [packages.homebrew.common]
@@ -65,6 +83,7 @@
       "grep",
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
+      "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mas",             # Mac App Store command-line interface
@@ -94,6 +113,7 @@
       "bruno",
       "dbeaver-community",
       "httpie",
+      "sst/tap/opencode",
     ]
     formulae = [
       "act",        # runs GitHub Actions locally
@@ -137,6 +157,7 @@
       "grep",
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
+      "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mc",              # Midnight Commander
@@ -172,6 +193,7 @@
       "doggo",      # DNS Client
       "goaccess",
       "httpie",
+      "sst/tap/opencode",
       "oven-sh/bun/bun",
     ]
   [packages.linuxbrew.homelab_member]
