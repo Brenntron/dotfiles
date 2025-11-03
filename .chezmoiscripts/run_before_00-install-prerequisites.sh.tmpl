@@ -47,7 +47,7 @@ for cmd in "${packages[@]}"; do
   fi
 done
 
-{{   if .chezmoi.osRelease | inList "Pop" "Ubuntu" "Debian" -}}
+{{ if or (eq .chezmoi.osRelease "Pop") (eq .chezmoi.osRelease "Ubuntu") (eq .chezmoi.osRelease "Debian") -}}
   # Install missing packages
   if ${install}; then
     header "Updating package list"
@@ -58,7 +58,7 @@ done
         sudo apt install -y "${pkg}"
     done
   fi
-{{   else if .chezmoid.osRelease | inList "EndeavourOS" "Arch" -}}
+{{ else if or (eq .chezmoi.osRelease "EndeavourOS") (eq .chezmoi.osRelease "Arch") -}}
   # Install missing packages
   if ${install}; then
     header "Updating package list"
