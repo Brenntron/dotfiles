@@ -91,7 +91,7 @@ eval "$(oh-my-posh init zsh --config ~/.config/catppuccin/oh-my-posh/catppuccin_
 eval $(thefuck --alias)
 
 {{ if eq .chezmoi.os "Linux" }}
-export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib --enable-hipe --enable-sctp --enable-smp-support --enable-threads --enable-kernel-poll --enable-wx --enable-darwin-64bit --with-ssl=/usr/local/Cellar/openssl/1.0.2p"
+export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
 export SSH_AUTH_SOCK=~/.1password/agent.sock
 
 export PYENV_ROOT="$HOME/.pyenv"
@@ -102,11 +102,12 @@ skip_global_compinit=1
 {{ else if eq .chezmoi.os "darwin" }}
 ssh-add --apple-use-keychain
 
-export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
+export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib --enable-hipe --enable-sctp --enable-smp-support --enable-threads --enable-kernel-poll --enable-wx --enable-darwin-64bit --with-ssl=$(brew --prefix openssl)"
 export NODE_OPTIONS="--max-old-space-size=8192"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
 {{ end }}
+
 # enable autocomplete function
 source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
@@ -176,6 +177,12 @@ alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc f
 
 alias cc='gcc'
 alias CC='gcc'
+
+# Openssl setup
+export LDFLAGS="-Wl,-rpath,$(brew --prefix openssl@3)/lib"
+export CPPFLAGS="-I$(brew --prefix openssl@3)/include"
+export OPENSSLDIR="$(brew --prefix openssl@3)"
+export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(brew --prefix openssl@3) --with-openssl-rpath=auto"
 
 # Lazygit setup
 
