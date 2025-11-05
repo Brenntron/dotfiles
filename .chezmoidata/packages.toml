@@ -30,7 +30,6 @@
   plugins = [
     "aria2",
     "bun",
-    "chezmoi",
     "elixir",
     "erlang",
     "gleam",
@@ -93,6 +92,7 @@
       "neovim",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
+      "opencode",
       "openssl",         # SSL/TLS cryptography library
       "podman",
       "podman-compose",
@@ -113,7 +113,6 @@
       "bruno",
       "dbeaver-community",
       "httpie",
-      "sst/tap/opencode",
     ]
     formulae = [
       "act",        # runs GitHub Actions locally

@@ -2,6 +2,11 @@
 {{- $homelab_member := promptBoolOnce . "homelab_member" "Is this computer in the homelab? (true/false)" -}}
 {{- $dev_computer := promptBoolOnce . "dev_computer" "Do you do development on this computer? (true/false)" -}}
 
+{{- $osid := .chezmoi.os -}}
+{{- if hasKey .chezmoi.osRelease "id" -}}
+{{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
 [data]
   dev_computer = {{ $dev_computer }}
   email = "brennan.willingham@gmail.com"
@@ -9,7 +14,7 @@
   homelab_member = {{ $homelab_member }}
   hostname = "{{ .chezmoi.hostname }}"
   is_ci_workflow = false
-  os = "{{ .chezmoi.os }}"
+  os = "{{ $osid }}"
   personal_computer = {{ $personal_computer }}
   xdgConfigCache = "{{ .chezmoi.homeDir }}/.cache"
   xdgConfigDir = "{{ .chezmoi.homeDir }}/.config"

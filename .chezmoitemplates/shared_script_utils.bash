@@ -430,7 +430,7 @@ _uvBinaryPath_() {
     shift $((OPTIND - 1))
 
     if [[ $(command -v uv) ]]; then
-        echo "$(command -v uv)"
+        "$(command -v uv)"
     elif [ -f "${HOME}/.local/bin/uv" ]; then
         echo "${HOME}/.local/bin/uv"
     elif [ -f "{{ .xdgDataDir }}/cargo/uv" ]; then
