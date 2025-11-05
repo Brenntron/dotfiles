@@ -7,7 +7,7 @@ header "Checking for packages to remove"
 
 did_remove_package=false
 
-{{ if and (eq .chezmoi.os "darwin") (lookPath "brew") }}
+{{ if and (eq .os "darwin") (lookPath "brew") }}
 
     {{ range $package := .packages.homebrew.to_remove }}
     if brew list | grep "{{ $package }}" &> /dev/null; then
@@ -16,16 +16,23 @@ did_remove_package=false
     fi
 
     {{ end }}
+{{ else if and (eq .chezmoi.os "linux") (lookPath "brew") }}
+
+    {{ range $package := .packages.linuxbrew.to_remove }}
+    if brew list | grep "{{ $package }}" &> /dev/null; then
+        did_remove_package=true
+        brew uninstall "{{ $package }}"
+    fi
+
+    {{ end }}
 {{ end }}
 
-{{- if eq .chezmoi.osRelease | inList "Pop" "Ubuntu" "Debian" -}}
-    # header "removing python packages with uv"
-    {{ range $package := .packages.python.to_remove }}
-    if apt search "{{ $package }}" | grep "installed" &> /dev/null; then
-        did_remove_package=true
-        sudo apt remove package_to_remove"{{ $package }}"
-    fi
-    {{ end }}
+# header "removing python packages with uv"
+{{ range $package := .packages.python.to_remove }}
+if apt search "{{ $package }}" | grep "installed" &> /dev/null; then
+    did_remove_package=true
+    sudo apt remove package_to_remove"{{ $package }}"
+fi
 {{ end }}
 
 if ${did_remove_package}; then
