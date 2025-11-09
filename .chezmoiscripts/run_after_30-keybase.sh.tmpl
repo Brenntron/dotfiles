@@ -1,10 +1,17 @@
+{{- if or (eq .os "linux-pop") (eq .os "linux-ubuntu") (eq .os "linux-debian") -}}
 #!/usr/bin/env bash
 
-{{- if or (eq .os "linux-pop") (eq .os "linux-ubuntu") (eq .os "linux-debian") -}}
-  {{ template "shared_script_utils.bash" . }}
+{{ template "shared_script_utils.bash" . }}
 
+if [[ ! $(command -v keybase ) ]]; then
+  header "🔑 Installing Keybase chat and file sharing app"
   curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
   sudo apt install ./keybase_amd64.deb
   run_keybase
 
+  success "Added keybase"
+fi
+
 {{- end }}
+
+_safeExit_

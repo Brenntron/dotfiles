@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+{{- if eq .chezmoi.os "linux" -}}
+
+{{ template "shared_script_utils.bash" . }}
+
+if [[ "$(basename "$SHELL")" != "zsh" && -x "$(command -v zsh)" ]]; then
+   chsh -s $(which zsh)
+fi
+
+{{- end }}
+
+_safeExit_
