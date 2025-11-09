@@ -1,0 +1,46 @@
+{{- if eq .chezmoi.os "linux" -}}
+
+#!/usr/bin/env bash
+
+if [[ $(command -v snap) ]]; then
+  {{ template "shared_script_utils.bash" . }}
+
+  packages=(
+    {{ range $package := .packages.snap.common.packages }}
+    "{{ $package }}"
+    {{ end }}
+    {{ if .dev_computer }}
+    {{ range $package := .packages.snap.dev_computer.packages }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+    {{ if .homelab_member }}
+    {{ range $package := .packages.snap.homelab_member.packages }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+    {{ if .personal_computer }}
+    {{ range $package := .packages.snap.personal_computer.packages }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+  )
+
+  header "Installing packages with snap"
+
+  for package in "${packages[@]}"; do
+    if snap list | awk {'print $1'} | grep -E "^${package}$" &>/dev/null; then
+      info "Package ${package} is already installed"
+      continue
+    fi
+    if snap find "${package}" | grep -E "^${package}\s" &>/dev/null; then
+      sudo snap install ${package}
+    else
+      warning "Package ${package} is not available in snap"
+    fi
+  done
+fi
+
+success "Snap packages installed"
+_safeExit_
+{{- end }}

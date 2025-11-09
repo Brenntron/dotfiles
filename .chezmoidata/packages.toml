@@ -10,15 +10,21 @@
       "file",
       "git",
       "git-extras",
+      "gnome-tweaks",
       "needrestart",
       "net-tools",
+      "nmon",
       "p7zip-full",
       "procps",
+      "qutebrowser",  # keyboard-focused browser
       "snapd",
       "sudo",
       "tzdata",
       "unzip",
+      "vulkan-tools",
       "wget",
+      "zoxide",
+      "zsh",
     ]
   [packages.apt.dev_computer]
     packages = []
@@ -80,6 +86,7 @@
       "gnutls",          # GNU Transport Layer Security (TLS) Library
       "gping",           # Ping, but with a graph
       "grep",
+      "janedobbleer/oh-my-posh/oh-my-posh",  # prompt theme engine
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
@@ -105,8 +112,8 @@
       "tldr",            # TLDR man pages
       "tre-command",      # Display directories as trees (with optional color/HTML output)
       "vivid",           # https://github.com/sharkdp/vivid
-      "zoxide",          # A faster way to navigate your filesystem
       "zsh",
+      "zsh-autocomplete",
     ]
   [packages.homebrew.dev_computer]
     casks = [
@@ -120,7 +127,6 @@
       "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
-      "oven-sh/bun/bun",
     ]
   [packages.homebrew.homelab_member]
     casks    = []
@@ -147,7 +153,6 @@
       "gh",              # GitHub CLI
       "git",
       "git-delta",       # https://github.com/dandavison/delta
-      "git-extras",
       "gnu-sed",         # GNU implementation of the famous stream editor
       "gnu-tar",         # GNU version of the tar archiving utility
       "gnutls",          # GNU Transport Layer Security (TLS) Library
@@ -161,6 +166,7 @@
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mc",              # Midnight Commander
       "most",            # Pager
+      "oh-my-posh",      # prompt theme engine
       "nano",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
@@ -177,12 +183,12 @@
       "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
       "thefuck",         # Mistake corrector
       "tldr",            # TLDR man pages
-      "tre-command",      # Display directories as trees (with optional color/HTML output)
+      "tre-command",     # Display directories as trees (with optional color/HTML output)
       "util-linux",
       "vivid",           # https://github.com/sharkdp/vivid
       "winetricks",
       "zoxide",          # A faster way to navigate your filesystem
-      "zsh",
+      "zsh-autocomplete",
     ]
   [packages.linuxbrew.dev_computer]
     formulae = [
@@ -193,17 +199,22 @@
       "goaccess",
       "httpie",
       "sst/tap/opencode",
-      "oven-sh/bun/bun",
     ]
   [packages.linuxbrew.homelab_member]
     formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
   [packages.linuxbrew.personal_computer]
     formulae = []
 [packages.snap]
+  [packages.snap.common]
+    packages = [
+      "snap-store",
+    ]
   [packages.snap.dev_computer]
     packages = [
       "dbeaver-ce",  # Database management tool
     ]
+  [packages.snap.personal_computer]
+    packages = []
 [packages.python]
   to_remove = []
   [packages.python.common]
