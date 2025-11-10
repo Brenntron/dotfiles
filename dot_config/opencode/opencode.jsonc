@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "lsp": {},
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1",
+      },
+      "models": {
+        "gpt-oss:20b": {
+          "name": "gtp-oss:20b",
+        },
+        "codestral:22b": {
+          "name": "codestral:22b",
+        },
+      },
+    },
+  },
+  "theme": "catppuccin-maccchiato",
+}
