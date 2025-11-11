@@ -55,6 +55,31 @@ casks=(
     {{ end }}
 )
 
+taps=(
+    {{ range $package := .packages.homebrew.common.taps }}
+    "{{ $package }}"
+    {{ end }}
+
+    {{ if .dev_computer }}
+    {{ range $package := .packages.homebrew.dev_computer.taps }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .homelab_member }}
+    {{ range $package := .packages.homebrew.homelab_member.taps }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+    {{ if .personal_computer }}
+    {{ range $package := .packages.homebrew.personal_computer.taps }}
+    "{{ $package }}"
+    {{ end }}
+    {{ end }}
+
+)
+
 currently_installed_formulae=($(brew list --formula -1))
 currently_installed_casks=($(brew list --cask -1))
 
@@ -63,6 +88,12 @@ header "Install Homebrew packages"
 brew update
 
 BREW_DIR="$(brew --prefix)/bin/"
+
+for tap in ${taps[@]}; do
+    if ! brew tap | grep -q "^${tap}\$"; then
+        brew tap "${tap}"
+    fi
+  done
 
 for formula in ${formulae[@]}; do
     if ! _inArray_ -i "${formula}" "${currently_installed_formulae[@]}"; then

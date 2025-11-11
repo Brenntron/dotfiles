@@ -219,8 +219,11 @@ export WINEARCH="win32"
 
 eval "$(zoxide init zsh)"
 
-# Enable vi mode
-bindkey -v
+# Bun
+export PATH="${HOME}/.bun/bin:$PATH"
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
+
+# Enable vi mode
+bindkey -v
