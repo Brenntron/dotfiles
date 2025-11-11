@@ -115,7 +115,7 @@
       "vivid",           # https://github.com/sharkdp/vivid
       "zsh",
       "zsh-autocomplete",
-    ],
+    ]
     taps = [
       "slp/krunkit",
     ]
