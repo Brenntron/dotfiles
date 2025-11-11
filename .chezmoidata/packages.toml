@@ -91,6 +91,7 @@
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
+      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mas",             # Mac App Store command-line interface
       "mc",              # Midnight Commander
@@ -114,6 +115,9 @@
       "vivid",           # https://github.com/sharkdp/vivid
       "zsh",
       "zsh-autocomplete",
+    ],
+    taps = [
+      "slp/krunkit",
     ]
   [packages.homebrew.dev_computer]
     casks = [
@@ -163,6 +167,7 @@
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
+      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mc",              # Midnight Commander
       "most",            # Pager
