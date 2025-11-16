@@ -23,7 +23,6 @@
       "unzip",
       "vulkan-tools",
       "wget",
-      "zoxide",
       "zsh",
     ]
   [packages.apt.dev_computer]
@@ -113,6 +112,7 @@
       "tldr",            # TLDR man pages
       "tre-command",      # Display directories as trees (with optional color/HTML output)
       "vivid",           # https://github.com/sharkdp/vivid
+      "zoxide",          # A faster way to navigate your filesystem
       "zsh",
       "zsh-autocomplete",
     ]
