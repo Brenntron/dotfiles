@@ -225,8 +225,10 @@ export PATH="${HOME}/.bun/bin:$PATH"
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 
+{{ if eq .chezmoi.os "darwin" }}
 # AWS Completions
 source "/usr/local/bin/aws_zsh_completer.sh"
+{{ end }}
 
 # Enable vi mode
 bindkey -v

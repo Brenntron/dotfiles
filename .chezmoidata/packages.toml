@@ -85,7 +85,7 @@
       "gnutls",          # GNU Transport Layer Security (TLS) Library
       "gping",           # Ping, but with a graph
       "grep",
-      "janedobbleer/oh-my-posh/oh-my-posh",  # prompt theme engine
+      "jandedobbeleer/oh-my-posh/oh-my-posh", # prompt theme engine
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
@@ -132,12 +132,15 @@
       "doggo",      # DNS Client
       "goaccess",
     ]
+    taps = []
   [packages.homebrew.homelab_member]
     casks    = []
     formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
+    taps = []
   [packages.homebrew.personal_computer]
     casks = []
     formulae = []
+    taps = []
 [packages.linuxbrew]
   to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
   [packages.linuxbrew.common]

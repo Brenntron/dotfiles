@@ -1,7 +1,8 @@
-{{- if or (eq .os "linux-pop") (eq .os "linux-ubuntu") (eq .os "linux-debian") -}}
 #!/usr/bin/env bash
 
 {{ template "shared_script_utils.bash" . }}
+
+{{- if or (eq .os "linux-pop") (eq .os "linux-ubuntu") (eq .os "linux-debian") -}}
 
 if [[ ! $(command -v keybase ) ]]; then
   header "🔑 Installing Keybase chat and file sharing app"
