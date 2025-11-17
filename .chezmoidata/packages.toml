@@ -16,10 +16,12 @@
       "nmon",
       "p7zip-full",
       "procps",
+      "qemu-system",
       "qutebrowser",  # keyboard-focused browser
       "snapd",
       "sudo",
       "tzdata",
+      "uidmap",
       "unzip",
       "vulkan-tools",
       "wget",
