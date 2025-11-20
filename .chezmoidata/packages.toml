@@ -5,12 +5,20 @@
       "1password",
       "1password-cli",
       "apt-transport-https",
+      "aptitude",
       "build-essential",
       "curl",
       "file",
+      "fort77",
+      "gcc-multilib",
       "git",
       "git-extras",
       "gnome-tweaks",
+      "gobjc++",
+      "libblas-dev",
+      "libbz2-dev",
+      "liblzma-dev",
+      "libreadline-dev",
       "needrestart",
       "net-tools",
       "nmon",
@@ -25,6 +33,8 @@
       "unzip",
       "vulkan-tools",
       "wget",
+      "xclip", # clipboard utility
+      "xorg-dev",
       "zsh",
     ]
   [packages.apt.dev_computer]
@@ -57,8 +67,8 @@
       "1password",
       "font-geist",
       "font-geist-mono",
-      "grandperspective", # Disk usage visualizer
       "gpg-suite",
+      "grandperspective", # Disk usage visualizer
       "keybase",
       "podman-desktop",           # open source container tools
     ]
@@ -76,9 +86,10 @@
       "fd",              # fd-find
       "findutils",       # GNU find, locate, updatedb, and xargs
       "fzf",             # Fuzzy finder
-      "thefuck",         # Mistake corrector
       "gawk",            # GNU awk
+      "gfortran",        # fortran compiler
       "gh",              # GitHub CLI
+      "ghostscript",     # imagemagick optional dependency
       "git",
       "git-delta",       # https://github.com/dandavison/delta
       "git-extras",
@@ -87,20 +98,22 @@
       "gnutls",          # GNU Transport Layer Security (TLS) Library
       "gping",           # Ping, but with a graph
       "grep",
+      "imagemagick",     # Image manipulation tools
       "jandedobbeleer/oh-my-posh/oh-my-posh", # prompt theme engine
+      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
-      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mas",             # Mac App Store command-line interface
       "mc",              # Midnight Commander
+      "mermaid-cli",     # Graph cli tool
       "most",            # Pager
       "nano",
-      "neovim",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
+      "neovim",
       "opencode",
       "openssl",         # SSL/TLS cryptography library
       "podman",
@@ -111,6 +124,7 @@
       "ripgrep",         # search tool like grep and the silver searcher
       "sqlite3",
       "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
+      "thefuck",         # Mistake corrector
       "tldr",            # TLDR man pages
       "tre-command",      # Display directories as trees (with optional color/HTML output)
       "vivid",           # https://github.com/sharkdp/vivid
@@ -159,7 +173,9 @@
       "findutils",       # GNU find, locate, updatedb, and xargs
       "fzf",             # Fuzzy finder
       "gawk",            # GNU awk
+      "gfortran",        # fortran compiler
       "gh",              # GitHub CLI
+      "ghostscript",     # imagemagick optional dependency
       "git",
       "git-delta",       # https://github.com/dandavison/delta
       "gnu-sed",         # GNU implementation of the famous stream editor
@@ -168,19 +184,21 @@
       "gpg",
       "gping",           # Ping, but with a graph
       "grep",
+      "imagemagick",     # Image manipulation tools
+      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
-      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "mc",              # Midnight Commander
+      "mermaid-cli",     # Graph cli tool
       "most",            # Pager
-      "oh-my-posh",      # prompt theme engine
       "nano",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
       "neovim",
+      "oh-my-posh",      # prompt theme engine
       "openssl",         # SSL/TLS cryptography library
       "podman",           # open source container tools
       "podman-compose",
