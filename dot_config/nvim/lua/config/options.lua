@@ -21,6 +21,3 @@ vim.filetype.add({
     avanterules = 'markdown'
   }
 })
-
--- kitty specific settings
-vim.opt.clipboard = ""

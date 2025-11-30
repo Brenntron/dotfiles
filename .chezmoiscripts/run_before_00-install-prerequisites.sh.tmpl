@@ -6,7 +6,9 @@
 if [[ ! $(command -v kitty) ]]; then
   header "😸 Installing Kitty terminal emulator"
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+  {{ if (eq .chezmoi.os "linux") }}
   sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator $( which kitty) 10
+  {{ end }}
 fi
 
 if [[ ! $(command -v brew) ]]; then
