@@ -79,6 +79,7 @@
       "bash-completion",
       "bat",             # cat with syntax highlighting and Git integration
       "bottom",          # Process/system monitor for the terminal.
+      "chezmoi", 	 # Install via homebrew to replace /bin/ executable.
       "coreutils",
       "exercism",
       "eza",             # ls replacement
