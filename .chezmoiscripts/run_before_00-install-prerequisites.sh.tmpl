@@ -2,24 +2,20 @@
 
 {{ template "shared_script_utils.bash" . }}
 
-{{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") }}
+{{ if (and (or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux")) (not .work_computer)) }}
 if [[ ! $(command -v kitty) ]]; then
   header "😸 Installing Kitty terminal emulator"
-  {{ if .work_computer }}
-  curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin dest=~/Applications/
-  {{ else }}
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-  {{ end }}
   {{ if eq .chezmoi.os "linux" }}
   sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator $( which kitty) 10
   {{ end }}
 fi
+{{ end }}
 
 if [[ ! $(command -v brew) ]]; then
   header "🍺 Installing Homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
-{{ end }}
 
 {{ if eq .chezmoi.os "darwin" }}
 if [[ -e "/opt/homebrew/bin/brew" && ! $(command -v brew) ]]; then
@@ -76,7 +72,7 @@ done
         sudo pacman -S --noconfirm "${pkg}"
     done
   fi
-{{   end }}
+{{ end }}
 
 {{ end }}
 
