@@ -67,20 +67,23 @@
       "1password",
       "font-geist",
       "font-geist-mono",
+      "font-fira-code",  # Fira Code font
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",
       "podman-desktop",           # open source container tools
     ]
     formulae = [
+      "antidote",        # zsh plugin manager
       "asdf",            # Package manager that supports multiple runtimes
       "atuin",           # Better shell history
       "bash",
       "bash-completion",
       "bat",             # cat with syntax highlighting and Git integration
       "bottom",          # Process/system monitor for the terminal.
-      "chezmoi", 	 # Install via homebrew to replace /bin/ executable.
+      "chezmoi", 	       # Install via homebrew to replace /bin/ executable.
       "coreutils",
+      "curl",
       "exercism",
       "eza",             # ls replacement
       "fastfetch",
@@ -94,8 +97,10 @@
       "git",
       "git-delta",       # https://github.com/dandavison/delta
       "git-extras",
+      "glow",            # Render markdown in the terminal
       "gnu-sed",         # GNU implementation of the famous stream editor
       "gnu-tar",         # GNU version of the tar archiving utility
+      "gnupg",           # GPG Keys
       "gnutls",          # GNU Transport Layer Security (TLS) Library
       "gping",           # Ping, but with a graph
       "grep",
@@ -127,7 +132,8 @@
       "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
       "thefuck",         # Mistake corrector
       "tldr",            # TLDR man pages
-      "tre-command",      # Display directories as trees (with optional color/HTML output)
+      "tre-command",     # Display directories as trees (with optional color/HTML output)
+      "vhs",             # terminal recordings
       "vivid",           # https://github.com/sharkdp/vivid
       "zoxide",          # A faster way to navigate your filesystem
       "zsh",
@@ -162,6 +168,7 @@
   to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
   [packages.linuxbrew.common]
     formulae = [
+      "antidote",        # zsh plugin manager
       "asdf",            # Package manager that supports multiple runtimes
       "atuin",           # Better shell history
       "bash",
@@ -172,11 +179,13 @@
       "fastfetch",
       "fd",              # fd-find
       "findutils",       # GNU find, locate, updatedb, and xargs
+      "font-fira-code",  # Fira Code font
       "fzf",             # Fuzzy finder
       "gawk",            # GNU awk
       "gfortran",        # fortran compiler
       "gh",              # GitHub CLI
       "ghostscript",     # imagemagick optional dependency
+      "glow",            # Render markdown in the terminal
       "git",
       "git-delta",       # https://github.com/dandavison/delta
       "gnu-sed",         # GNU implementation of the famous stream editor
@@ -214,6 +223,7 @@
       "tldr",            # TLDR man pages
       "tre-command",     # Display directories as trees (with optional color/HTML output)
       "util-linux",
+      "vhs",             # terminal recordings
       "vivid",           # https://github.com/sharkdp/vivid
       "winetricks",
       "zoxide",          # A faster way to navigate your filesystem
