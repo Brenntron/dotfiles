@@ -67,11 +67,11 @@
       "1password",
       "font-geist",
       "font-geist-mono",
-      "font-fira-code",  # Fira Code font
+      "font-fira-code",   # Fira Code font
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",
-      "podman-desktop",           # open source container tools
+      "podman-desktop",   # open source container tools
     ]
     formulae = [
       "antidote",        # zsh plugin manager
@@ -106,7 +106,7 @@
       "grep",
       "imagemagick",     # Image manipulation tools
       "jandedobbeleer/oh-my-posh/oh-my-posh", # prompt theme engine
-      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
+      "jesseduffield/lazydocker/lazydocker",  # simple terminal UI for docker commands
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
@@ -179,7 +179,6 @@
       "fastfetch",
       "fd",              # fd-find
       "findutils",       # GNU find, locate, updatedb, and xargs
-      "font-fira-code",  # Fira Code font
       "fzf",             # Fuzzy finder
       "gawk",            # GNU awk
       "gfortran",        # fortran compiler

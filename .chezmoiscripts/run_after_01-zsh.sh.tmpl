@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-{{ template "shared_script_utils.bash" . }}
+{{ template "shared_script_utils.bash" . -}}
 
-{{ if eq .chezmoi.os "linux" }}
+{{ if eq .chezmoi.os "linux" -}}
 
 if [[ "$(basename "$SHELL")" != "zsh" && -x "$(command -v zsh)" ]]; then
    chsh -s $(which zsh)
 fi
 
-if [[ ! $(command -v omw) ]]; then
+if command -v omz >/dev/null; then
   # install oh-my-zsh
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
