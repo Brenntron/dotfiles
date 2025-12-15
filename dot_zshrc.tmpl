@@ -6,17 +6,6 @@ export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
 
-# zsh plugins using antidate
-source $(brew --prefix antidote)/share/antidote/antidote.zsh
-antidote load ${ZDOTDIR:-$HOME}/.config/zsh_plugins.txt
-
-# load custom plugins
-plugins=(
-  rebar
-  redis-cli
-  zsh-syntax-highlighting
-)
-
 {{ if eq .chezmoi.os "linux" }}
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 {{ else if eq .chezmoi.os "darwin" }}
@@ -36,6 +25,17 @@ source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-
 eval "$(oh-my-posh init zsh --config ~/.config/catppuccin/oh-my-posh/catppuccin_macchiato.omp.yaml)"
 
 eval $(thefuck --alias)
+
+# zsh plugins using antidate
+source $(brew --prefix antidote)/share/antidote/antidote.zsh
+antidote load ${ZDOTDIR:-$HOME}/.config/zsh_plugins.txt
+
+# load custom plugins
+plugins=(
+  rebar
+  redis-cli
+  zsh-syntax-highlighting
+)
 
 {{ if eq .chezmoi.os "Linux" }}
 export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
