@@ -1,22 +1,17 @@
-# If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
-
-# Path to your oh-my-zsh installation.
-export ZSH="${HOME}/.oh-my-zsh"
-
-source $ZSH/oh-my-zsh.sh
 
 {{ if eq .chezmoi.os "linux" }}
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 {{ else if eq .chezmoi.os "darwin" }}
 export PATH="/opt/homebrew/bin:$PATH"
 {{ end }}
-# FZF setup
-source ~/.config/fzf/fzf.zsh
 
-# Custom syntax highlighting must come before activating zsh-syntax-highlighting
-# source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
-source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-zsh-syntax-highlighting.zsh
+export PATH="${HOME}/.local/bin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
+
+export XDG_CONFIG_HOME="${HOME}/.config"
+export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
+export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
 # oh-my-posh theme
 # tokyonight_moon
@@ -24,42 +19,110 @@ source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-
 # Catppuccin Macchiato
 eval "$(oh-my-posh init zsh --config ~/.config/catppuccin/oh-my-posh/catppuccin_macchiato.omp.yaml)"
 
-eval $(thefuck --alias)
-
-# zsh plugins using antidate
-source $(brew --prefix antidote)/share/antidote/antidote.zsh
-antidote load ${ZDOTDIR:-$HOME}/.config/zsh_plugins.txt
-
-# load custom plugins
-plugins=(
-  rebar
-  redis-cli
-  zsh-syntax-highlighting
-)
-
 {{ if eq .chezmoi.os "Linux" }}
-export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
-export SSH_AUTH_SOCK=~/.1password/agent.sock
+export SSH_AUTH_SOCK=$HOME.1password/agent.sock
 
-export PYENV_ROOT="$HOME/.pyenv"
+export PYENV_ROOT=$HOME/.pyenv
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
-skip_global_compinit=1
+export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
+
 {{ else if eq .chezmoi.os "darwin" }}
-ssh-add --apple-use-keychain
+export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
 export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib --enable-hipe --enable-sctp --enable-smp-support --enable-threads --enable-kernel-poll --enable-wx --enable-darwin-64bit --with-ssl=$(brew --prefix openssl)"
 export NODE_OPTIONS="--max-old-space-size=8192"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-
 {{ end }}
 
-# enable autocomplete function
-source $(brew --prefix zsh-autocomplete)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# Custom syntax highlighting must come before activating zsh-syntax-highlighting
+# source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
+source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-zsh-syntax-highlighting.zsh
 
-# zsh-autocomplete config, Leave out _expand
-zstyle ':completion:*' completer _expand_alias _complete _complete:-fuzzy _correct _approximate _ignored menu select
+eval $(thefuck --alias)
+
+zmodload zsh/complist
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'j' vi-down-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+
+bindkey -M menuselect '^xg' clear-screen
+bindkey -M menuselect '^xi' vi-insert                      # Insert
+bindkey -M menuselect '^xh' accept-and-hold                # Hold
+bindkey -M menuselect '^xn' accept-and-infer-next-history  # Next
+bindkey -M menuselect '^xu' undo                           # Undo
+
+# zsh completions config
+autoload -U compinit; compinit
+_comp_options=(globdots) # With hidden files
+
+compdef vman="man"
+
+# Options
+setopt MENU_COMPLETE
+setopt AUTO_LIST
+setopt COMPLETE_IN_WORD
+
+# zstyles
+
+# Define completers
+zstyle ':completion:*' completer _extensions _complete _approximate
+
+# Use cache for commands using cache
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$XDG_CONFIG_HOME/zsh/.zcompcache" 
+
+# Complete the alias when _expand_alias is used as a function
+zstyle ':completion:*' complete true 
+zle -C alias-expansion complete-word _generic
+bindkey '^Xa' alias-expansion
+zstyle ':completion:alias-expansion:*' completer _expand_alias 
+
+# Use cache for commands which use it
+
+# Enable menu selection and keymaps
+zstyle ':completion:*' menu select
+
+# Autocomplete options for cd instead of directory stack
+zstyle ':completion:*' complete-options true
+zstyle ':completion:*' file-sort modification 
+
+# Only displays ome tags for the command cd and z
+zstyle ':completion:*:*:cd:*' tag-order local-directories directory-stack path-directories
+zstyle ':completion:*:*:z:*' tag-order local-directories directory-stack path-directories
+
+# Group completions
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:*:-command-:*:*' group-order aliases builtins functions commands
+
+# See ZSHCOMPWID "completion matching control"
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+zstyle ':completion:*' keep-prefix true
+
+zstyle -e ':completion:*:(ssh|scp|sftp|rsh|rsync):hosts' hosts 'reply=(${=${${(f)"$(cat {/etc/ssh_,~/.ssh/known_}hosts(|2)(N) /dev/null)"}%%[# ]*}//,/ })'
+
+## For kubernetes
+zstyle ':completion:*:*:kubectl:*' list-grouped false
+
+# Expand '//' to '/'
+zstyle ':completion:*' squeeze-slashes true
+
+# # AWS Completions (the aws plugin may render this redundant)
+# {{ if (and (eq .chezmoi.os "darwin") (not .work_computer)) -}}
+# source "/usr/local/bin/aws_zsh_completer.sh"
+# {{ else }}
+# if command -v aws_completer >/dev/null 2>&1; then
+#     complete -C aws_completer aws
+# fi
+# {{ end }}
+
+# zsh plugins using antidate
+source $(brew --prefix antidote)/share/antidote/antidote.zsh
+antidote load $XDG_CONFIG_HOME/zsh_plugins.txt
+
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -71,11 +134,15 @@ HYPHEN_INSENSITIVE="true"
 # asdf setup
 source ~/.config/asdf/asdf_setup.zsh
 
+# Atuin
+# Disable up arrow navigation
+eval "$(atuin init zsh --disable-up-arrow)"
+
+# FZF setup
+source ~/.config/fzf/fzf.zsh
+
 # obsidianmd-cli completions
 source ~/.config/completions/obsidianmd.zsh
-
-
-# User configuration
 
 # You may need to manually set your language environment
 export LC_ALL=en_US.UTF-8
@@ -91,25 +158,9 @@ fi
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
 export PATH="$(brew --prefix imagemagick@6)/bin:$PATH"
 export PATH="$(brew --prefix openssl@3)/bin:$PATH"
 export PATH="$(brew --prefix make)/libexec/gnubin:$PATH"
-
-export PATH="${HOME}/.local/bin:$PATH"
-export PATH="/usr/local/sbin:$PATH"
-
-export XDG_CONFIG_HOME="${HOME}/.config"
-export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
-export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
 # set brew installed curl if installed
 if brew list curl &>/dev/null; then 
@@ -156,11 +207,6 @@ alias pc='podman compose'
 # Yarn aliases
 source ~/.config/zsh/yarn.zsh
 
-# enable alias-finder
-zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
-
-alias spectral='spectral-language-server'
-
 # use bat as a colorizing pager for man
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # Uncomment below if you experience formatting problems
@@ -174,20 +220,11 @@ export WINEPREFIX="${HOME}/.wine32 winecfg"
 export WINEARCH="win32"
 {{ end }}
 
+# Zoxide setup
 eval "$(zoxide init zsh)"
 
 # Bun
 export PATH="${HOME}/.bun/bin:$PATH"
-
-# # AWS Completions (the aws plugin may render this redundant)
-# {{ if (and (eq .chezmoi.os "darwin") (not .work_computer)) -}}
-# source "/usr/local/bin/aws_zsh_completer.sh"
-# {{ else }}
-# autoload -Uz compinit && compinit
-# if command -v aws_completer >/dev/null 2>&1; then
-#     complete -C aws_completer aws
-# fi
-# {{ end }}
 
 # Enable vi mode
 bindkey -v
