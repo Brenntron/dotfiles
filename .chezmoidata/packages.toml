@@ -65,8 +65,6 @@
   [packages.homebrew.common]
     casks = [
       "1password",
-      "font-geist",
-      "font-geist-mono",
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",
