@@ -74,6 +74,7 @@
       "antidote",        # zsh plugin manager
       "asdf",            # Package manager that supports multiple runtimes
       "atuin",           # Better shell history
+      "autoconf",        # asdf-erlang dependency
       "bash",
       "bash-completion",
       "bat",             # cat with syntax highlighting and Git integration
@@ -86,6 +87,7 @@
       "fastfetch",
       "fd",              # fd-find
       "findutils",       # GNU find, locate, updatedb, and xargs
+      "fop",             # Formatting Objects Processor, asdf-erlang dependency
       "fzf",             # Fuzzy finder
       "gawk",            # GNU awk
       "gfortran",        # fortran compiler
@@ -109,6 +111,7 @@
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
+      "libxslt",         # asdf-erlang dependency
       "mas",             # Mac App Store command-line interface
       "mc",              # Midnight Commander
       "mermaid-cli",     # Graph cli tool
@@ -130,8 +133,10 @@
       "thefuck",         # Mistake corrector
       "tldr",            # TLDR man pages
       "tre-command",     # Display directories as trees (with optional color/HTML output)
+      "unixodbc",        # Optional asdf-erlang dependency
       "vhs",             # terminal recordings
       "vivid",           # https://github.com/sharkdp/vivid
+      "wxwidgets",       # asdf-erlang dependency
       "zoxide",          # A faster way to navigate your filesystem
       "zsh",
       "zsh-autocomplete",
