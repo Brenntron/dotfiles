@@ -68,7 +68,6 @@
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",
-      "podman-desktop",   # open source container tools
     ]
     formulae = [
       "antidote",        # zsh plugin manager
@@ -105,7 +104,7 @@
       "grep",
       "imagemagick",     # Image manipulation tools
       "jandedobbeleer/oh-my-posh/oh-my-posh", # prompt theme engine
-      "jesseduffield/lazydocker/lazydocker",  # simple terminal UI for docker commands
+      "lazydocker",      # simple terminal UI for docker commands
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
@@ -122,8 +121,6 @@
       "neovim",
       "opencode",
       "openssl",         # SSL/TLS cryptography library
-      "podman",
-      "podman-compose",
       "postgresql",
       "redis",
       "rip2",            # A safer, rust-based rm
@@ -148,6 +145,7 @@
     casks = [
       "bruno",
       "dbeaver-community",
+      "docker-desktop",
       "httpie",
     ]
     formulae = [
@@ -156,6 +154,8 @@
       "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
+      "docker",
+      "docker-compose"
     ]
     taps = []
   [packages.homebrew.homelab_member]
@@ -196,7 +196,7 @@
       "gping",           # Ping, but with a graph
       "grep",
       "imagemagick",     # Image manipulation tools
-      "jesseduffield/lazydocker/lazydocker", # simple terminal UI for docker commands
+      "lazydocker",      # simple terminal UI for docker commands
       "jless",           # JSON viewer
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
