@@ -144,6 +144,9 @@ source ~/.config/asdf/asdf_setup.zsh
 # Disable up arrow navigation
 eval "$(atuin init zsh --disable-up-arrow)"
 
+# Docker
+alias lzd='lazydocker'
+
 # FZF setup
 source ~/.config/fzf/fzf.zsh
 
@@ -201,14 +204,12 @@ export CPPFLAGS="-I$(brew --prefix openssl@3)/include"
 export OPENSSLDIR="$(brew --prefix openssl@3)"
 export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(brew --prefix openssl@3) --with-openssl-rpath=auto"
 
-# Lazygit setup
+{{ if eq .chezmoi.os "linux" }}
+# Podman setup
 
-# Lazydocker setup
-export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
-alias docker='podman'
+alias lazypodman='DOCKER_HOST=unix:///run/user/1000/podman/podman.sock lazydocker'
 
-# Podman Compose aliases
-alias pc='podman compose'
+{{ end -}}
 
 # Yarn aliases
 source ~/.config/zsh/yarn.zsh
