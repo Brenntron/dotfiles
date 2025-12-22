@@ -20,9 +20,10 @@ export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 omp_config='~/.config/catppuccin/oh-my-posh/catppuccin_macchiato.omp.yaml'
 eval "$(oh-my-posh init zsh --config ${omp_config})"
 
-{{ if eq .chezmoi.os "Linux" }}
+# Set 1Password SSH agent.
 export SSH_AUTH_SOCK=$HOME.1password/agent.sock
 
+{{ if eq .chezmoi.os "Linux" }}
 export PYENV_ROOT=$HOME/.pyenv
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
@@ -31,8 +32,6 @@ export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe \
   --with-ssl=$(brew --prefix openssl)"
 
 {{ else if eq .chezmoi.os "darwin" }}
-export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-
 export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules \
   --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib \
   --enable-hipe --disable-sctp --enable-smp-support --enable-threads \
