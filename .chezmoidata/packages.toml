@@ -65,6 +65,7 @@
   [packages.homebrew.common]
     casks = [
       "1password",
+      "docker-desktop",   # open source container tools
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",
@@ -81,6 +82,8 @@
       "chezmoi", 	       # Install via homebrew to replace /bin/ executable.
       "coreutils",
       "curl",
+      "docker",
+      "docker-compose",
       "exercism",
       "eza",             # ls replacement
       "fastfetch",

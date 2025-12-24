@@ -122,8 +122,7 @@ zstyle ':completion:*' squeeze-slashes true
 # {{ end }}
 
 # 1Password
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-eval "$(ssh-agent)"
+export SSH_AUTH_SOCK=~/.1password/agent.sock
 
 # zsh plugins using antidate
 source $(brew --prefix antidote)/share/antidote/antidote.zsh
@@ -208,7 +207,10 @@ export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(br
 
 {{ if eq .chezmoi.os "linux" }}
 # Podman setup
+export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 alias lzp='DOCKER_HOST=unix:///run/user/1000/podman/podman.sock lazydocker'
+alias docker='podman'
+alias pc='podman compose'
 {{ else }}
 # Docker
 alias lzd='lazydocker'
