@@ -20,9 +20,6 @@ export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 omp_config='~/.config/catppuccin/oh-my-posh/catppuccin_macchiato.omp.yaml'
 eval "$(oh-my-posh init zsh --config ${omp_config})"
 
-# Set 1Password SSH agent.
-export SSH_AUTH_SOCK=$HOME.1password/agent.sock
-
 {{ if eq .chezmoi.os "Linux" }}
 export PYENV_ROOT=$HOME/.pyenv
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
@@ -124,6 +121,10 @@ zstyle ':completion:*' squeeze-slashes true
 # fi
 # {{ end }}
 
+# 1Password
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+eval "$(ssh-agent)"
+
 # zsh plugins using antidate
 source $(brew --prefix antidote)/share/antidote/antidote.zsh
 antidote load $XDG_CONFIG_HOME/zsh_plugins.txt
@@ -139,15 +140,17 @@ HYPHEN_INSENSITIVE="true"
 # asdf setup
 source ~/.config/asdf/asdf_setup.zsh
 
-# Atuin
-# Disable up arrow navigation
-eval "$(atuin init zsh --disable-up-arrow)"
+# auto execute after zsh-vi-mode initializes
+function zvm_after_init() {
+  # Atuin
+  # Disable up arrow navigation
+  eval "$(atuin init zsh --disable-up-arrow)"
+  zvm_bindkey viins '^R' atuin-search
+  zvm_bindkey vicmd '^R' atuin-search
 
-# Docker
-alias lzd='lazydocker'
-
-# FZF setup
-source ~/.config/fzf/fzf.zsh
+  # FZF setup
+  source ~/.config/fzf/fzf.zsh
+}
 
 # obsidianmd-cli completions
 source ~/.config/completions/obsidianmd.zsh
@@ -205,9 +208,10 @@ export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(br
 
 {{ if eq .chezmoi.os "linux" }}
 # Podman setup
-
-alias lazypodman='DOCKER_HOST=unix:///run/user/1000/podman/podman.sock lazydocker'
-
+alias lzp='DOCKER_HOST=unix:///run/user/1000/podman/podman.sock lazydocker'
+{{ else }}
+# Docker
+alias lzd='lazydocker'
 {{ end -}}
 
 # Yarn aliases
