@@ -8,15 +8,6 @@ if [[ "$(basename "$SHELL")" != "zsh" && -x "$(command -v zsh)" ]]; then
    chsh -s $(which zsh)
 fi
 
-if command -v omz >/dev/null; then
-  # install oh-my-zsh
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-  # clone fast-syntax-highlighting
-  git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git \
-  ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
-fi
-
 {{- end }}
 
 _safeExit_
