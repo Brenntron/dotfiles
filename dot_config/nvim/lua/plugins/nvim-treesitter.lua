@@ -5,7 +5,6 @@ return {
       "bash",
       "comment",
       "css",
-      "csv",
       "dap_repl",
       "diff",
       "dockerfile",
