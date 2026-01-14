@@ -1,0 +1,12 @@
+{
+  "Statement": {
+    "prefix": "{% %}",
+    "body": ["{% $0 %}"],
+    "description": "Statement"
+  },
+  "Comment": {
+    "prefix": "{# #}",
+    "body": ["{# $0 #}"],
+    "description": "Comment"
+  }
+}
