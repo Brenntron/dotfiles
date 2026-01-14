@@ -25,7 +25,7 @@ blocks:
         background: p:blue
         type: os
         style: diamond
-      - template: " {{ .UserName }}@{{ .HostName }} "
+      - template: " {{ .HostName }} "
         foreground: p:text
         background: p:blue
         type: session
