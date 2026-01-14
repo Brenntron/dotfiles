@@ -19,8 +19,7 @@ blocks:
       - options:
           debian: " "
           display_distro_name: true
-        leading_diamond: 
-        template: "{{.Icon}} "
+        template: " {{.Icon}} "
         foreground: p:text
         background: p:blue
         type: os
@@ -69,7 +68,7 @@ blocks:
         style: diamond
       - options:
           cache_duration: none
-        template: "  {{ .Full }} "
+        template: "   {{ .Full }} "
         foreground: p:text
         background: p:mauve
         type: elixir
