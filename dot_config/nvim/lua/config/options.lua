@@ -2,9 +2,6 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
--- auto format
-vim.g.autoformat = false
-
 -- listchars
 vim.opt.listchars = {
   tab = "> ",
@@ -15,6 +12,6 @@ vim.opt.listchars = {
 -- filetype settings
 vim.filetype.add({
   extension = {
-    avanterules = 'markdown'
-  }
+    avanterules = "markdown",
+  },
 })
