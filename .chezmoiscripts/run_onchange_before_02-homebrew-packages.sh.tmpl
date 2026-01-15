@@ -93,7 +93,7 @@ for tap in ${taps[@]}; do
     if ! brew tap | grep -q "^${tap}\$"; then
         brew tap "${tap}"
     fi
-  done
+done
 
 for formula in ${formulae[@]}; do
     if ! _inArray_ -i "${formula}" "${currently_installed_formulae[@]}"; then
@@ -112,7 +112,7 @@ done
 {{ if not (or .is_ci_workflow .work_computer) }}
 for cask in ${casks[@]}; do
     if ! _inArray_ -i "${cask}" "${currently_installed_casks[@]}"; then
-        brew install -q --cask ${cask}
+        brew install --cask ${cask}
     fi
 
 done

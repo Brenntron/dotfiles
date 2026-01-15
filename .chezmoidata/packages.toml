@@ -45,7 +45,6 @@
     packages = []
 [packages.asdf]
   plugins = [
-    "aria2",
     "bun",
     "elixir",
     "erlang",
@@ -66,6 +65,7 @@
     casks = [
       "1password",
       "docker-desktop",   # open source container tools
+      "font-symbols-only-nerd-font",
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",

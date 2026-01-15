@@ -2,7 +2,7 @@
 
 {{ template "shared_script_utils.bash" . }}
 
-{{ if (and (or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux")) (not .work_computer)) }}
+{{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") }}
 if [[ ! $(command -v kitty) ]]; then
   header "😸 Installing Kitty terminal emulator"
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
