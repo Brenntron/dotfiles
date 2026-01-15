@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+{{ template "shared_script_utils.bash" . }}
+
+if [[ $(command -v asdf) ]]; then
+  asdf_plugins=(
+    {{ range $plugin := .packages.asdf.plugins }}
+    "{{ $plugin }}"
+    {{ end }}
+  )
+
+  echo "Installing asdf plugins"
+  for plugin in ${asdf_plugins[@]}; do
+    asdf plugin add $plugin
+  done
+fi
+
+_safeExit_

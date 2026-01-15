@@ -1,5 +1,6 @@
-{{- if and (eq .chezmoi.os "linux") (not .is_ci_workflow) -}}
 #!/usr/bin/env bash
+
+{{- if and (eq .chezmoi.os "linux") (not .is_ci_workflow) -}}
 
 {{ template "shared_script_utils.bash" . }}
 

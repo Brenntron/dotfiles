@@ -29,9 +29,9 @@
 # More examples can be found here:
 #  https://developer.1password.com/docs/ssh/agent/config
 [[ssh-keys]]
-vault = "Private"
+vault p "Private"
 
-{{- if .eq.work_computer }}
+{{- if .work_computer }}
 [[ssh-keys]]
 vault = "Spreetail"
 {{ end -}}
