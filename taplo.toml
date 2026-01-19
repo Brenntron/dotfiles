@@ -1,0 +1,6 @@
+include=["taplo.toml", ".chezmoidata/packages.toml"]
+
+[formatting]
+  align_entries  =true
+  compact_entries=true
+  indent_entries =true
