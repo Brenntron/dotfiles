@@ -41,8 +41,6 @@
     packages = []
   [packages.apt.homelab_member]
     packages = ["iperf"]
-  [packages.apt.personal_computer]
-    packages = []
 [packages.asdf]
   plugins = [
     "bun",
@@ -113,6 +111,7 @@
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
       "libpq",           # PostgreSQL utilities but not postgresql itself
+      "libyaml",          # ruby-build dependency
       "libxslt",         # asdf-erlang dependency
       "mas",             # Mac App Store command-line interface
       "mc",              # Midnight Commander
@@ -164,10 +163,6 @@
   [packages.homebrew.homelab_member]
     casks    = []
     formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
-    taps = []
-  [packages.homebrew.personal_computer]
-    casks = []
-    formulae = []
     taps = []
 [packages.linuxbrew]
   to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
@@ -245,8 +240,6 @@
     ]
   [packages.linuxbrew.homelab_member]
     formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
-  [packages.linuxbrew.personal_computer]
-    formulae = []
 [packages.snap]
   [packages.snap.common]
     packages = [
@@ -256,8 +249,6 @@
     packages = [
       "dbeaver-ce",  # Database management tool
     ]
-  [packages.snap.personal_computer]
-    packages = []
 [packages.python]
   to_remove = []
   [packages.python.common]
@@ -265,8 +256,6 @@
   [packages.python.dev_computer]
     packages = []
   [packages.python.homelab_member]
-    packages = []
-  [packages.python.personal_computer]
     packages = []
 [package.ruby]
   to_remove = []
