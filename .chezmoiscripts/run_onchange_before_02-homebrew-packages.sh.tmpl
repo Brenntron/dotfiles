@@ -147,12 +147,6 @@ formulae=(
     "{{ $package }}"
     {{ end }}
     {{ end }}
-
-    {{ if .personal_computer }}
-    {{ range $package := .packages.linuxbrew.personal_computer.formulae }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
 )
 
 currently_installed_formulae=($(brew list --formula -1))
