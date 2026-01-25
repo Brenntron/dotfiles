@@ -27,6 +27,7 @@ blocks:
       - template: " {{ .HostName }} "
         foreground: p:text
         background: p:blue
+        powerline_symbol: 
         type: session
         style: diamond
       - options:
@@ -36,6 +37,7 @@ blocks:
         template: " {{ .Path }}"
         foreground: p:text
         background: p:pink
+        powerline_symbol: 
         type: path
         style: powerline
       - options:
@@ -69,6 +71,7 @@ blocks:
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
+        leading_diamond: 
         foreground: p:text
         background: p:mauve
         type: elixir
@@ -78,6 +81,7 @@ blocks:
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:sapphire
+        leading_diamond: 
         type: go
         style: plain
       - options:
@@ -85,6 +89,7 @@ blocks:
         template: " 󰢱  {{ .Full }} "
         foreground: p:text
         background: p:blue
+        leading_diamond: 
         type: lua
         style: plain
       - options:
@@ -92,6 +97,7 @@ blocks:
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:green
+        leading_diamond: 
         type: node
         style: plain
       - options:
@@ -99,6 +105,7 @@ blocks:
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:yellow
+        leading_diamond: 
         type: python
         style: plain
       - options:
@@ -106,6 +113,7 @@ blocks:
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:red
+        leading_diamond: 
         type: ruby
         style: plain
       # - options:

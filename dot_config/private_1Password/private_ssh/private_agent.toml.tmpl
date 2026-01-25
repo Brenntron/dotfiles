@@ -28,10 +28,15 @@
 #
 # More examples can be found here:
 #  https://developer.1password.com/docs/ssh/agent/config
-[[ssh-keys]]
-vault p "Private"
 
-{{- if .work_computer }}
+{{ if .work_computer }}
+[[ssh-keys]]
+item = "Desktop Git Key"
+vault = "Private"
+
 [[ssh-keys]]
 vault = "Spreetail"
+{{ else }}
+[[ssh-keys]]
+vault = "Private"
 {{ end -}}
