@@ -23,12 +23,6 @@ formulae=(
     "{{ $package }}"
     {{ end }}
     {{ end }}
-
-    {{ if .personal_computer }}
-    {{ range $package := .packages.homebrew.personal_computer.formulae }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
 )
 
 casks=(
@@ -44,12 +38,6 @@ casks=(
 
     {{ if .homelab_member }}
     {{ range $package := .packages.homebrew.homelab_member.casks }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
-
-    {{ if .personal_computer }}
-    {{ range $package := .packages.homebrew.personal_computer.casks }}
     "{{ $package }}"
     {{ end }}
     {{ end }}
@@ -71,17 +59,28 @@ taps=(
     "{{ $package }}"
     {{ end }}
     {{ end }}
-
-    {{ if .personal_computer }}
-    {{ range $package := .packages.homebrew.personal_computer.taps }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
-
 )
 
 currently_installed_formulae=($(brew list --formula -1))
 currently_installed_casks=($(brew list --cask -1))
+
+is_font_cask () { [[ "$1" == font-* ]]; }
+
+font_exists () {
+  local name="${1#font-}"
+  name="${name//-/ }"
+
+  # Search system and user font directories for .ttf/.otf files matching the name
+  shopt -s nullglob
+  for dir in "/Library/Fonts" "$HOME/Library/Fonts"; do
+    if ls "$dir"/*"$name"*.ttf "$dir"/*"$name"*.otf 2>/dev/null; then
+      shopt -u nullglob
+      return 0
+    fi
+  done
+  shopt -u nullglob
+  return 1
+}
 
 header "Install Homebrew packages"
 
@@ -110,11 +109,19 @@ for formula in ${formulae[@]}; do
 done
 
 {{ if not (or .is_ci_workflow .work_computer) }}
-for cask in ${casks[@]}; do
-    if ! _inArray_ -i "${cask}" "${currently_installed_casks[@]}"; then
-        brew install --cask ${cask}
+for cask in "${casks[@]}"; do
+    # Skip if already installed via Homebrew
+    if _inArray_ -i "$cask" "${currently_installed_casks[@]}"; then
+        continue
     fi
 
+    # If this is a font cask and the font already exists on the system, skip it
+    if is_font_cask "$cask" && font_exists "$cask"; then
+        info "Skipping $cask – font already present"
+        continue
+    fi
+
+    brew install --cask "$cask"
 done
 {{ end }}
 
