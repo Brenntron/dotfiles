@@ -19,11 +19,6 @@ if [[ $(command -v snap) ]]; then
     "{{ $package }}"
     {{ end }}
     {{ end }}
-    {{ if .personal_computer }}
-    {{ range $package := .packages.snap.personal_computer.packages }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
   )
 
   header "Installing packages with snap"

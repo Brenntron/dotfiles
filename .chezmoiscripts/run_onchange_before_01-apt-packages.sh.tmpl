@@ -19,9 +19,6 @@ packages=(
     {{ end }}
     {{ end }}
     {{ if .personal_computer }}
-    {{ range $package := .packages.apt.personal_computer.packages }}
-    "{{ $package }}"
-    {{ end }}
     {{ end }}
 )
 
