@@ -1,40 +1,45 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   opts = {
+    -- Disable regex language globally to prevent crashes
+    ignore_install = { "regex" },
     ensure_installed = {
       "bash",
       "comment",
       "css",
-      "dap_repl",
       "diff",
       "dockerfile",
       "dot",
       "git_config",
       "git_rebase",
       "gitignore",
-      "gotmpl",
-      "gpg",
       "html",
-      "http",
       "javascript",
+      "jinja",
       "json",
       "lua",
       "markdown",
       "markdown_inline",
       "python",
       "query",
-      "regex",
+      -- "regex", -- incompatible with nvim 0.11.6
       "ruby",
-      "scss",
-      "ssh_config",
       "sql",
-      "svelte",
-      "tsx",
+      "toml",
       "typescript",
       "vim",
       "vimdoc",
-      "vue",
       "yaml",
+    },
+    highlight = {
+      enable = true,
+      disable = function(lang, buf)
+        -- Disable regex language to prevent crashes
+        if lang == "regex" then
+          return true
+        end
+        return false
+      end,
     },
   },
 }
