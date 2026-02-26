@@ -1,184 +1,179 @@
-{{- if eq .chezmoi.os "darwin" -}}
 #!/usr/bin/env bash
 
 {{ template "shared_script_utils.bash" . }}
+
+{{- if eq .chezmoi.os "darwin" -}}
 
 export HOMEBREW_NO_INSTALL_UPGRADE=TRUE
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 formulae=(
-    {{ range $package := .packages.homebrew.common.formulae }}
-    "{{ $package }}"
-    {{ end }}
+  {{ range $package := .packages.homebrew.common.formulae }}
+  "{{ $package }}"
+  {{ end }}
 
-    {{ if .dev_computer }}
-    {{ range $package := .packages.homebrew.dev_computer.formulae }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .dev_computer }}
+  {{ range $package := .packages.homebrew.dev_computer.formulae }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 
-    {{ if .homelab_member }}
-    {{ range $package := .packages.homebrew.homelab_member.formulae }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .homelab_member }}
+  {{ range $package := .packages.homebrew.homelab_member.formulae }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 )
 
 casks=(
-    {{ range $package := .packages.homebrew.common.casks }}
-    "{{ $package }}"
-    {{ end }}
+  {{ range $package := .packages.homebrew.common.casks }}
+  "{{ $package }}"
+  {{ end }}
 
-    {{ if .dev_computer }}
-    {{ range $package := .packages.homebrew.dev_computer.casks }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .dev_computer }}
+  {{ range $package := .packages.homebrew.dev_computer.casks }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 
-    {{ if .homelab_member }}
-    {{ range $package := .packages.homebrew.homelab_member.casks }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .homelab_member }}
+  {{ range $package := .packages.homebrew.homelab_member.casks }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 )
 
 taps=(
-    {{ range $package := .packages.homebrew.common.taps }}
-    "{{ $package }}"
-    {{ end }}
+  {{ range $package := .packages.homebrew.common.taps }}
+  "{{ $package }}"
+  {{ end }}
 
-    {{ if .dev_computer }}
-    {{ range $package := .packages.homebrew.dev_computer.taps }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .dev_computer }}
+  {{ range $package := .packages.homebrew.dev_computer.taps }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 
-    {{ if .homelab_member }}
-    {{ range $package := .packages.homebrew.homelab_member.taps }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .homelab_member }}
+  {{ range $package := .packages.homebrew.homelab_member.taps }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 )
 
-currently_installed_formulae=($(brew list --formula -1))
-currently_installed_casks=($(brew list --cask -1))
+casks_to_install=()
+currently_installed_casks=()
+currently_installed_formulae=()
+formulae_to_install=()
+installed_taps="$(brew tap)"
 
-is_font_cask () { [[ "$1" == font-* ]]; }
+while IFS= read -r line; do currently_installed_casks+=("$line"); done < <(brew list --cask -1)
+while IFS= read -r line; do currently_installed_formulae+=("$line"); done < <(brew list --formula -1)
 
-font_exists () {
+is_font_cask() { [[ "$1" == font-* ]]; }
+
+font_exists() {
   local name="${1#font-}"
   name="${name//-/ }"
 
   # Search system and user font directories for .ttf/.otf files matching the name
-  shopt -s nullglob
   for dir in "/Library/Fonts" "$HOME/Library/Fonts"; do
-    if ls "$dir"/*"$name"*.ttf "$dir"/*"$name"*.otf 2>/dev/null; then
-      shopt -u nullglob
+    if compgen -G "$dir"/*"$name"*.ttf >/dev/null || compgen -G "$dir"/*"$name"*.otf >/dev/null; then
       return 0
     fi
   done
-  shopt -u nullglob
   return 1
 }
 
-header "Install Homebrew packages"
+header "Updating Homebrew"
 
 brew update
 
 BREW_DIR="$(brew --prefix)/bin/"
 
-for tap in ${taps[@]}; do
-    if ! brew tap | grep -q "^${tap}\$"; then
-        brew tap "${tap}"
-    fi
+for tap in "${taps[@]}"; do
+  if ! grep -q "^${tap}\$" <<<"$installed_taps"; then
+    brew tap "${tap}"
+  fi
 done
 
-for formula in ${formulae[@]}; do
-    if ! _inArray_ -i "${formula}" "${currently_installed_formulae[@]}"; then
-        if [[ ! -e "${BREW_DIR}/${formula}" ]]; then
-            brew install -q --formula ${formula}
-        fi
-
-        # https://github.com/microsoft/Git-Credential-Manager-for-Mac-and-Linux/blob/master/Install.md
-        if [[ ${formula} == "git-credential-manager" ]]; then
-            git-credential-manager install
-        fi
-
-    fi
+for formula in "${formulae[@]}"; do
+  formula_name="${formula##*/}" # Returns 'formula' from 'author/dir/formula' or just 'formula'.
+  if ! _inArray_ -i "${formula_name}" "${currently_installed_formulae[@]}" && [[ ! -e "${BREW_DIR}/${formula_name}" ]]; then
+    formulae_to_install+=("${formula}")
+  fi
 done
 
-{{ if not (or .is_ci_workflow .work_computer) }}
 for cask in "${casks[@]}"; do
-    # Skip if already installed via Homebrew
-    if _inArray_ -i "$cask" "${currently_installed_casks[@]}"; then
-        continue
-    fi
-
-    # If this is a font cask and the font already exists on the system, skip it
-    if is_font_cask "$cask" && font_exists "$cask"; then
-        info "Skipping $cask – font already present"
-        continue
-    fi
-
-    brew install --cask "$cask"
+  _inArray_ -i "$cask" "${currently_installed_casks[@]}" && continue
+  is_font_cask "$cask" && font_exists "$cask" && continue
+  casks_to_install+=("$cask")
 done
-{{ end }}
 
-success "Homebrew packages installed"
+if [[ ${#formulae_to_install[@]} -gt 0 || ${#casks_to_install[@]} -gt 0 ]]; then
+  header "Installing Homebrew packages"
+  for formula in "${formulae_to_install[@]}"; do
+    brew install -q --formula "${formula}"
+  done
 
-_safeExit_
+  {{- if not .is_ci_workflow }}
+  for cask in "${casks_to_install[@]}"; do
+    brew install --cask "$cask"
+  done
+  {{- end }}
+
+  success "Homebrew packages installed"
+fi
 
 {{- else if eq .chezmoi.os "linux" -}}
-#!/usr/bin/env bash
-
-{{ template "shared_script_utils.bash" . }}
 
 export HOMEBREW_NO_INSTALL_UPGRADE=TRUE
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 formulae=(
-    {{ range $package := .packages.linuxbrew.common.formulae }}
-    "{{ $package }}"
-    {{ end }}
+  {{ range $package := .packages.linuxbrew.common.formulae }}
+  "{{ $package }}"
+  {{ end }}
 
-    {{ if .dev_computer }}
-    {{ range $package := .packages.linuxbrew.dev_computer.formulae }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .dev_computer }}
+  {{ range $package := .packages.linuxbrew.dev_computer.formulae }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 
-    {{ if .homelab_member }}
-    {{ range $package := .packages.linuxbrew.homelab_member.formulae }}
-    "{{ $package }}"
-    {{ end }}
-    {{ end }}
+  {{ if .homelab_member }}
+  {{ range $package := .packages.linuxbrew.homelab_member.formulae }}
+  "{{ $package }}"
+  {{ end }}
+  {{ end }}
 )
 
-currently_installed_formulae=($(brew list --formula -1))
+currently_installed_formulae=()
+while IFS= read -r line; do currently_installed_formulae+=("$line"); done < <(brew list --formula -1)
+formulae_to_install=()
 
-header "Install Homebrew packages"
+header "Updating Homebrew"
 
 brew update
 
 BREW_DIR="$(brew --prefix)/bin/"
 
-for formula in ${formulae[@]}; do
-    if ! _inArray_ -i "${formula}" "${currently_installed_formulae[@]}"; then
-        if [[ ! -e "${BREW_DIR}/${formula}" ]]; then
-            brew install -q --formula ${formula}
-        fi
-
-        # https://github.com/microsoft/Git-Credential-Manager-for-Mac-and-Linux/blob/master/Install.md
-        if [[ ${formula} == "git-credential-manager" ]]; then
-            git-credential-manager install
-        fi
-
-    fi
+for formula in "${formulae[@]}"; do
+  formula_name="${formula##*/}" # Returns 'formula' from 'author/dir/formula' or just 'formula'.
+  if ! _inArray_ -i "${formula_name}" "${currently_installed_formulae[@]}" && [[ ! -e "${BREW_DIR}/${formula_name}" ]]; then
+    formulae_to_install+=("${formula}")
+  fi
 done
 
-success "Homebrew packages installed"
+if [[ ${#formulae_to_install[@]} -gt 0 ]]; then
+  header "Installing Homebrew packages"
+  for formula in "${formulae_to_install[@]}"; do
+    brew install -q --formula "${formula}"
+  done
+  success "Homebrew packages installed"
+fi
+
+{{- end -}}
 
 _safeExit_
-{{- end }}

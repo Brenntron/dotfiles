@@ -1,48 +1,48 @@
 [packages.apt]
-  to_remove = ["btop", "htop"]
-  [packages.apt.common]
-    packages = [
-      "1password",
-      "1password-cli",
-      "apt-transport-https",
-      "aptitude",
-      "build-essential",
-      "curl",
-      "file",
-      "fort77",
-      "gcc-multilib",
-      "git",
-      "git-extras",
-      "gnome-tweaks",
-      "gobjc++",
-      "libblas-dev",
-      "libbz2-dev",
-      "liblzma-dev",
-      "libreadline-dev",
-      "needrestart",
-      "net-tools",
-      "nmon",
-      "p7zip-full",
-      "procps",
-      "qemu-system",
-      "qutebrowser",  # keyboard-focused browser
-      "snapd",
-      "sudo",
-      "tzdata",
-      "uidmap",
-      "unzip",
-      "vulkan-tools",
-      "wget",
-      "xclip", # clipboard utility
-      "xorg-dev",
-      "zsh",
-    ]
-  [packages.apt.dev_computer]
-    packages = []
-  [packages.apt.homelab_member]
-    packages = ["iperf"]
+  to_remove=["btop", "htop"]
+[packages.apt.common]
+  packages=[
+    "1password",
+    "1password-cli",
+    "apt-transport-https",
+    "aptitude",
+    "build-essential",
+    "curl",
+    "file",
+    "fort77",
+    "gcc-multilib",
+    "git",
+    "git-extras",
+    "gnome-tweaks",
+    "gobjc++",
+    "libblas-dev",
+    "libbz2-dev",
+    "liblzma-dev",
+    "libreadline-dev",
+    "needrestart",
+    "net-tools",
+    "nmon",
+    "p7zip-full",
+    "procps",
+    "qemu-system",
+    "qutebrowser",         # keyboard-focused browser
+    "snapd",
+    "sudo",
+    "tzdata",
+    "uidmap",
+    "unzip",
+    "vulkan-tools",
+    "wget",
+    "xclip",               # clipboard utility
+    "xorg-dev",
+    "zsh",
+  ]
+[packages.apt.dev_computer]
+  packages=[]
+[packages.apt.homelab_member]
+  packages=["iperf"]
 [packages.asdf]
-  plugins = [
+  plugins=[
     "bun",
     "elixir",
     "erlang",
@@ -58,213 +58,204 @@
     "v",
   ]
 [packages.homebrew]
-  to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
-  [packages.homebrew.common]
-    casks = [
-      "1password",
-      "podman-desktop",   # open source container tools
-      "font-symbols-only-nerd-font",
-      "gpg-suite",
-      "grandperspective", # Disk usage visualizer
-      "keybase",
-      "rancher",          # Kubernetes management
-    ]
-    formulae = [
-      "antidote",        # zsh plugin manager
-      "asdf",            # Package manager that supports multiple runtimes
-      "atuin",           # Better shell history
-      "autoconf",        # asdf-erlang dependency
-      "bash",
-      "bash-completion",
-      "bat",             # cat with syntax highlighting and Git integration
-      "bottom",          # Process/system monitor for the terminal.
-      "chafa",           # Image display in terminal
-      "chezmoi", 	       # Install via homebrew to replace /bin/ executable.
-      "coreutils",
-      "csvlens",         # less for CSVs.
-      "curl",
-      "podman",
-      "podman-compose",
-      "exercism",
-      "eza",             # ls replacement
-      "fastfetch",
-      "fd",              # fd-find
-      "findutils",       # GNU find, locate, updatedb, and xargs
-      "fop",             # Formatting Objects Processor, asdf-erlang dependency
-      "fzf",             # Fuzzy finder
-      "gawk",            # GNU awk
-      "gfortran",        # fortran compiler
-      "gh",              # GitHub CLI
-      "ghostscript",     # imagemagick optional dependency
-      "git",
-      "git-delta",       # https://github.com/dandavison/delta
-      "git-extras",
-      "glow",            # Render markdown in the terminal
-      "gnu-sed",         # GNU implementation of the famous stream editor
-      "gnu-tar",         # GNU version of the tar archiving utility
-      "gnupg",           # GPG Keys
-      "gnutls",          # GNU Transport Layer Security (TLS) Library
-      "gping",           # Ping, but with a graph
-      "grep",
-      "imagemagick",     # Image manipulation tools
-      "jandedobbeleer/oh-my-posh/oh-my-posh", # prompt theme engine
-      "lazydocker",      # simple terminal UI for docker commands
-      "jless",           # JSON viewer
-      "jq",              # Lightweight and flexible command-line JSON processor
-      "languagetool",    # Local grammary and spell checker
-      "lazygit",         # simple terminal UI for git commands
-      "libpq",           # PostgreSQL utilities but not postgresql itself
-      "libyaml",          # ruby-build dependency
-      "libxslt",         # asdf-erlang dependency
-      "AlexsJones/llmfit", # Hardware analysis for LLMs
-      "mas",             # Mac App Store command-line interface
-      "mermaid-cli",     # Graph cli tool
-      "arimxyer/tap/models", # List LLM providers and models
-      "nano",
-      "ncdu",            # NCurses Disk Usage
-      "ncurses",         # Text-based UI library
-      "neovim",
-      "opencode",
-      "openssl",         # SSL/TLS cryptography library
-      "postgresql",
-      "ranger",          # File Manager.
-      "redis",
-      "rip2",            # A safer, rust-based rm
-      "ripgrep",         # search tool like grep and the silver searcher
-      "sqlite3",
-      "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
-      "gromgit/brewtils/taproom", Homebrew TUI
-      "thefuck",         # Mistake corrector
-      "tldr",            # TLDR man pages
-      "tre-command",     # Display directories as trees (with optional color/HTML output)
-      "unixodbc",        # Optional asdf-erlang dependency
-      "vhs",             # terminal recordings
-      "vivid",           # https://github.com/sharkdp/vivid
-      "wxwidgets",       # asdf-erlang dependency
-      "zoxide",          # A faster way to navigate your filesystem
-      "zsh",
-      "zsh-autocomplete",
-    ]
-    taps = [
-      "slp/krunkit",
-    ]
-  [packages.homebrew.dev_computer]
-    casks = [
-      "bruno",
-      "dbeaver-community",
-      "httpie",
-      "podman-desktop",
-    ]
-    formulae = [
-      "act",        # runs GitHub Actions locally
-      "bats-core",
-      "bruno-cli",
-      "doggo",      # DNS Client
-      "goaccess",
-      "podman",
-      "podman-compose"
-    ]
-    taps = []
-  [packages.homebrew.homelab_member]
-    casks    = []
-    formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
-    taps = []
+  to_remove=["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
+[packages.homebrew.common]
+  casks=[
+    "1password",
+    "podman-desktop",              # open source container tools
+    "font-symbols-only-nerd-font",
+    "gpg-suite",
+    "grandperspective",            # Disk usage visualizer
+    "keybase",
+    "rancher",                     # Kubernetes management
+  ]
+  formulae=[
+    "antidote",                             # zsh plugin manager
+    "asdf",                                 # Package manager that supports multiple runtimes
+    "atuin",                                # Better shell history
+    "autoconf",                             # asdf-erlang dependency
+    "bash",
+    "bash-completion",
+    "bat",                                  # cat with syntax highlighting and Git integration
+    "bottom",                               # Process/system monitor for the terminal.
+    "chafa",                                # Image display in terminal
+    "chezmoi",                              # Install via homebrew to replace /bin/ executable.
+    "coreutils",
+    "csvlens",                              # less for CSVs.
+    "curl",
+    "podman",
+    "podman-compose",
+    "exercism",
+    "eza",                                  # ls replacement
+    "fastfetch",
+    "fd",                                   # fd-find
+    "findutils",                            # GNU find, locate, updatedb, and xargs
+    "fop",                                  # Formatting Objects Processor, asdf-erlang dependency
+    "fzf",                                  # Fuzzy finder
+    "gawk",                                 # GNU awk
+    "gfortran",                             # fortran compiler
+    "gh",                                   # GitHub CLI
+    "ghostscript",                          # imagemagick optional dependency
+    "git",
+    "git-delta",                            # https://github.com/dandavison/delta
+    "git-extras",
+    "glow",                                 # Render markdown in the terminal
+    "gnu-sed",                              # GNU implementation of the famous stream editor
+    "gnu-tar",                              # GNU version of the tar archiving utility
+    "gnupg",                                # GPG Keys
+    "gnutls",                               # GNU Transport Layer Security (TLS) Library
+    "gping",                                # Ping, but with a graph
+    "grep",
+    "imagemagick",                          # Image manipulation tools
+    "oh-my-posh",                           # prompt theme engine
+    "lazydocker",                           # simple terminal UI for docker commands
+    "jless",                                # JSON viewer
+    "jq",                                   # Lightweight and flexible command-line JSON processor
+    "languagetool",                         # Local grammary and spell checker
+    "lazygit",                              # simple terminal UI for git commands
+    "libpq",                                # PostgreSQL utilities but not postgresql itself
+    "libyaml",                              # ruby-build dependency
+    "libxslt",                              # asdf-erlang dependency
+    "AlexsJones/llmfit",                    # Hardware analysis for LLMs
+    "mas",                                  # Mac App Store command-line interface
+    "mermaid-cli",                          # Graph cli tool
+    "arimxyer/tap/models",                  # List LLM providers and models
+    "nano",
+    "ncdu",                                 # NCurses Disk Usage
+    "ncurses",                              # Text-based UI library
+    "neovim",
+    "opencode",
+    "openssl",                              # SSL/TLS cryptography library
+    "postgresql",
+    "ranger",                               # File Manager.
+    "redis",
+    "rip2",                                 # A safer, rust-based rm
+    "ripgrep",                              # search tool like grep and the silver searcher
+    "sqlite3",
+    "ssh-copy-id",                          # Add a public key to a remote machine's authorized_keys file
+    "gromgit/brewtils/taproom",             # Homebrew TUI
+    "thefuck",                              # Mistake corrector
+    "tldr",                                 # TLDR man pages
+    "tre-command",                          # Display directories as trees (with optional color/HTML output)
+    "unixodbc",                             # Optional asdf-erlang dependency
+    "vhs",                                  # terminal recordings
+    "vivid",                                # https://github.com/sharkdp/vivid
+    "wxwidgets",                            # asdf-erlang dependency
+    "zoxide",                               # A faster way to navigate your filesystem
+    "zsh",
+    "zsh-autocomplete",
+  ]
+  taps=["slp/krunkit"]
+[packages.homebrew.dev_computer]
+  casks=["bruno", "dbeaver-community", "httpie", "podman-desktop"]
+  formulae=[
+    "act",            # runs GitHub Actions locally
+    "bats-core",
+    "bruno-cli",
+    "doggo",          # DNS Client
+    "goaccess",
+    "podman",
+    "podman-compose",
+  ]
+  taps=[]
+[packages.homebrew.homelab_member]
+  casks   =[]
+  formulae=["ffmpeg", "iperf", "nmap", "tailspin"]
+  taps    =[]
 [packages.linuxbrew]
-  to_remove = ["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
-  [packages.linuxbrew.common]
-    formulae = [
-      "antidote",        # zsh plugin manager
-      "asdf",            # Package manager that supports multiple runtimes
-      "atuin",           # Better shell history
-      "bash",
-      "bat",             # cat with syntax highlighting and Git integration
-      "bottom",          # Process/system monitor for the terminal.
-      "coreutils",
-      "eza",             # ls replacement
-      "fastfetch",
-      "fd",              # fd-find
-      "findutils",       # GNU find, locate, updatedb, and xargs
-      "fzf",             # Fuzzy finder
-      "gawk",            # GNU awk
-      "gfortran",        # fortran compiler
-      "gh",              # GitHub CLI
-      "ghostscript",     # imagemagick optional dependency
-      "glow",            # Render markdown in the terminal
-      "git",
-      "git-delta",       # https://github.com/dandavison/delta
-      "gnu-sed",         # GNU implementation of the famous stream editor
-      "gnu-tar",         # GNU version of the tar archiving utility
-      "gnutls",          # GNU Transport Layer Security (TLS) Library
-      "gpg",
-      "gping",           # Ping, but with a graph
-      "grep",
-      "imagemagick",     # Image manipulation tools
-      "lazydocker",      # simple terminal UI for docker commands
-      "jless",           # JSON viewer
-      "jq",              # Lightweight and flexible command-line JSON processor
-      "languagetool",    # Local grammary and spell checker
-      "lazygit",         # simple terminal UI for git commands
-      "AlexsJones/llmfit", # Hardware analysis for LLMs
-      "libpq",           # PostgreSQL utilities but not postgresql itself
-      "mermaid-cli",     # Graph cli tool
-      "arimxyer/tap/models", # List LLM providers and models
-      "nano",
-      "ncdu",            # NCurses Disk Usage
-      "ncurses",         # Text-based UI library
-      "neovim",
-      "oh-my-posh",      # prompt theme engine
-      "openssl",         # SSL/TLS cryptography library
-      "podman",          # open source container tools
-      "podman-compose",
-      "postgresql",
-      "ranger",          # File Manager.
-      "redis",
-      "rip2",            # A safer, rust-based rm
-      "ripgrep",
-      "ripgrep",         # search tool like grep and the silver searcher
-      "sqlite3",
-      "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
-      "gromgit/brewtils/taproom", # Homebrew TUI
-      "thefuck",         # Mistake corrector
-      "tldr",            # TLDR man pages
-      "tre-command",     # Display directories as trees (with optional color/HTML output)
-      "util-linux",
-      "vhs",             # terminal recordings
-      "vivid",           # https://github.com/sharkdp/vivid
-      "winetricks",
-      "zoxide",          # A faster way to navigate your filesystem
-      "zsh-autocomplete",
-    ]
-  [packages.linuxbrew.dev_computer]
-    formulae = [
-      "act",        # runs GitHub Actions locally
-      "bats-core",
-      "bruno-cli",
-      "doggo",      # DNS Client
-      "goaccess",
-      "httpie",
-      "sst/tap/opencode",
-    ]
-  [packages.linuxbrew.homelab_member]
-    formulae = ["ffmpeg", "iperf", "nmap", "tailspin"]
+  to_remove=["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
+[packages.linuxbrew.common]
+  formulae=[
+    "antidote",                 # zsh plugin manager
+    "asdf",                     # Package manager that supports multiple runtimes
+    "atuin",                    # Better shell history
+    "bash",
+    "bat",                      # cat with syntax highlighting and Git integration
+    "bottom",                   # Process/system monitor for the terminal.
+    "coreutils",
+    "eza",                      # ls replacement
+    "fastfetch",
+    "fd",                       # fd-find
+    "findutils",                # GNU find, locate, updatedb, and xargs
+    "fzf",                      # Fuzzy finder
+    "gawk",                     # GNU awk
+    "gfortran",                 # fortran compiler
+    "gh",                       # GitHub CLI
+    "ghostscript",              # imagemagick optional dependency
+    "glow",                     # Render markdown in the terminal
+    "git",
+    "git-delta",                # https://github.com/dandavison/delta
+    "gnu-sed",                  # GNU implementation of the famous stream editor
+    "gnu-tar",                  # GNU version of the tar archiving utility
+    "gnutls",                   # GNU Transport Layer Security (TLS) Library
+    "gpg",
+    "gping",                    # Ping, but with a graph
+    "grep",
+    "imagemagick",              # Image manipulation tools
+    "lazydocker",               # simple terminal UI for docker commands
+    "jless",                    # JSON viewer
+    "jq",                       # Lightweight and flexible command-line JSON processor
+    "languagetool",             # Local grammary and spell checker
+    "lazygit",                  # simple terminal UI for git commands
+    "AlexsJones/llmfit",        # Hardware analysis for LLMs
+    "libpq",                    # PostgreSQL utilities but not postgresql itself
+    "mermaid-cli",              # Graph cli tool
+    "arimxyer/tap/models",      # List LLM providers and models
+    "nano",
+    "ncdu",                     # NCurses Disk Usage
+    "ncurses",                  # Text-based UI library
+    "neovim",
+    "oh-my-posh",               # prompt theme engine
+    "openssl",                  # SSL/TLS cryptography library
+    "podman",                   # open source container tools
+    "podman-compose",
+    "postgresql",
+    "ranger",                   # File Manager.
+    "redis",
+    "rip2",                     # A safer, rust-based rm
+    "ripgrep",
+    "ripgrep",                  # search tool like grep and the silver searcher
+    "sqlite3",
+    "ssh-copy-id",              # Add a public key to a remote machine's authorized_keys file
+    "gromgit/brewtils/taproom", # Homebrew TUI
+    "thefuck",                  # Mistake corrector
+    "tldr",                     # TLDR man pages
+    "tre-command",              # Display directories as trees (with optional color/HTML output)
+    "util-linux",
+    "vhs",                      # terminal recordings
+    "vivid",                    # https://github.com/sharkdp/vivid
+    "winetricks",
+    "zoxide",                   # A faster way to navigate your filesystem
+    "zsh-autocomplete",
+  ]
+[packages.linuxbrew.dev_computer]
+  formulae=[
+    "act",              # runs GitHub Actions locally
+    "bats-core",
+    "bruno-cli",
+    "doggo",            # DNS Client
+    "goaccess",
+    "httpie",
+    "sst/tap/opencode",
+  ]
+[packages.linuxbrew.homelab_member]
+  formulae=["ffmpeg", "iperf", "nmap", "tailspin"]
 [packages.snap]
-  [packages.snap.common]
-    packages = [
-      "snap-store",
-    ]
-  [packages.snap.dev_computer]
-    packages = [
-      "dbeaver-ce",  # Database management tool
-    ]
+[packages.snap.common]
+  packages=["snap-store"]
+[packages.snap.dev_computer]
+  packages=[
+    "dbeaver-ce", # Database management tool
+  ]
 [packages.python]
-  to_remove = []
-  [packages.python.common]
-    packages = []
-  [packages.python.dev_computer]
-    packages = []
-  [packages.python.homelab_member]
-    packages = []
+  to_remove=[]
+[packages.python.common]
+  packages=[]
+[packages.python.dev_computer]
+  packages=[]
+[packages.python.homelab_member]
+  packages=[]
 [package.ruby]
-  to_remove = []
-  [packages.ruby.common]
-    packages = []
+  to_remove=[]
+[packages.ruby.common]
+  packages=[]
