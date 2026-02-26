@@ -62,11 +62,12 @@
   [packages.homebrew.common]
     casks = [
       "1password",
-      "docker-desktop",   # open source container tools
+      "podman-desktop",   # open source container tools
       "font-symbols-only-nerd-font",
       "gpg-suite",
       "grandperspective", # Disk usage visualizer
       "keybase",
+      "rancher",          # Kubernetes management
     ]
     formulae = [
       "antidote",        # zsh plugin manager
@@ -77,11 +78,13 @@
       "bash-completion",
       "bat",             # cat with syntax highlighting and Git integration
       "bottom",          # Process/system monitor for the terminal.
+      "chafa",           # Image display in terminal
       "chezmoi", 	       # Install via homebrew to replace /bin/ executable.
       "coreutils",
+      "csvlens",         # less for CSVs.
       "curl",
-      "docker",
-      "docker-compose",
+      "podman",
+      "podman-compose",
       "exercism",
       "eza",             # ls replacement
       "fastfetch",
@@ -113,10 +116,10 @@
       "libpq",           # PostgreSQL utilities but not postgresql itself
       "libyaml",          # ruby-build dependency
       "libxslt",         # asdf-erlang dependency
+      "AlexsJones/llmfit", # Hardware analysis for LLMs
       "mas",             # Mac App Store command-line interface
-      "mc",              # Midnight Commander
       "mermaid-cli",     # Graph cli tool
-      "most",            # Pager
+      "arimxyer/tap/models", # List LLM providers and models
       "nano",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
@@ -124,11 +127,13 @@
       "opencode",
       "openssl",         # SSL/TLS cryptography library
       "postgresql",
+      "ranger",          # File Manager.
       "redis",
       "rip2",            # A safer, rust-based rm
       "ripgrep",         # search tool like grep and the silver searcher
       "sqlite3",
       "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
+      "gromgit/brewtils/taproom", Homebrew TUI
       "thefuck",         # Mistake corrector
       "tldr",            # TLDR man pages
       "tre-command",     # Display directories as trees (with optional color/HTML output)
@@ -147,8 +152,8 @@
     casks = [
       "bruno",
       "dbeaver-community",
-      "docker-desktop",
       "httpie",
+      "podman-desktop",
     ]
     formulae = [
       "act",        # runs GitHub Actions locally
@@ -156,8 +161,8 @@
       "bruno-cli",
       "doggo",      # DNS Client
       "goaccess",
-      "docker",
-      "docker-compose"
+      "podman",
+      "podman-compose"
     ]
     taps = []
   [packages.homebrew.homelab_member]
@@ -199,25 +204,27 @@
       "jq",              # Lightweight and flexible command-line JSON processor
       "languagetool",    # Local grammary and spell checker
       "lazygit",         # simple terminal UI for git commands
+      "AlexsJones/llmfit", # Hardware analysis for LLMs
       "libpq",           # PostgreSQL utilities but not postgresql itself
-      "mc",              # Midnight Commander
       "mermaid-cli",     # Graph cli tool
-      "most",            # Pager
+      "arimxyer/tap/models", # List LLM providers and models
       "nano",
       "ncdu",            # NCurses Disk Usage
       "ncurses",         # Text-based UI library
       "neovim",
       "oh-my-posh",      # prompt theme engine
       "openssl",         # SSL/TLS cryptography library
-      "podman",           # open source container tools
+      "podman",          # open source container tools
       "podman-compose",
       "postgresql",
+      "ranger",          # File Manager.
       "redis",
       "rip2",            # A safer, rust-based rm
       "ripgrep",
       "ripgrep",         # search tool like grep and the silver searcher
       "sqlite3",
       "ssh-copy-id",     # Add a public key to a remote machine's authorized_keys file
+      "gromgit/brewtils/taproom", # Homebrew TUI
       "thefuck",         # Mistake corrector
       "tldr",            # TLDR man pages
       "tre-command",     # Display directories as trees (with optional color/HTML output)

@@ -205,16 +205,16 @@ export CPPFLAGS="-I$(brew --prefix openssl@3)/include"
 export OPENSSLDIR="$(brew --prefix openssl@3)"
 export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(brew --prefix openssl@3) --with-openssl-rpath=auto"
 
-{{ if eq .chezmoi.os "linux" }}
-# Podman setup
+# Containerization setup
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
-alias lzp='DOCKER_HOST=unix:///run/user/1000/podman/podman.sock lazydocker'
+alias lzd='lazydocker'
+{{ if eq .chezmoi.os "linux" }}
 alias docker='podman'
 alias pc='podman compose'
-{{ else }}
-# Docker
-alias lzd='lazydocker'
 {{ end -}}
+
+# zip2/rm
+alias rm="rip"
 
 # Zsh aliases
 source ~/.config/zsh/zsh.zsh
