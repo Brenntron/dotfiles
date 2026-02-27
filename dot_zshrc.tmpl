@@ -151,8 +151,12 @@ function zvm_after_init() {
   source ~/.config/fzf/fzf.zsh
 }
 
-# obsidianmd-cli completions
-source ~/.config/completions/obsidianmd.zsh
+# obsidianmd CLI
+{{ if eq .chezmoi.os "darwin" }}
+export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
+{{ else }}
+# export PATH=""
+{{ end }}
 
 # You may need to manually set your language environment
 export LC_ALL=en_US.UTF-8
@@ -222,7 +226,7 @@ source ~/.config/zsh/yarn.zsh
 
 # use bat as a colorizing pager for man
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-# Uncomment below if you experience formatting problems
+# Uncomment below if formatting problems occur
 # export MANROFFOPT="-c"
 
 # Ripgrep config
@@ -236,12 +240,9 @@ export WINEARCH="win32"
 # Zoxide setup
 eval "$(zoxide init zsh)"
 
-# Bun
-export PATH="${HOME}/.bun/bin:$PATH"
-
-# Enable vi mode
-bindkey -v
-
 {{ if .work_computer -}}
 export AWS_PROFILE='spreetail-dev'
 {{- end }}
+
+# Enable vi mode
+bindkey -v
