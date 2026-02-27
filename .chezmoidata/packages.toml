@@ -67,6 +67,7 @@
     "gpg-suite",
     "grandperspective",            # Disk usage visualizer
     "keybase",
+    "obsidian",
     "rancher",                     # Kubernetes management
   ]
   formulae=[
@@ -240,13 +241,6 @@
   ]
 [packages.linuxbrew.homelab_member]
   formulae=["ffmpeg", "iperf", "nmap", "tailspin"]
-[packages.snap]
-[packages.snap.common]
-  packages=["snap-store"]
-[packages.snap.dev_computer]
-  packages=[
-    "dbeaver-ce", # Database management tool
-  ]
 [packages.python]
   to_remove=[]
 [packages.python.common]
@@ -259,3 +253,10 @@
   to_remove=[]
 [packages.ruby.common]
   packages=[]
+[packages.snap]
+[packages.snap.common]
+  packages=["snap-store"]
+[packages.snap.dev_computer]
+  packages=[
+    "dbeaver-ce", # Database management tool
+  ]

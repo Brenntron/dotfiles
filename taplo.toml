@@ -1,6 +1,9 @@
-include=["taplo.toml", ".chezmoidata/packages.toml"]
+[schema]
+  path="taplo://taplo.toml"
 
 [formatting]
   align_entries  =true
   compact_entries=true
   indent_entries =true
+  reorder_arrays =true
+  reorder_keys   =true
