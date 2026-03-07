@@ -9,57 +9,57 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 formulae=(
-  {{ range $package := .packages.homebrew.common.formulae }}
-  "{{ $package }}"
-  {{ end }}
+	{{ range $package := .packages.homebrew.common.formulae }}
+	"{{ $package }}"
+	{{ end }}
 
-  {{ if .dev_computer }}
-  {{ range $package := .packages.homebrew.dev_computer.formulae }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .dev_computer }}
+	{{ range $package := .packages.homebrew.dev_computer.formulae }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 
-  {{ if .homelab_member }}
-  {{ range $package := .packages.homebrew.homelab_member.formulae }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .homelab_member }}
+	{{ range $package := .packages.homebrew.homelab_member.formulae }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 )
 
 casks=(
-  {{ range $package := .packages.homebrew.common.casks }}
-  "{{ $package }}"
-  {{ end }}
+	{{ range $package := .packages.homebrew.common.casks }}
+	"{{ $package }}"
+	{{ end }}
 
-  {{ if .dev_computer }}
-  {{ range $package := .packages.homebrew.dev_computer.casks }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .dev_computer }}
+	{{ range $package := .packages.homebrew.dev_computer.casks }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 
-  {{ if .homelab_member }}
-  {{ range $package := .packages.homebrew.homelab_member.casks }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .homelab_member }}
+	{{ range $package := .packages.homebrew.homelab_member.casks }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 )
 
 taps=(
-  {{ range $package := .packages.homebrew.common.taps }}
-  "{{ $package }}"
-  {{ end }}
+	{{ range $package := .packages.homebrew.common.taps }}
+	"{{ $package }}"
+	{{ end }}
 
-  {{ if .dev_computer }}
-  {{ range $package := .packages.homebrew.dev_computer.taps }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .dev_computer }}
+	{{ range $package := .packages.homebrew.dev_computer.taps }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 
-  {{ if .homelab_member }}
-  {{ range $package := .packages.homebrew.homelab_member.taps }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .homelab_member }}
+	{{ range $package := .packages.homebrew.homelab_member.taps }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 )
 
 casks_to_install=()
@@ -74,16 +74,16 @@ while IFS= read -r line; do currently_installed_formulae+=("$line"); done < <(br
 is_font_cask() { [[ "$1" == font-* ]]; }
 
 font_exists() {
-  local name="${1#font-}"
-  name="${name//-/ }"
+	local name="${1#font-}"
+	name="${name//-/ }"
 
-  # Search system and user font directories for .ttf/.otf files matching the name
-  for dir in "/Library/Fonts" "$HOME/Library/Fonts"; do
-    if compgen -G "$dir"/*"$name"*.ttf >/dev/null || compgen -G "$dir"/*"$name"*.otf >/dev/null; then
-      return 0
-    fi
-  done
-  return 1
+	# Search system and user font directories for .ttf/.otf files matching the name
+	for dir in "/Library/Fonts" "$HOME/Library/Fonts"; do
+		if compgen -G "$dir"/*"$name"*.ttf >/dev/null || compgen -G "$dir"/*"$name"*.otf >/dev/null; then
+			return 0
+		fi
+	done
+	return 1
 }
 
 header "Updating Homebrew"
@@ -93,37 +93,37 @@ brew update
 BREW_DIR="$(brew --prefix)/bin/"
 
 for tap in "${taps[@]}"; do
-  if ! grep -q "^${tap}\$" <<<"$installed_taps"; then
-    brew tap "${tap}"
-  fi
+	if ! grep -q "^${tap}\$" <<<"$installed_taps"; then
+		brew tap "${tap}"
+	fi
 done
 
 for formula in "${formulae[@]}"; do
-  formula_name="${formula##*/}" # Returns 'formula' from 'author/dir/formula' or just 'formula'.
-  if ! _inArray_ -i "${formula_name}" "${currently_installed_formulae[@]}" && [[ ! -e "${BREW_DIR}/${formula_name}" ]]; then
-    formulae_to_install+=("${formula}")
-  fi
+	formula_name="${formula##*/}" # Returns 'formula' from 'author/dir/formula' or just 'formula'.
+	if ! _inArray_ -i "${formula_name}" "${currently_installed_formulae[@]}" && [[ ! -e "${BREW_DIR}/${formula_name}" ]]; then
+		formulae_to_install+=("${formula}")
+	fi
 done
 
 for cask in "${casks[@]}"; do
-  _inArray_ -i "$cask" "${currently_installed_casks[@]}" && continue
-  is_font_cask "$cask" && font_exists "$cask" && continue
-  casks_to_install+=("$cask")
+	_inArray_ -i "$cask" "${currently_installed_casks[@]}" && continue
+	is_font_cask "$cask" && font_exists "$cask" && continue
+	casks_to_install+=("$cask")
 done
 
 if [[ ${#formulae_to_install[@]} -gt 0 || ${#casks_to_install[@]} -gt 0 ]]; then
-  header "Installing Homebrew packages"
-  for formula in "${formulae_to_install[@]}"; do
-    brew install -q --formula "${formula}"
-  done
+	header "Installing Homebrew packages"
+	for formula in "${formulae_to_install[@]}"; do
+		brew install -q --formula "${formula}"
+	done
 
-  {{- if not .is_ci_workflow }}
-  for cask in "${casks_to_install[@]}"; do
-    brew install --cask "$cask"
-  done
-  {{- end }}
+	{{- if not .is_ci_workflow }}
+	for cask in "${casks_to_install[@]}"; do
+		brew install --cask "$cask"
+	done
+	{{- end }}
 
-  success "Homebrew packages installed"
+	success "Homebrew packages installed"
 fi
 
 {{- else if eq .chezmoi.os "linux" -}}
@@ -132,21 +132,21 @@ export HOMEBREW_NO_INSTALL_UPGRADE=TRUE
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 formulae=(
-  {{ range $package := .packages.linuxbrew.common.formulae }}
-  "{{ $package }}"
-  {{ end }}
+	{{ range $package := .packages.linuxbrew.common.formulae }}
+	"{{ $package }}"
+	{{ end }}
 
-  {{ if .dev_computer }}
-  {{ range $package := .packages.linuxbrew.dev_computer.formulae }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .dev_computer }}
+	{{ range $package := .packages.linuxbrew.dev_computer.formulae }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 
-  {{ if .homelab_member }}
-  {{ range $package := .packages.linuxbrew.homelab_member.formulae }}
-  "{{ $package }}"
-  {{ end }}
-  {{ end }}
+	{{ if .homelab_member }}
+	{{ range $package := .packages.linuxbrew.homelab_member.formulae }}
+	"{{ $package }}"
+	{{ end }}
+	{{ end }}
 )
 
 currently_installed_formulae=()
@@ -160,18 +160,18 @@ brew update
 BREW_DIR="$(brew --prefix)/bin/"
 
 for formula in "${formulae[@]}"; do
-  formula_name="${formula##*/}" # Returns 'formula' from 'author/dir/formula' or just 'formula'.
-  if ! _inArray_ -i "${formula_name}" "${currently_installed_formulae[@]}" && [[ ! -e "${BREW_DIR}/${formula_name}" ]]; then
-    formulae_to_install+=("${formula}")
-  fi
+	formula_name="${formula##*/}" # Returns 'formula' from 'author/dir/formula' or just 'formula'.
+	if ! _inArray_ -i "${formula_name}" "${currently_installed_formulae[@]}" && [[ ! -e "${BREW_DIR}/${formula_name}" ]]; then
+		formulae_to_install+=("${formula}")
+	fi
 done
 
 if [[ ${#formulae_to_install[@]} -gt 0 ]]; then
-  header "Installing Homebrew packages"
-  for formula in "${formulae_to_install[@]}"; do
-    brew install -q --formula "${formula}"
-  done
-  success "Homebrew packages installed"
+	header "Installing Homebrew packages"
+	for formula in "${formulae_to_install[@]}"; do
+		brew install -q --formula "${formula}"
+	done
+	success "Homebrew packages installed"
 fi
 
 {{- end }}

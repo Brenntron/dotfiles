@@ -117,7 +117,6 @@
     "libpq",                                # PostgreSQL utilities but not postgresql itself
     "libyaml",                              # ruby-build dependency
     "libxslt",                              # asdf-erlang dependency
-    "AlexsJones/llmfit",                    # Hardware analysis for LLMs
     "mas",                                  # Mac App Store command-line interface
     "mermaid-cli",                          # Graph cli tool
     "arimxyer/tap/models",                  # List LLM providers and models
@@ -199,7 +198,7 @@
     "kanata",                   # Keyboard customizer
     "languagetool",             # Local grammary and spell checker
     "lazygit",                  # simple terminal UI for git commands
-    "AlexsJones/llmfit",        # Hardware analysis for LLMs
+    "llmfit",                   # Hardware analysis for LLMs
     "libpq",                    # PostgreSQL utilities but not postgresql itself
     "mermaid-cli",              # Graph cli tool
     "arimxyer/tap/models",      # List LLM providers and models
