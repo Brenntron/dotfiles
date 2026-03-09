@@ -195,7 +195,6 @@
     "lazydocker",               # simple terminal UI for docker commands
     "jless",                    # JSON viewer
     "jq",                       # Lightweight and flexible command-line JSON processor
-    "kanata",                   # Keyboard customizer
     "languagetool",             # Local grammary and spell checker
     "lazygit",                  # simple terminal UI for git commands
     "llmfit",                   # Hardware analysis for LLMs
