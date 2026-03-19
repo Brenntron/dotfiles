@@ -71,77 +71,77 @@
     "rancher",                     # Kubernetes management
   ]
   formulae=[
-    "antidote",                             # zsh plugin manager
-    "asdf",                                 # Package manager that supports multiple runtimes
-    "atuin",                                # Better shell history
-    "autoconf",                             # asdf-erlang dependency
+    "antidote",                 # zsh plugin manager
+    "asdf",                     # Package manager that supports multiple runtimes
+    "atuin",                    # Better shell history
+    "autoconf",                 # asdf-erlang dependency
     "bash",
     "bash-completion",
-    "bat",                                  # cat with syntax highlighting and Git integration
-    "bottom",                               # Process/system monitor for the terminal.
-    "chafa",                                # Image display in terminal
-    "chezmoi",                              # Install via homebrew to replace /bin/ executable.
+    "bat",                      # cat with syntax highlighting and Git integration
+    "bottom",                   # Process/system monitor for the terminal.
+    "chafa",                    # Image display in terminal
+    "chezmoi",                  # Install via homebrew to replace /bin/ executable.
     "coreutils",
-    "csvlens",                              # less for CSVs.
+    "csvlens",                  # less for CSVs.
     "curl",
     "podman",
     "podman-compose",
     "exercism",
-    "eza",                                  # ls replacement
+    "eza",                      # ls replacement
     "fastfetch",
-    "fd",                                   # fd-find
-    "findutils",                            # GNU find, locate, updatedb, and xargs
-    "fop",                                  # Formatting Objects Processor, asdf-erlang dependency
-    "fzf",                                  # Fuzzy finder
-    "gawk",                                 # GNU awk
-    "gfortran",                             # fortran compiler
-    "gh",                                   # GitHub CLI
-    "ghostscript",                          # imagemagick optional dependency
+    "fd",                       # fd-find
+    "findutils",                # GNU find, locate, updatedb, and xargs
+    "fop",                      # Formatting Objects Processor, asdf-erlang dependency
+    "fzf",                      # Fuzzy finder
+    "gawk",                     # GNU awk
+    "gfortran",                 # fortran compiler
+    "gh",                       # GitHub CLI
+    "ghostscript",              # imagemagick optional dependency
     "git",
-    "git-delta",                            # https://github.com/dandavison/delta
+    "git-delta",                # https://github.com/dandavison/delta
     "git-extras",
-    "glow",                                 # Render markdown in the terminal
-    "gnu-sed",                              # GNU implementation of the famous stream editor
-    "gnu-tar",                              # GNU version of the tar archiving utility
-    "gnupg",                                # GPG Keys
-    "gnutls",                               # GNU Transport Layer Security (TLS) Library
-    "gping",                                # Ping, but with a graph
+    "glow",                     # Render markdown in the terminal
+    "gnu-sed",                  # GNU implementation of the famous stream editor
+    "gnu-tar",                  # GNU version of the tar archiving utility
+    "gnupg",                    # GPG Keys
+    "gnutls",                   # GNU Transport Layer Security (TLS) Library
+    "gping",                    # Ping, but with a graph
     "grep",
-    "imagemagick",                          # Image manipulation tools
-    "oh-my-posh",                           # prompt theme engine
-    "lazydocker",                           # simple terminal UI for docker commands
-    "jless",                                # JSON viewer
-    "jq",                                   # Lightweight and flexible command-line JSON processor
-    "languagetool",                         # Local grammary and spell checker
-    "lazygit",                              # simple terminal UI for git commands
-    "libpq",                                # PostgreSQL utilities but not postgresql itself
-    "libyaml",                              # ruby-build dependency
-    "libxslt",                              # asdf-erlang dependency
-    "mas",                                  # Mac App Store command-line interface
-    "mermaid-cli",                          # Graph cli tool
-    "arimxyer/tap/models",                  # List LLM providers and models
+    "imagemagick",              # Image manipulation tools
+    "oh-my-posh",               # prompt theme engine
+    "lazydocker",               # simple terminal UI for docker commands
+    "jless",                    # JSON viewer
+    "jq",                       # Lightweight and flexible command-line JSON processor
+    "languagetool",             # Local grammary and spell checker
+    "lazygit",                  # simple terminal UI for git commands
+    "libpq",                    # PostgreSQL utilities but not postgresql itself
+    "libyaml",                  # ruby-build dependency
+    "libxslt",                  # asdf-erlang dependency
+    "mas",                      # Mac App Store command-line interface
+    "mermaid-cli",              # Graph cli tool
+    "arimxyer/tap/models",      # List LLM providers and models
     "nano",
-    "ncdu",                                 # NCurses Disk Usage
-    "ncurses",                              # Text-based UI library
+    "ncdu",                     # NCurses Disk Usage
+    "ncurses",                  # Text-based UI library
     "neovim",
     "opencode",
-    "openssl",                              # SSL/TLS cryptography library
+    "openssl",                  # SSL/TLS cryptography library
     "postgresql",
-    "ranger",                               # File Manager.
     "redis",
-    "rip2",                                 # A safer, rust-based rm
-    "ripgrep",                              # search tool like grep and the silver searcher
+    "rip2",                     # A safer, rust-based rm
+    "ripgrep",                  # search tool like grep and the silver searcher
     "sqlite3",
-    "ssh-copy-id",                          # Add a public key to a remote machine's authorized_keys file
-    "gromgit/brewtils/taproom",             # Homebrew TUI
-    "thefuck",                              # Mistake corrector
-    "tldr",                                 # TLDR man pages
-    "tre-command",                          # Display directories as trees (with optional color/HTML output)
-    "unixodbc",                             # Optional asdf-erlang dependency
-    "vhs",                                  # terminal recordings
-    "vivid",                                # https://github.com/sharkdp/vivid
-    "wxwidgets",                            # asdf-erlang dependency
-    "zoxide",                               # A faster way to navigate your filesystem
+    "ssh-copy-id",              # Add a public key to a remote machine's authorized_keys file
+    "gromgit/brewtils/taproom", # Homebrew TUI
+    "thefuck",                  # Mistake corrector
+    "tldr",                     # TLDR man pages
+    "tre-command",              # Display directories as trees (with optional color/HTML output)
+    "unixodbc",                 # Optional asdf-erlang dependency
+    "vhs",                      # terminal recordings
+    "vivid",                    # https://github.com/sharkdp/vivid
+    "wxwidgets",                # asdf-erlang dependency
+    "yazi",                     # File Manager
+    "zoxide",                   # A faster way to navigate your filesystem
     "zsh",
     "zsh-autocomplete",
   ]
@@ -210,7 +210,6 @@
     "podman",                   # open source container tools
     "podman-compose",
     "postgresql",
-    "ranger",                   # File Manager.
     "redis",
     "rip2",                     # A safer, rust-based rm
     "ripgrep",
@@ -225,6 +224,7 @@
     "vhs",                      # terminal recordings
     "vivid",                    # https://github.com/sharkdp/vivid
     "winetricks",
+    "yazi",                     # File Manager
     "zoxide",                   # A faster way to navigate your filesystem
     "zsh-autocomplete",
   ]
