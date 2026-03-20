@@ -62,13 +62,11 @@
 [packages.homebrew.common]
   casks=[
     "1password",
-    "podman-desktop",              # open source container tools
     "font-symbols-only-nerd-font",
     "gpg-suite",
     "grandperspective",            # Disk usage visualizer
     "keybase",
     "obsidian",
-    "rancher",                     # Kubernetes management
   ]
   formulae=[
     "antidote",                 # zsh plugin manager
@@ -84,8 +82,6 @@
     "coreutils",
     "csvlens",                  # less for CSVs.
     "curl",
-    "podman",
-    "podman-compose",
     "exercism",
     "eza",                      # ls replacement
     "fastfetch",
@@ -147,15 +143,13 @@
   ]
   taps=["slp/krunkit"]
 [packages.homebrew.dev_computer]
-  casks=["bruno", "dbeaver-community", "httpie", "podman-desktop"]
+  casks=["bruno", "dbeaver-community", "httpie"]
   formulae=[
     "act",            # runs GitHub Actions locally
     "bats-core",
     "bruno-cli",
     "doggo",          # DNS Client
     "goaccess",
-    "podman",
-    "podman-compose",
   ]
   taps=[]
 [packages.homebrew.homelab_member]
@@ -207,8 +201,6 @@
     "neovim",
     "oh-my-posh",               # prompt theme engine
     "openssl",                  # SSL/TLS cryptography library
-    "podman",                   # open source container tools
-    "podman-compose",
     "postgresql",
     "redis",
     "rip2",                     # A safer, rust-based rm
