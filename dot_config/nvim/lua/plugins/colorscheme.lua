@@ -1,31 +1,28 @@
-return {
+-- Catppuccin colorscheme (macchiato)
 
-  -- tokyonight
-  {
-    "folke/tokyonight.nvim",
-    lazy = true,
-    opts = { style = "moon" },
+require("catppuccin").setup({
+  flavour = "macchiato",
+  background = {
+    light = "latte",
+    dark = "macchiato",
   },
+  auto_integrations = true,
+  integrations = {
+    blink_cmp = true,
+    bufferline = true,
+    flash = true,
+    gitsigns = true,
+    indent_blankline = { enabled = true },
+    lsp_trouble = true,
+    mason = true,
+    mini = { enabled = true },
+    native_lsp = { enabled = true },
+    noice = true,
+    notify = true,
+    snacks = true,
+    treesitter = true,
+    which_key = true,
+  },
+})
 
-  -- catppuccin
-  {
-    "catppuccin/nvim",
-    lazy = true,
-    name = "catppuccin",
-    opts = {
-      flavour = "macchiato", -- latte, frappe, macchiato, mocha
-      backgrorund = {
-        light = "latte",
-        dark = "macchiato",
-      },
-      auto_integrations = true,
-    },
-    specs = {
-      "akinsho/bufferline.nvim",
-      after = "catppuccin",
-      opts = {
-        highlights = require("catppuccin.special.bufferline").get_theme(),
-      }
-    },
-  },
-}
+vim.cmd.colorscheme("catppuccin")

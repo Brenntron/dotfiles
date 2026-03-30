@@ -1,0 +1,75 @@
+-- Plugin management via vim.pack (Neovim 0.12+)
+-- Plugins are installed to site/pack/core/opt in stdpath("data")
+-- Lockfile at stdpath("config")/nvim-pack-lock.json
+
+vim.pack.add({
+  -- Colorscheme
+  { src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
+
+  -- UI
+  "https://github.com/folke/snacks.nvim",
+  "https://github.com/akinsho/bufferline.nvim",
+  "https://github.com/nvim-lualine/lualine.nvim",
+  "https://github.com/folke/noice.nvim",
+  "https://github.com/MunifTanjim/nui.nvim",
+  "https://github.com/nvim-mini/mini.icons",
+  "https://github.com/nvim-tree/nvim-web-devicons",
+
+  -- Treesitter
+  "https://github.com/nvim-treesitter/nvim-treesitter",
+  "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+  "https://github.com/windwp/nvim-ts-autotag",
+
+  -- LSP
+  "https://github.com/neovim/nvim-lspconfig",
+  "https://github.com/mason-org/mason.nvim",
+  "https://github.com/mason-org/mason-lspconfig.nvim",
+
+  -- Completion
+  { src = "https://github.com/Saghen/blink.cmp", version = "v1.10.1" },
+
+  -- Formatting & Linting
+  "https://github.com/stevearc/conform.nvim",
+  "https://github.com/mfussenegger/nvim-lint",
+
+  -- Coding
+  "https://github.com/nvim-mini/mini.ai",
+  "https://github.com/nvim-mini/mini.pairs",
+  "https://github.com/nvim-mini/mini.surround",
+  "https://github.com/nvim-mini/mini.snippets",
+  "https://github.com/rafamadriz/friendly-snippets",
+  "https://github.com/folke/ts-comments.nvim",
+  "https://github.com/folke/lazydev.nvim",
+  "https://github.com/gbprod/yanky.nvim",
+  "https://github.com/jiaoshijie/undotree",
+
+  -- Editor
+  "https://github.com/folke/flash.nvim",
+  "https://github.com/folke/which-key.nvim",
+  "https://github.com/folke/persistence.nvim",
+
+  -- Terminal
+  "https://github.com/akinsho/toggleterm.nvim",
+
+  -- Python
+  "https://github.com/benomahony/uv.nvim",
+
+  -- Chezmoi
+  "https://github.com/alker0/chezmoi.vim",
+  "https://github.com/xvzc/chezmoi.nvim",
+
+  -- AI
+  "https://github.com/coder/claudecode.nvim",
+
+  -- Diagnostics
+  "https://github.com/folke/trouble.nvim",
+
+  -- Util
+  "https://github.com/folke/edgy.nvim",
+  "https://github.com/nvim-mini/mini.misc",
+  "https://github.com/nvim-lua/plenary.nvim",
+  "https://github.com/dstein64/vim-startuptime",
+
+  -- Git
+  "https://github.com/lewis6991/gitsigns.nvim",
+})

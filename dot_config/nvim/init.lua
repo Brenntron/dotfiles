@@ -1,2 +1,35 @@
--- bootstrap lazy.nvim, LazyVim and your plugins
-require("config.lazy")
+-- Leader keys (must be set before plugins)
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+-- Load options before plugins
+require("config.options")
+
+-- Install and load plugins via vim.pack
+require("config.pack")
+
+-- Configure plugins
+require("plugins.colorscheme")
+require("plugins.ui")
+require("plugins.treesitter")
+require("plugins.lsp")
+require("plugins.completion")
+require("plugins.formatting")
+require("plugins.linting")
+require("plugins.coding")
+require("plugins.editor")
+require("plugins.terminal")
+require("plugins.python")
+require("plugins.ai")
+require("plugins.chezmoi")
+require("plugins.trouble")
+require("plugins.edgy")
+require("plugins.git")
+
+-- Keymaps and autocmds (after plugins are loaded)
+require("config.keymaps")
+require("config.autocmds")
+
+-- Custom filetype detection and treesitter parser registration
+require("config.filetype")
+require("config.treesitter")
