@@ -210,12 +210,17 @@ export OPENSSLDIR="$(brew --prefix openssl@3)"
 export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(brew --prefix openssl@3) --with-openssl-rpath=auto"
 
 # Containerization setup
-export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
-alias lzd='lazydocker'
+if command -v podman &> /dev/null
+then
+  export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
+else
 {{ if eq .chezmoi.os "linux" }}
-alias docker='podman'
-alias pc='podman compose'
+  alias docker='podman'
+  alias pc='podman compose'
 {{ end -}}
+fi
+
+alias lzd='lazydocker'
 
 # Zsh aliases
 source ~/.config/zsh/zsh.zsh
