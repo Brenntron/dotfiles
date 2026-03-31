@@ -1,0 +1,22 @@
+{{ if .work_computer }}
+require("claudecode").setup({
+  terminal = {
+    split_side = "right",
+    split_width_percentage = 0.3,
+  },
+})
+{{ else }}
+-- opencode options
+vim.o.autoread = true
+
+vim.g.opencode_opts = {
+  server = {
+    start = function ()
+      require("snacks.terminal").open("opencode --port", {
+        win = { position = "right", enter = false },
+      }),
+    end,
+  }
+}
+require("opencode").setup({})
+{{ end }}

@@ -80,7 +80,25 @@ require("snacks").setup({
   lazygit = { enabled = true },
   notifier = { enabled = true },
   notify = { enabled = true },
+  {{- if not .work_computer }}
+  picker = {
+    enabled = true,
+    actions = { 
+      opencode_send = function(...)
+        return require("opencode").snacks_picker_send(...)
+      end,
+    },
+    win = {
+      inputs = {
+        keys = {
+          ["<a-a>"] = { "opencode_send", mode = { "n", "i" } },
+        },
+      },
+    },
+  },
+  {{ else }}
   picker = { enabled = true },
+  {{ end -}}
   profiler = { enabled = true },
   quickfile = { enabled = true },
   rename = { enabled = true },

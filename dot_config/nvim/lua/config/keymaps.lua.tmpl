@@ -146,8 +146,6 @@ map("n", "<leader>fF", function() Snacks.terminal() end, { desc = "Terminal (Roo
 map("n", "<leader>fT", function() Snacks.terminal(nil, { cwd = vim.fn.getcwd() }) end, { desc = "Terminal (cwd)" })
 map("n", "<c-/>", function() Snacks.terminal() end, { desc = "Terminal" })
 map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
--- (toggleterm)
-map("n", "<c-\\>", "<cmd>ToggleTerm direction=float<cr>", { desc = "Float Terminal" })
 
 -- Toggle options
 map("n", "<leader>uw", function() vim.wo.wrap = not vim.wo.wrap end, { desc = "Toggle Wrap" })
@@ -208,11 +206,13 @@ map("n", "<c-n>", "<Plug>(YankyNextEntry)", { desc = "Next Yank Entry" })
 -- Undotree
 map("n", "<leader>cu", function() require("undotree").toggle() end, { desc = "Undotree" })
 
--- AI (Claude Code)
+-- AI
 local wk = require("which-key")
 wk.add({
   { "<leader>a", group = "ai", icon = "󰚩 " },
 })
+{{ if .work_computer }}
+-- Claude Code
 map("n", "<leader>ac", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 map("n", "<leader>af", "<cmd>ClaudeCodeFocus<cr>", { desc = "Focus Claude Code" })
 map("n", "<leader>ar", "<cmd>ClaudeCode --resume<cr>", { desc = "Resume Claude Code" })
@@ -226,6 +226,14 @@ map({ "v" }, "<leader>as", "<cmd>ClaudeCodeSend<cr>", { desc = "Send to Claude" 
 map({ "n" }, "<leader>as", "<cmd>ClaudeCodeTreeAdd<cr>", { desc = "Add file" })
 map("n", "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", { desc = "Accept Diff" })
 map("n", "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", { desc = "Deny Diff" })
+{{ else }}
+-- opencode
+map({ "n", "x" }, "<leader>aa", function() require("opencode").ask("@this: ", { submit = true }) end, { desc = "Ask opencode" })
+map({ "n", "x" }, "<leader>ax", function() require("opencode").select() end, { desc = "Execute opencode action" })
+map({ "n", "t" }, "<leader>ac", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
+map({ "n", "x" }, "<leader>ar", function() return require("opencode").operator("@this ") end, { desc = "Add range to opencode", expr = true })
+map({ "n", "x" }, "<leader>al", function() return require("opencode").operator("@this ") .. "_" end, { desc = "Add line to opencode", expr = true })
+{{ end }}
 
 -- Python / dbt
 wk.add({

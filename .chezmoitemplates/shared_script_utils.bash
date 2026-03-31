@@ -136,7 +136,7 @@ _alert_() {
     fi
 
     if [[ ${_alertType} == header ]]; then
-      printf "\n✨ ${_color}%s${reset} ✨\n" "${_message}"
+      printf "\n   ${_color}%s${reset}   \n" "${_message}"
     else
       printf "${_color}[%7s] %s${reset}\n" "${_alertType}" "${_message}"
     fi

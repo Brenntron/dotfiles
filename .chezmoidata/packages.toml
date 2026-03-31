@@ -61,11 +61,9 @@
   to_remove=["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
 [packages.homebrew.common]
   casks=[
-    "1password",
     "font-symbols-only-nerd-font",
     "gpg-suite",
     "grandperspective",            # Disk usage visualizer
-    "keybase",
     "obsidian",
   ]
   formulae=[
@@ -142,6 +140,11 @@
     "zsh-autocomplete",
   ]
   taps=["slp/krunkit"]
+[packages.homebrew.personal]
+  casks=[
+    "1password",
+  ]
+  formulae=[]
 [packages.homebrew.dev_computer]
   casks=["bruno", "dbeaver-community", "httpie"]
   formulae=[
