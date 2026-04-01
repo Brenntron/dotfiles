@@ -44,3 +44,10 @@ symbol_map U+f32a,U+e73a,U+f31b,U+0548,U+ebc9,U+f31c,U+e712,U+f17c,U+f033d,U+ebc
 # U+F167 is HTML logo, but YouTube logo in Symbols Nerd Font Mono
 symbol_map U+f102,U+f116-U+f118,U+f12f,U+f13e,U+f1af,U+f1bf,U+f1cf,U+f1ff,U+f20f,U+f21f-U+f220,U+f22e-U+f22f,U+f23f,U+f24f,U+f25f nonicons
 symbol_map U+23f8 Iosevka Term
+
+# Emoji fallback (kitty 0.46+ requires explicit mapping)
+{{ if eq .chezmoi.os "darwin" -}}
+symbol_map U+2600-U+26FF,U+2700-U+27BF,U+FE00-U+FE0F,U+1F000-U+1F02F,U+1F0A0-U+1F0FF,U+1F100-U+1F64F,U+1F680-U+1F6FF,U+1F900-U+1F9FF,U+1FA00-U+1FA6F,U+1FA70-U+1FAFF,U+200D,U+2328,U+23CF,U+23E9-U+23F3,U+23F8-U+23FA Apple Color Emoji
+{{ else -}}
+symbol_map U+2600-U+26FF,U+2700-U+27BF,U+FE00-U+FE0F,U+1F000-U+1F02F,U+1F0A0-U+1F0FF,U+1F100-U+1F64F,U+1F680-U+1F6FF,U+1F900-U+1F9FF,U+1FA00-U+1FA6F,U+1FA70-U+1FAFF,U+200D,U+2328,U+23CF,U+23E9-U+23F3,U+23F8-U+23FA Noto Color Emoji
+{{ end -}}
