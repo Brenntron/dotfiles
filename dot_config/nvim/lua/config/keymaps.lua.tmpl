@@ -137,7 +137,7 @@ map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Gi
 -- LSP (supplements Neovim 0.12 built-in gd, gr, K, grn, gra, grr)
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
 map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename" })
-map("n", "<leader>cl", "<cmd>lsp<cr>", { desc = "LSP Info" })
+map("n", "<leader>cl", function() Snacks.picker.lsp_config() end, { desc = "LSP Info" })
 map("n", "<leader>cm", "<cmd>Mason<cr>", { desc = "Mason" })
 
 -- Terminal 

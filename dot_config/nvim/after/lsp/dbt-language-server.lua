@@ -1,5 +1,7 @@
 return {
   cmd = { "dbt-language-server" },
-  filetypes = { "sql", "yaml" },
-  root_dir = require'lspconfig'.util.root_pattern("dbt_project.yml"),
+  filetypes = { "sql.jinja" },
+  root_dir = function(fname)
+    return vim.fs.root(fname, { "dbt_project.yml" })
+  end,
 }

@@ -53,69 +53,95 @@ blocks:
           tag_icon: "  "
         template: "{{ .HEAD }}"
         foreground: p:text
-        powerline_symbol: 
         background: p:lavender
+        powerline_symbol: 
         type: git
         style: powerline
   - type: prompt
-    alignment: right
+    alignment: left
+    newline: true
     overflow: hide
     segments:
       - options:
           time_format: "15:04:05"
-        leading_diamond: 
         foreground: p:text
         background: p:sky
         type: time
         style: diamond
+        powerline_symbol: 
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
-        leading_diamond: 
+        powerline_symbol: 
         foreground: p:text
         background: p:mauve
         type: elixir
-        style: plain
+        style: powerline
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:sapphire
-        leading_diamond: 
+        powerline_symbol: 
         type: go
-        style: plain
+        style: powerline
       - options:
           cache_duration: none
         template: " 󰢱  {{ .Full }} "
         foreground: p:text
         background: p:blue
-        leading_diamond: 
+        powerline_symbol: 
         type: lua
-        style: plain
+        style: powerline
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:green
-        leading_diamond: 
+        powerline_symbol: 
         type: node
-        style: plain
+        style: powerline
       - options:
           cache_duration: none
-        template: "   {{ .Full }} {{ if .Venv }}{{ .Venv }} {{end}}"
+        template: "  {{ if .Venv }} {{ .Venv }}{{end}} {{ .Full }} "
         foreground: p:text
         background: p:yellow
-        leading_diamond: 
+        powerline_symbol: 
         type: python
-        style: plain
+        style: powerline
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
         foreground: p:text
         background: p:red
-        leading_diamond: 
+        powerline_symbol: 
         type: ruby
-        style: plain
+        style: powerline
+      - options:
+          cache_duration: none
+        template: "   {{ .Full }} "
+        foreground: p:text
+        background: p:lavender
+        powerline_symbol: 
+        type: dotnet
+        style: powerline
+      - options:
+          cache_duration: none
+        template: " 󱘗  {{ .Full }} "
+        foreground: p:text
+        background: p:red
+        powerline_symbol: 
+        type: rust
+        style: powerline
+      - type: spotify
+        style: powerline
+        foreground: p:text
+        background: p:green
+        powerline_symbol: 
+        options:
+          playing_icon: "  "
+          paused_icon: "  "
+          stopped_icon: "  "
       # - options:
       #     http_timeout: 1000
       #   cache:

@@ -26,9 +26,11 @@ end
 lint.linters_by_ft = {
   javascript = { "eslint_d" },
   typescript = { "eslint_d" },
-  python = { "ruff" },
-  markdown = { "markdownlint" },
+  python = { "black" },
+  markdown = { "markdownlint-cli2" },
+  ruby = { "rubocop" },
   ["sql.jinja"] = { "sqlfluff_dbt" },
+  sql = { "sqlfluff" },
 }
 
 -- Lint on save and insert leave

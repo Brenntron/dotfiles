@@ -128,13 +128,12 @@ export SSH_AUTH_SOCK=~/.1password/agent.sock
 source $(brew --prefix antidote)/share/antidote/antidote.zsh
 antidote load $XDG_CONFIG_HOME/zsh_plugins.txt
 
-
 # Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+CASE_SENSITIVE="true"
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE="true"
+# HYPHEN_INSENSITIVE="true"
 
 # asdf setup
 source ~/.config/asdf/asdf_setup.zsh
@@ -150,6 +149,8 @@ function zvm_after_init() {
   # FZF setup
   source ~/.config/fzf/fzf.zsh
 }
+
+eval "$(direnv hook zsh)"
 
 # obsidianmd CLI
 {{ if eq .chezmoi.os "darwin" }}
@@ -244,6 +245,12 @@ eval "$(zoxide init zsh)"
 
 {{ if .work_computer -}}
 export AWS_PROFILE='spreetail-dev'
+export AWS_REGION="us-east-1"
+export CLAUDE_CODE_USE_BEDROCK=1
+# Opt into flicker-free alt-screen rendering with virtualized scrollback
+export CLAUDE_CODE_NO_FLICKER=1
+
+~/bin/claude-code-bedrock
 {{- end }}
 
 # Enable vi mode

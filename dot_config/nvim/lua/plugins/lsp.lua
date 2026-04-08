@@ -8,12 +8,7 @@ require("lazydev").setup({
   },
 })
 
--- Mason (LSP/tool installer)
-require("mason").setup()
-
--- Mason-lspconfig (ensures servers are installed)
-require("mason-lspconfig").setup({
-  ensure_installed = {
+lsps = {
     "lua_ls",
     "ts_ls",
     "pyright",
@@ -21,7 +16,15 @@ require("mason-lspconfig").setup({
     "cssls",
     "jsonls",
     "yamlls",
-  },
+    "copilot",
+  }
+
+-- Mason (LSP/tool installer)
+require("mason").setup()
+
+-- Mason-lspconfig (ensures servers are installed)
+require("mason-lspconfig").setup({
+  ensure_installed = lsps,
 })
 
 -- Merge blink.cmp capabilities
@@ -48,15 +51,7 @@ vim.lsp.config("lua_ls", {
 })
 
 -- Enable all configured servers
-vim.lsp.enable({
-  "lua_ls",
-  "ts_ls",
-  "pyright",
-  "html",
-  "cssls",
-  "jsonls",
-  "yamlls",
-})
+vim.lsp.enable(lsps)
 
 -- LspAttach: buffer-local keymaps using Snacks pickers
 vim.api.nvim_create_autocmd("LspAttach", {

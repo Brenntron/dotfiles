@@ -80,6 +80,7 @@
     "coreutils",
     "csvlens",                  # less for CSVs.
     "curl",
+    "direnv",                   # ENV loading and unloading by dir.
     "exercism",
     "eza",                      # ls replacement
     "fastfetch",
@@ -170,6 +171,7 @@
     "bat",                      # cat with syntax highlighting and Git integration
     "bottom",                   # Process/system monitor for the terminal.
     "coreutils",
+    "direnv",                   # ENV loading and unloading by dir.
     "eza",                      # ls replacement
     "fastfetch",
     "fd",                       # fd-find
