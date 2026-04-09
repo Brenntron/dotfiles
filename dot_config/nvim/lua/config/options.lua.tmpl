@@ -58,15 +58,12 @@ opt.winminwidth = 5
 opt.wrap = false
 
 -- Globals
-vim.g.autoformat = false
+vim.g.autoformat = true
 vim.g.snacks_animate = true
 vim.g.markdown_recommended_style = 0
 
 -- Filetype additions
 vim.filetype.add({
-  extension = {
-    avanterules = "markdown",
-  },
   filename = {
     ["%.sqlfluff.*"] = "cfg",
   },

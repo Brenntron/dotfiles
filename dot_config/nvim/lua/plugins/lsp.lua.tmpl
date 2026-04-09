@@ -9,15 +9,26 @@ require("lazydev").setup({
 })
 
 lsps = {
-    "lua_ls",
-    "ts_ls",
-    "pyright",
-    "html",
-    "cssls",
-    "jsonls",
-    "yamlls",
-    "copilot",
-  }
+  "bashls",
+  "copilot",
+  "cssls",
+  "docker_compose_language_service",
+  "dockerls",
+  "eslint",
+  "gopls",
+  "html",
+  "jinja_lsp",
+  "jsonls",
+  "lua_ls",
+  "marksman",
+  "omnisharp",
+  "pyright",
+  "snyk_ls",
+  "taplo",
+  "terraformls",
+  "ts_ls",
+  "yamlls",
+}
 
 -- Mason (LSP/tool installer)
 require("mason").setup()
@@ -38,6 +49,14 @@ end
 vim.lsp.config("*", {
   capabilities = capabilities,
 })
+
+{{- if .work_computer }}
+vim.lsp.config('jinja_lsp', {
+  filetypes = {
+    "sql.jinja", -- Adding sql for use with dbt.
+  },
+})
+{{ end -}}
 
 vim.lsp.config("lua_ls", {
   settings = {
@@ -60,9 +79,17 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local buf = ev.buf
     local opts = { buffer = buf }
 
-    vim.keymap.set("n", "gd", function() Snacks.picker.lsp_definitions() end, vim.tbl_extend("force", opts, { desc = "Goto Definition" }))
-    vim.keymap.set("n", "gr", function() Snacks.picker.lsp_references() end, vim.tbl_extend("force", opts, { nowait = true, desc = "References" }))
-    vim.keymap.set("n", "gI", function() Snacks.picker.lsp_implementations() end, vim.tbl_extend("force", opts, { desc = "Goto Implementation" }))
-    vim.keymap.set("n", "gy", function() Snacks.picker.lsp_type_definitions() end, vim.tbl_extend("force", opts, { desc = "Goto Type Definition" }))
+    vim.keymap.set("n", "gd", function()
+      Snacks.picker.lsp_definitions()
+    end, vim.tbl_extend("force", opts, { desc = "Goto Definition" }))
+    vim.keymap.set("n", "gr", function()
+      Snacks.picker.lsp_references()
+    end, vim.tbl_extend("force", opts, { nowait = true, desc = "References" }))
+    vim.keymap.set("n", "gI", function()
+      Snacks.picker.lsp_implementations()
+    end, vim.tbl_extend("force", opts, { desc = "Goto Implementation" }))
+    vim.keymap.set("n", "gy", function()
+      Snacks.picker.lsp_type_definitions()
+    end, vim.tbl_extend("force", opts, { desc = "Goto Type Definition" }))
   end,
 })

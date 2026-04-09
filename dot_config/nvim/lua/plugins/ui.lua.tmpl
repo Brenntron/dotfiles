@@ -142,7 +142,14 @@ require("lualine").setup({
       { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
       { "filename", path = 1 },
     },
-    lualine_x = { "diff" },
+    lualine_x = {
+      {
+        require("noice").api.status.mode.get,
+        cond = require("noice").api.status.mode.has,
+        color = { fg = "#ff9e64" },
+      },
+      "diff",
+    },
     lualine_y = {
       { "progress", separator = " ", padding = { left = 1, right = 0 } },
       { "location", padding = { left = 0, right = 1 } },
@@ -169,6 +176,10 @@ require("noice").setup({
           { find = "; before #%d+" },
         },
       },
+      view = "mini",
+    },
+    {
+      filter = { event = "msg_showmode" },
       view = "mini",
     },
   },

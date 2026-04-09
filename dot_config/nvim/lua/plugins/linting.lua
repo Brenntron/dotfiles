@@ -24,13 +24,17 @@ end
 
 -- Linters by filetype
 lint.linters_by_ft = {
+  ["*"] = { "snyk_ls" },
+  go = { "golangci-lint" },
   javascript = { "eslint_d" },
-  typescript = { "eslint_d" },
-  python = { "black" },
   markdown = { "markdownlint-cli2" },
+  python = { "ruff" },
   ruby = { "rubocop" },
-  ["sql.jinja"] = { "sqlfluff_dbt" },
+  sh = { "shellcheck" },
   sql = { "sqlfluff" },
+  ["sql.jinja"] = { "sqlfluff_dbt" },
+  typescript = { "eslint_d" },
+  yaml = { "yamllint" },
 }
 
 -- Lint on save and insert leave

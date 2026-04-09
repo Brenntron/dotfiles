@@ -2,6 +2,7 @@
 
 require("conform").setup({
   formatters_by_ft = {
+    cs = { "csharpier" },
     css = { "prettierd" },
     go = { "gofmt" },
     html = { "prettierd" },
@@ -15,7 +16,7 @@ require("conform").setup({
     sql = { "sqlfluff" },
     ["sql.jinja"] = { "sqlfluff_dbt" },
     typescript = { "prettierd" },
-    yaml = { "prettierd" },
+    yaml = { "prettierd", "yamlfmt" },
   },
   format_on_save = function()
     if not vim.g.autoformat then
