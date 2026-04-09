@@ -30,6 +30,8 @@ require("plugins.git")
 require("config.keymaps")
 require("config.autocmds")
 
+{{ if .work_computer }}
 -- Custom filetype detection and treesitter parser registration
 require("config.filetype")
 require("config.treesitter")
+{{ end -}}

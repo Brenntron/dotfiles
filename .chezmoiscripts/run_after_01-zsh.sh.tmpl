@@ -2,12 +2,12 @@
 
 {{ template "shared_script_utils.bash" . -}}
 
-{{ if eq .chezmoi.os "linux" -}}
-
 if [[ "$(basename "$SHELL")" != "zsh" && -x "$(command -v zsh)" ]]; then
-   chsh -s $(which zsh)
+  ZSH_PATH="$(which zsh)"
+  if ! grep -qxF "$ZSH_PATH" /etc/shells; then
+    echo "$ZSH_PATH" | sudo tee -a /etc/shells
+  fi
+  chsh -s "$ZSH_PATH"
 fi
-
-{{- end }}
 
 _safeExit_
