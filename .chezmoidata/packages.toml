@@ -141,7 +141,7 @@
     "zsh-autocomplete",
   ]
   taps=["slp/krunkit"]
-[packages.homebrew.personal]
+[packages.homebrew.personal_computer]
   casks=[
     "1password",
   ]

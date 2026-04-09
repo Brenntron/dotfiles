@@ -5,17 +5,13 @@
 # migrate to XDG directories
 /.curlrc
 /.gitignore
-/.gitconfig
 /.nanorc
 /.digrc
 /.wget-hsts
 /.zcompdump
 /.python_history
-/.local/share/zsh/history
 /.sed/htmlDecode.sed
 /.sed/htmlEncode.sed
 /.sed/stopwords.sed
-/.yamllint.yml
 /.git_stop_words
-/.config/jdfile/config.toml
 /.config/dotfile_source/third-party/jdfile.sh
