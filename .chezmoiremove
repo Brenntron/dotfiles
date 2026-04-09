@@ -8,7 +8,6 @@
 /.nanorc
 /.digrc
 /.wget-hsts
-/.zcompdump
 /.python_history
 /.sed/htmlDecode.sed
 /.sed/htmlEncode.sed
