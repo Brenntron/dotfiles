@@ -252,6 +252,15 @@ export CLAUDE_CODE_NO_FLICKER=1
 
 ~/bin/claude-code-bedrock
 {{- end }}
+{{- if .personal_computer }}
+if [[ -d ~/google-cloud-sdk ]]; then
+  # The next line updates PATH for the Google Cloud SDK.
+  if [ -f '/Users/Brenntron/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/Brenntron/google-cloud-sdk/path.zsh.inc'; fi 
+
+  # The next line enables shell command completion for gcloud.
+  if [ -f '/Users/Brenntron/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/Brenntron/google-cloud-sdk/completion.zsh.inc'; fi
+fi
+{{ end }}
 
 # Enable vi mode
 bindkey -v
