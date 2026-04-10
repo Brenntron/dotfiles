@@ -1,17 +1,18 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
-
 palette:
-  blue: "#8AADF4"
-  closer: "#ACB0BE"
+  blue: "#8aadf4"
   green: "#a6da95"
-  lavender: "#B7BDF8"
+  flamingo: "#f0c6c6"
+  lavender: "#b7bdf8"
   mauve: "#c6a0f6"
-  pink: "#F5BDE6"
+  maroon: "#ee99a0"
+  pink: "#f5bde6"
   red: "#ed8796"
   sapphire: "#7dc4e4"
   sky: "#91d7e3"
-  text: "#1e2030"
+  teal: "#8bd5ca"
   yellow: "#eed49f"
+  text: "#1e2030"
 blocks:
   - type: prompt
     alignment: left
@@ -23,52 +24,79 @@ blocks:
         foreground: p:text
         background: p:blue
         type: os
-        style: diamond
-      - template: " {{ .HostName }} "
+        style: powerline
+        powerline_symbol: ''
+      - template: "{{ .HostName }} "
         foreground: p:text
         background: p:blue
         powerline_symbol: 
         type: session
-        style: diamond
-      - options:
-          folder_icon: .. ..
-          home_icon: "~"
-          style: agnoster_short
-        template: " {{ .Path }}"
-        foreground: p:text
-        background: p:pink
-        powerline_symbol: 
-        type: path
         style: powerline
-      - options:
-          branch_icon: "  "
-          cherry_pick_icon: "  "
-          commit_icon: "  "
-          fetch_status: false
-          fetch_upstream_icon: false
-          merge_icon: "  "
-          no_commits_icon: "󰜛  "
-          rebase_icon: "  "
-          revert_icon: "  "
-          tag_icon: "  "
-        template: "{{ .HEAD }}"
-        foreground: p:text
-        background: p:lavender
-        powerline_symbol: 
-        type: git
+      - type: text
         style: powerline
+        foreground: p:text
+        background: p:sky
+        powerline_symbol: 
+        template: "  "
+      - options:
+          time_format: "11:04:05 PM"
+        foreground: p:text
+        background: p:sky
+        type: time
+        style: powerline
+        powerline_symbol: ''
+      - options:
+          http_timeout: 1000
+        cache:
+          duration: 5m0s
+          strategy: folder
+        template: " \U000F0A60 {{ .IP }} "
+        background: p:flamingo
+        foreground: p:text
+        powerline_symbol: 
+        type: ipify
+        style: powerline
+      - type: spotify
+        style: powerline
+        foreground: p:text
+        background: p:green
+        powerline_symbol: 
+        options:
+          playing_icon: "  "
+          paused_icon: "  "
+          stopped_icon: "  "
   - type: prompt
     alignment: left
     newline: true
     overflow: hide
     segments:
       - options:
-          time_format: "15:04:05"
+          folder_icon: " "
+          home_icon: "~"
+          style: agnoster_full
+        template: " {{ .Path }}"
         foreground: p:text
-        background: p:sky
-        type: time
-        style: diamond
+        background: p:pink
+        type: path
+        style: powerline
+        leading_powerline_symbol: ''
+      - options:
+          branch_icon: "   "
+          cherry_pick_icon: "   "
+          commit_icon: "   "
+          fetch_status: false
+          fetch_upstream_icon: false
+          merge_icon: "   "
+          no_commits_icon: " \U000F071B  "
+          rebase_icon: "   "
+          revert_icon: "   "
+          tag_icon: "   "
+        template: "{{ .HEAD }}"
+        foreground: p:text
+        background: p:lavender
         powerline_symbol: 
+        type: git
+        style: powerline
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
@@ -87,7 +115,7 @@ blocks:
         style: powerline
       - options:
           cache_duration: none
-        template: " 󰢱  {{ .Full }} "
+        template: " \U000F08B1  {{ .Full }} "
         foreground: p:text
         background: p:blue
         powerline_symbol: 
@@ -121,37 +149,27 @@ blocks:
           cache_duration: none
         template: "   {{ .Full }} "
         foreground: p:text
-        background: p:lavender
+        background: p:mauve
         powerline_symbol: 
         type: dotnet
         style: powerline
       - options:
           cache_duration: none
-        template: " 󱘗  {{ .Full }} "
+        template: " \U000F1617  {{ .Full }} "
         foreground: p:text
         background: p:red
         powerline_symbol: 
         type: rust
         style: powerline
-      - type: spotify
+      - type: status
         style: powerline
         foreground: p:text
-        background: p:green
+        background: p:teal
+        background_templates:
+          - "{{ if .Error }}p:maroon{{ end }}"
         powerline_symbol: 
+        template: "  "
         options:
-          playing_icon: "  "
-          paused_icon: "  "
-          stopped_icon: "  "
-      # - options:
-      #     http_timeout: 1000
-      #   cache:
-      #     duration: 5m0s
-      #     strategy: folder
-      #   template: " {{ .IP }} "
-      #   foreground: p:text
-      #   powerline_symbol: 
-      #   background: p:lavender
-      #   type: ipify
-      #   style: diamond
+          always_enabled: true
 version: 4
 final_space: true
