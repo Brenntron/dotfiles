@@ -25,15 +25,17 @@ export PYENV_ROOT=$HOME/.pyenv
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
+_brew_openssl="$(brew --prefix openssl)"
+
 export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe \
-  --with-ssl=$(brew --prefix openssl)"
+  --with-ssl=${_brew_openssl}"
 
 {{ else if eq .chezmoi.os "darwin" }}
 export KERL_CONFIGURE_OPTIONS="--disable-debug --disable-silent-rules \
   --without-javac --enable-shared-zlib --enable-dynamic-ssl-lib \
   --enable-hipe --disable-sctp --enable-smp-support --enable-threads \
   --enable-kernel-poll --enable-wx --enable-darwin-64bit \
-  --with-ssl=$(brew --prefix openssl)"
+  --with-ssl=${_brew_openssl}"
 export NODE_OPTIONS="--max-old-space-size=8192"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 {{ end }}
@@ -41,8 +43,6 @@ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 # Custom syntax highlighting must come before activating zsh-syntax-highlighting
 # source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
 source ~/.config/catppuccin/zsh-syntax-highlighting/themes/catppuccin_macchiato-zsh-syntax-highlighting.zsh
-
-eval $(thefuck --alias)
 
 zmodload zsh/complist
 bindkey -M menuselect 'h' vi-backward-char
@@ -57,7 +57,13 @@ bindkey -M menuselect '^xn' accept-and-infer-next-history  # Next
 bindkey -M menuselect '^xu' undo                           # Undo
 
 # zsh completions config
-autoload -U compinit; compinit
+autoload -U compinit
+if [[ ~/.zcompdump -nt ~/.zcompdump.timestamp ]] || [[ ! -f ~/.zcompdump.timestamp ]]; then
+  compinit
+  touch ~/.zcompdump.timestamp
+else
+  compinit -C
+fi
 _comp_options=(globdots) # With hidden files
 
 compdef vman="man"
@@ -125,8 +131,11 @@ zstyle ':completion:*' squeeze-slashes true
 export SSH_AUTH_SOCK=~/.1password/agent.sock
 
 # zsh plugins using antidate
-source $(brew --prefix antidote)/share/antidote/antidote.zsh
-antidote load $XDG_CONFIG_HOME/zsh_plugins.txt
+zsh_plugins=~/XDG_CONFIG_HOME/zsh/.zsh_plugins.zsh
+if [[ ! $zsh_plugins -nt $XDG_CONFIG_HOME/zsh/zsh_plugins.txt ]]; then
+  antidote bundle <$XDG_CONFIG_HOME/zsh_plugins.txt >$zsh_plugins
+fi
+source $zsh_plugins
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -174,7 +183,7 @@ fi
 # export ARCHFLAGS="-arch x86_64"
 
 export PATH="$(brew --prefix imagemagick@6)/bin:$PATH"
-export PATH="$(brew --prefix openssl@3)/bin:$PATH"
+export PATH="${_brew_openssl}/bin:$PATH"
 export PATH="$(brew --prefix make)/libexec/gnubin:$PATH"
 
 # set brew installed curl if installed
@@ -205,10 +214,10 @@ alias cc='gcc'
 alias CC='gcc'
 
 # Openssl setup
-export LDFLAGS="-Wl,-rpath,$(brew --prefix openssl@3)/lib"
-export CPPFLAGS="-I$(brew --prefix openssl@3)/include"
-export OPENSSLDIR="$(brew --prefix openssl@3)"
-export CONFIGURE_OPTS="--with-ssl=$(brew --prefix openssl@3) --with-openssl=$(brew --prefix openssl@3) --with-openssl-rpath=auto"
+export LDFLAGS="-Wl,-rpath,${_brew_openssl}/lib"
+export CPPFLAGS="-I${_brew_openssl}/include"
+export OPENSSLDIR="${_brew_openssl}"
+export CONFIGURE_OPTS="--with-ssl=${_brew_openssl} --with-openssl=${_brew_openssl} --with-openssl-rpath=auto"
 
 # Containerization setup
 if command -v podman &> /dev/null; then
@@ -262,3 +271,5 @@ fi
 
 # Enable vi mode
 bindkey -v
+
+unset _brew_openssl
