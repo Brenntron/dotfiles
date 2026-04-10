@@ -131,9 +131,10 @@ zstyle ':completion:*' squeeze-slashes true
 export SSH_AUTH_SOCK=~/.1password/agent.sock
 
 # zsh plugins using antidate
-zsh_plugins=~/XDG_CONFIG_HOME/zsh/.zsh_plugins.zsh
-if [[ ! $zsh_plugins -nt $XDG_CONFIG_HOME/zsh/zsh_plugins.txt ]]; then
-  antidote bundle <$XDG_CONFIG_HOME/zsh_plugins.txt >$zsh_plugins
+source $(brew --prefix antidote)/share/antidote/antidote.zsh
+zsh_plugins=~/.config/zsh/.zsh_plugins.zsh
+if [[ ! $zsh_plugins -nt ~/.config/zsh/zsh_plugins.txt ]]; then
+  antidote bundle <~/.config/zsh/zsh_plugins.txt >$zsh_plugins
 fi
 source $zsh_plugins
 

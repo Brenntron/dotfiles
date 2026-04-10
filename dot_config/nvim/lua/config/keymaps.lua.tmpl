@@ -101,6 +101,17 @@ map("n", "=P", "<Plug>(YankyPutBeforeFilter)", { desc = "Put Before Applying a F
 map("n", "<c-p>", "<Plug>(YankyPreviousEntry)", { desc = "Prev Yank Entry" })
 map("n", "<c-n>", "<Plug>(YankyNextEntry)", { desc = "Next Yank Entry" })
 
+-- Sidekick NES (Next Edit Suggestion)
+map({ "i", "n" }, "<tab>", function()
+  if require("sidekick").nes_jump_or_apply() then
+    return
+  end
+  if vim.lsp.inline_completion.get() then
+    return
+  end
+  return "<tab>"
+end, { expr = true, desc = "Goto/Apply Next Edit Suggestion" })
+
 -- AI
 wk.add({
   { "<leader>a", group = "AI", icon = "󰚩 " },
