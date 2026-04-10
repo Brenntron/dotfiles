@@ -39,7 +39,7 @@ blocks:
         powerline_symbol: 
         template: "  "
       - options:
-          time_format: "11:04:05 PM"
+          time_format: "Mon Jan 02 03:03 PM"
         foreground: p:text
         background: p:sky
         type: time
@@ -56,20 +56,6 @@ blocks:
         powerline_symbol: 
         type: ipify
         style: powerline
-      - type: spotify
-        style: powerline
-        foreground: p:text
-        background: p:green
-        powerline_symbol: 
-        options:
-          playing_icon: "  "
-          paused_icon: "  "
-          stopped_icon: "  "
-  - type: prompt
-    alignment: left
-    newline: true
-    overflow: hide
-    segments:
       - options:
           folder_icon: " "
           home_icon: "~"
@@ -161,14 +147,27 @@ blocks:
         powerline_symbol: 
         type: rust
         style: powerline
-      - type: status
+      - type: spotify
         style: powerline
+        foreground: p:text
+        background: p:green
+        powerline_symbol: 
+        options:
+          playing_icon: "  "
+          paused_icon: "  "
+          stopped_icon: "  "
+  - type: prompt
+    alignment: left
+    newline: true
+    segments:
+      - type: status
+        style: diamond
         foreground: p:text
         background: p:teal
         background_templates:
           - "{{ if .Error }}p:maroon{{ end }}"
-        powerline_symbol: 
-        template: "  "
+        trailing_diamond: 
+        template: "   {{ .String }}"
         options:
           always_enabled: true
 version: 4
