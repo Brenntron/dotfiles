@@ -10,7 +10,9 @@ require("lazydev").setup({
 
 lsps = {
   "bashls",
+{{- if .work_computer }}
   "copilot",
+{{ end -}}
   "cssls",
   "docker_compose_language_service",
   "dockerls",
