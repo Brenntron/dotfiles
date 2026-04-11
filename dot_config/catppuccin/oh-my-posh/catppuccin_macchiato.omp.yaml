@@ -25,7 +25,7 @@ blocks:
         background: p:blue
         type: os
         style: powerline
-        powerline_symbol: ''
+        powerline_symbol: ""
       - template: "{{ .HostName }} "
         foreground: p:text
         background: p:blue
@@ -44,7 +44,7 @@ blocks:
         background: p:sky
         type: time
         style: powerline
-        powerline_symbol: ''
+        powerline_symbol: ""
       - options:
           http_timeout: 1000
         cache:
@@ -63,9 +63,10 @@ blocks:
         template: " {{ .Path }}"
         foreground: p:text
         background: p:pink
+        powerline_symbol: 
         type: path
         style: powerline
-        leading_powerline_symbol: ''
+        leading_powerline_symbol: ""
       - options:
           branch_icon: "   "
           cherry_pick_icon: "   "
