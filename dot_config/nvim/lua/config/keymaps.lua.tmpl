@@ -208,6 +208,14 @@ wk.add({
   { "<leader>/", function() Snacks.picker.grep() end, desc = "Live Grep" },
 }, { mode = { "n", "x" } })
 
+-- Replace
+wk.add({
+  { "<leader>r", group = "Replace" },
+  { "<leader>ro", function() require('grug-far').open({ transient = true }) end, desc = "Open Grug Far" },
+  { "<leader>rw", function() require('grug-far').open({ prefills = { search = vim.fn.expand('<cword>') }, transient = true }) end, desc = "Search word" },
+  { "<leader>rs", function() require('grug-far').with_visual_selection({ transient = true }) end, desc = "Search visual selection" },
+})
+
 -- UI
 wk.add({
   { "<leader>u", group = "Toggle" },
