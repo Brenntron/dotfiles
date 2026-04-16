@@ -152,6 +152,13 @@ wk.add({
   { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" },
 }, { mode = "n" })
 
+-- Databases
+wk.add({
+  { "<leader>d", group = "Databases", icon = " "},
+  { "<leader>da", "<cmd>DBUIAddConnection<cr>", desc = "Add Database Connection" },
+  { "<leader>dt", "<cmd>DBUIToggle<cr>", desc = "Toggle Database UI" },
+})
+
 -- Explorer
 wk.add({
   { "<leader>e", function() Snacks.explorer() end, desc = "File Explorer" },
@@ -179,6 +186,17 @@ wk.add({
   { "<leader>gf", function() Snacks.picker.git_log_file() end, desc = "Git File History" },
 }, { mode = "n" })
 
+  -- LSP
+wk.add({
+  { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
+  { "gD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
+  { "gr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
+  { "gI", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
+  { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
+  { "gai", function() Snacks.picker.lsp_incoming_calls() end, desc = "C[a]lls Incoming" },
+  { "gao", function() Snacks.picker.lsp_outgoing_calls() end, desc = "C[a]lls Outgoing" },
+}, { mode = "n" })
+
 -- Yanky
 wk.add({
   { "<leader>p", function() Snacks.picker.yanky() end, desc = "Open Yank History" },
@@ -197,14 +215,18 @@ wk.add({
 -- Search
 wk.add({
   { "<leader>s", group = "Search" },
-  { "<leader>ss", function() Snacks.picker.lsp_symbols() end, desc = "Search Symbols" },
+  { "<leader>sc", pick_chezmoi, desc = "Search Chezmoi" },
   { "<leader>sd", function() Snacks.picker.diagnostics() end, desc = "Search Diagnostics" },
+  { "<leader>sg", function() Snacks.picker.grep() end, desc = "Grep" },
   { "<leader>sh", function() Snacks.picker.help() end, desc = "Search Help" },
   { "<leader>sk", function() Snacks.picker.keymaps() end, desc = "Search Keymaps" },
+  { "<leader>sm", function() Snacks.picker.marks() end, desc = "Search Marks" },
+  { "<leader>sM", function() Snacks.picker.man() end, desc = "Search Man Pages" },
+  { "<leader>sq", function() Snacks.picker.qflist() end, desc = "Quickfix List" },
   { "<leader>sr", function() Snacks.picker.resume() end, desc = "Resume Picker" },
-  { "<leader>sg", function() Snacks.picker.grep() end, desc = "Grep" },
+  { "<leader>ss", function() Snacks.picker.lsp_symbols() end, desc = "Search Symbols" },
+  { "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
   { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Grep Word" },
-  { "<leader>sc", pick_chezmoi, desc = "Search Chezmoi" },
   { "<leader>/", function() Snacks.picker.grep() end, desc = "Live Grep" },
 }, { mode = { "n", "x" } })
 

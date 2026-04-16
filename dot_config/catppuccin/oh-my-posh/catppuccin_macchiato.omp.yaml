@@ -32,26 +32,13 @@ blocks:
         powerline_symbol: 
         type: session
         style: powerline
-      - type: text
-        style: powerline
-        foreground: p:text
-        background: p:sky
-        powerline_symbol: 
-        template: "  "
-      - options:
-          time_format: "Mon Jan 02 03:03 PM"
-        foreground: p:text
-        background: p:sky
-        type: time
-        style: powerline
-        powerline_symbol: ""
       - options:
           http_timeout: 1000
         cache:
           duration: 5m0s
           strategy: folder
         template: " \U000F0A60 {{ .IP }} "
-        background: p:flamingo
+        background: p:sky
         foreground: p:text
         powerline_symbol: 
         type: ipify
