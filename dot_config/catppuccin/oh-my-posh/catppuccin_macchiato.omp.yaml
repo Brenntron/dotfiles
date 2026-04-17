@@ -46,7 +46,7 @@ blocks:
       - options:
           folder_icon: " "
           home_icon: "~"
-          style: agnoster_full
+          style: agnoster_short
         template: " {{ .Path }}"
         foreground: p:text
         background: p:pink
