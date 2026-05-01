@@ -26,23 +26,23 @@ blocks:
         type: os
         style: powerline
         powerline_symbol: ""
-      - template: "{{ .HostName }} "
+      - template: "{{ .UserName }}@{{ .HostName }} "
         foreground: p:text
         background: p:blue
         powerline_symbol: 
         type: session
         style: powerline
-      - options:
-          http_timeout: 1000
-        cache:
-          duration: 5m0s
-          strategy: folder
-        template: " \U000F0A60 {{ .IP }} "
-        background: p:sky
-        foreground: p:text
-        powerline_symbol: 
-        type: ipify
-        style: powerline
+      # - options:
+      #     http_timeout: 1000
+      #   cache:
+      #     duration: 5m0s
+      #     strategy: folder
+      #   template: " \U000F0A60 {{ .IP }} "
+      #   background: p:sky
+      #   foreground: p:text
+      #   powerline_symbol: 
+      #   type: ipify
+      #   style: powerline
       - options:
           folder_icon: " "
           home_icon: "~"

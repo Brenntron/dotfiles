@@ -13,7 +13,7 @@ require("blink.cmp").setup({
       end,
       "fallback",
     },
-    ["<C-y>"] = { "select_and_accept" },
+    ["<C-cr>"] = { "select_and_accept" },
     ["<C-u>"] = { "scroll_documentation_up", "fallback" },
     ["<C-d>"] = { "scroll_documentation_down", "fallback" },
   },
