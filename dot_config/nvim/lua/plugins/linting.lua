@@ -25,7 +25,7 @@ end
 -- Linters by filetype
 lint.linters_by_ft = {
   ["*"] = { "snyk_ls" },
-  go = { "golangci-lint" },
+  go = { "golangcilint" },
   javascript = { "eslint_d" },
   markdown = { "markdownlint-cli2" },
   python = { "ruff" },
