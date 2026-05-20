@@ -26,7 +26,7 @@ blocks:
         type: os
         style: powerline
         powerline_symbol: ""
-      - template: "{{ .UserName }}@{{ .HostName }} "
+      - template: "{{ .UserName }} "
         foreground: p:text
         background: p:blue
         powerline_symbol: 
