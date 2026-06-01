@@ -241,16 +241,16 @@ wk.add({
 -- UI
 wk.add({
   { "<leader>u", group = "Toggle" },
-  { "<leader>uw", function() vim.wo.wrap = not vim.wo.wrap end, desc = "Toggle Wrap" },
-  { "<leader>ul", function() vim.wo.number = not vim.wo.number end, desc = "Toggle Line Numbers" },
-  { "<leader>uL", function() vim.wo.relativenumber = not vim.wo.relativenumber end, desc = "Toggle Relative Numbers" },
-  { "<leader>us", function() vim.wo.spell = not vim.wo.spell end, desc = "Toggle Spelling" },
-  { "<leader>ud", function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, desc = "Toggle Diagnostics" },
   { "<leader>uc", function()
     local cl = vim.wo.conceallevel
     vim.wo.conceallevel = cl > 0 and 0 or 2
   end, desc = "Toggle Conceallevel" },
+  { "<leader>ud", function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, desc = "Toggle Diagnostics" },
+  { "<leader>uf", function() vim.g.autoformat = not vim.g.autoformat end, desc = "Toggle Autoformat" },
   { "<leader>uh", function()
+  { "<leader>uL", function() vim.wo.relativenumber = not vim.wo.relativenumber end, desc = "Toggle Relative Numbers" },
+  { "<leader>ul", function() vim.wo.number = not vim.wo.number end, desc = "Toggle Line Numbers" },
+  { "<leader>us", function() vim.wo.spell = not vim.wo.spell end, desc = "Toggle Spelling" },
     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
   end, desc = "Toggle Inlay Hints" },
   { "<leader>uT", function()
@@ -260,6 +260,7 @@ wk.add({
       vim.treesitter.start()
     end
   end, desc = "Toggle Treesitter Highlight" },
+  { "<leader>uw", function() vim.wo.wrap = not vim.wo.wrap end, desc = "Toggle Wrap" },
 }, { mode = "n" })
 
 -- Window 
