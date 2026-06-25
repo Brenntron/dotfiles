@@ -80,7 +80,6 @@ require("snacks").setup({
   lazygit = { enabled = true },
   notifier = { enabled = true },
   notify = { enabled = true },
-  {{- if not .work_computer }}
   picker = {
     enabled = true,
     actions = { 
@@ -95,10 +94,19 @@ require("snacks").setup({
         },
       },
     },
+    sources = {
+      explorer = {
+        win = {
+          list = {
+            wo = {
+              number = true,
+              relativenumber = true,
+            },
+          },
+        },
+      },
+    },
   },
-  {{ else }}
-  picker = { enabled = true },
-  {{ end -}}
   profiler = { enabled = true },
   quickfile = { enabled = true },
   rename = { enabled = true },

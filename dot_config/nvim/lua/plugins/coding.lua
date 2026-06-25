@@ -1,4 +1,4 @@
--- Coding: mini.ai, mini.pairs, mini.surround, mini.snippets, ts-comments, yanky, undotree
+-- Coding: mini.ai, mini.comment, mini.pairs, mini.surround, mini.snippets, ts-comments, yanky, undotree
 
 -- Mini.ai (enhanced text objects)
 require("mini.ai").setup({
