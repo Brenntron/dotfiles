@@ -113,7 +113,6 @@ wk.add({
   { "<leader>a", group = "AI", icon = "󰚩 " },
   { "<leader>aa", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
   { "<leader>as", function() require("sidekick.cli").select() end, desc = "Select CLI" },
-  { "<leader>ad", function() require("sidekick.cli").close() end, desc = "Detach a CLI Session" },
   { "<leader>at", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = { "x", "n" }, desc = "Send This" },
   { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}" }) end, desc = "Send File" },
   { "<leader>av", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
@@ -242,11 +241,11 @@ wk.add({
   { "<leader>ud", function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, desc = "Toggle Diagnostics" },
   { "<leader>uf", function() vim.g.autoformat = not vim.g.autoformat end, desc = "Toggle Autoformat" },
   { "<leader>uh", function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+  end, desc = "Toggle Inlay Hints" },
   { "<leader>uL", function() vim.wo.relativenumber = not vim.wo.relativenumber end, desc = "Toggle Relative Numbers" },
   { "<leader>ul", function() vim.wo.number = not vim.wo.number end, desc = "Toggle Line Numbers" },
   { "<leader>us", function() vim.wo.spell = not vim.wo.spell end, desc = "Toggle Spelling" },
-    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-  end, desc = "Toggle Inlay Hints" },
   { "<leader>uT", function()
     if vim.b.ts_highlight then
       vim.treesitter.stop()
@@ -301,6 +300,9 @@ wk.add({
   { "<leader>Pdd", "<cmd>DbtGoToDefinition<cr>", desc = "Go to definition" },
   { "<leader>Pdu", "<cmd>DbtListUpstreamModels<cr>", desc = "Upstream models" },
   { "<leader>Pds", "<cmd>DbtListDownstreamModels<cr>", desc = "Downstream models" },
+  { "<leader>PdC", "<cmd>DbtCompiledPreview<cr>", desc = "Compiled SQL preview" },
+  { "<leader>Pdl", "<cmd>DbtLineage<cr>", desc = "Lineage graph" },
+  { "<leader>Pde", "<cmd>DbtRerunLast<cr>", desc = "Re-run last command" },
 
   { "<leader>Pu", group = "uv" },
   { "<leader>Pur", "<cmd>UVRunFile<cr>", desc = "Run current file" },

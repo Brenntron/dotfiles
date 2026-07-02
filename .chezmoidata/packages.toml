@@ -102,6 +102,7 @@
     "gnutls",                   # GNU Transport Layer Security (TLS) Library
     "gping",                    # Ping, but with a graph
     "grep",
+    "hunk",                     # Review-first terminal diff viewer for agent-authored changesets.
     "imagemagick",              # Image manipulation tools
     "oh-my-posh",               # prompt theme engine
     "lazydocker",               # simple terminal UI for docker commands
