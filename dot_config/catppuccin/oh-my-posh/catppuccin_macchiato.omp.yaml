@@ -21,39 +21,30 @@ blocks:
           debian: " "
           display_distro_name: true
         template: " {{.Icon}} "
-        foreground: p:text
-        background: p:blue
+        foreground: p:blue
         type: os
-        style: powerline
-        powerline_symbol: ""
+        style: plain
       - template: "{{ .UserName }} "
-        foreground: p:text
-        background: p:blue
-        powerline_symbol: 
+        foreground: p:blue
         type: session
-        style: powerline
-      # - options:
-      #     http_timeout: 1000
-      #   cache:
-      #     duration: 5m0s
-      #     strategy: folder
-      #   template: " \U000F0A60 {{ .IP }} "
-      #   background: p:sky
-      #   foreground: p:text
-      #   powerline_symbol: 
-      #   type: ipify
-      #   style: powerline
+        style: plain
+      - options:
+          http_timeout: 1000
+        cache:
+          duration: 5m0s
+          strategy: folder
+        template: " \U000F0A60 {{ .IP }} "
+        foreground: p:sky
+        type: ipify
+        style: plain
       - options:
           folder_icon: " "
           home_icon: "~"
           style: agnoster_short
         template: " {{ .Path }}"
-        foreground: p:text
-        background: p:pink
-        powerline_symbol: 
+        foreground: p:pink
         type: path
-        style: powerline
-        leading_powerline_symbol: ""
+        style: plain
       - options:
           branch_icon: "   "
           cherry_pick_icon: "   "
@@ -66,80 +57,60 @@ blocks:
           revert_icon: "   "
           tag_icon: "   "
         template: "{{ .HEAD }}"
-        foreground: p:text
-        background: p:lavender
-        powerline_symbol: 
+        foreground: p:lavender
         type: git
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
-        powerline_symbol: 
-        foreground: p:text
-        background: p:mauve
+        foreground: p:mauve
         type: elixir
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
-        foreground: p:text
-        background: p:sapphire
-        powerline_symbol: 
+        foreground: p:sapphire
         type: go
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: " \U000F08B1  {{ .Full }} "
-        foreground: p:text
-        background: p:blue
-        powerline_symbol: 
+        foreground: p:blue
         type: lua
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
-        foreground: p:text
-        background: p:green
-        powerline_symbol: 
+        foreground: p:green
         type: node
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: "  {{ if .Venv }} {{ .Venv }}{{end}} {{ .Full }} "
-        foreground: p:text
-        background: p:yellow
-        powerline_symbol: 
+        foreground: p:yellow
         type: python
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
-        foreground: p:text
-        background: p:red
-        powerline_symbol: 
+        foreground: p:red
         type: ruby
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: "   {{ .Full }} "
-        foreground: p:text
-        background: p:mauve
-        powerline_symbol: 
+        foreground: p:mauve
         type: dotnet
-        style: powerline
+        style: plain
       - options:
           cache_duration: none
         template: " \U000F1617  {{ .Full }} "
-        foreground: p:text
-        background: p:red
-        powerline_symbol: 
+        foreground: p:red
         type: rust
-        style: powerline
+        style: plain
       - type: spotify
-        style: powerline
-        foreground: p:text
-        background: p:green
-        powerline_symbol: 
+        style: plain
+        foreground: p:green
         options:
           playing_icon: "  "
           paused_icon: "  "
@@ -149,14 +120,15 @@ blocks:
     newline: true
     segments:
       - type: status
-        style: diamond
-        foreground: p:text
-        background: p:teal
-        background_templates:
+        style: plain
+        foreground: p:teal
+        foreground_templates:
           - "{{ if .Error }}p:maroon{{ end }}"
-        trailing_diamond: 
         template: "   {{ .String }}"
         options:
           always_enabled: true
+      - type: time
+        style: plain
+        template: " {{ .CurrentDate | date .Format }}"
 version: 4
 final_space: true
