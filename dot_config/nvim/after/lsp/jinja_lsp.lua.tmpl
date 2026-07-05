@@ -1,0 +1,10 @@
+{{ if .work_computer -}}
+return {
+  filetypes = {
+    "jinja",
+    "sql", -- Adding sql for use with dbt.
+  },
+}
+{{- else -}}
+return {}
+{{- end }}

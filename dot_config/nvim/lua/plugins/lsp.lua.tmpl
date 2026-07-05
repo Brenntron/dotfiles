@@ -19,13 +19,17 @@ lsps = {
   "eslint",
   "gopls",
   "html",
+{{- if .work_computer }}
   "jinja_lsp",
+{{ end -}}
   "jsonls",
   "lua_ls",
   "marksman",
   "omnisharp",
   "pyright",
+{{- if .work_computer }}
   "snyk_ls",
+{{ end -}}
   "taplo",
   "terraformls",
   "ts_ls",
