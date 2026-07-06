@@ -1,18 +1,19 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
 palette:
   blue: "#8aadf4"
-  green: "#a6da95"
   flamingo: "#f0c6c6"
+  green: "#a6da95"
   lavender: "#b7bdf8"
-  mauve: "#c6a0f6"
   maroon: "#ee99a0"
+  mauve: "#c6a0f6"
   pink: "#f5bde6"
   red: "#ed8796"
+  rosewater: "#f4dbd6"
   sapphire: "#7dc4e4"
   sky: "#91d7e3"
   teal: "#8bd5ca"
-  yellow: "#eed49f"
   text: "#1e2030"
+  yellow: "#eed49f"
 blocks:
   - type: prompt
     alignment: left
@@ -21,7 +22,7 @@ blocks:
           debian: " "
           display_distro_name: true
         template: " {{.Icon}} "
-        foreground: p:blue
+        foreground: p:flamingo
         type: os
         style: plain
       - template: "{{ .UserName }} "
@@ -45,7 +46,9 @@ blocks:
         foreground: p:pink
         type: path
         style: plain
-      - options:
+      - type: git
+        foreground: p:lavender
+        options:
           branch_icon: "   "
           cherry_pick_icon: "   "
           commit_icon: "   "
@@ -56,58 +59,56 @@ blocks:
           rebase_icon: "   "
           revert_icon: "   "
           tag_icon: "   "
+        style: plain
         template: "{{ .HEAD }}"
-        foreground: p:lavender
-        type: git
-        style: plain
-      - options:
-          cache_duration: none
-        template: "   {{ .Full }} "
+      - type: elixir
         foreground: p:mauve
-        type: elixir
+        options:
+          cache_duration: none
         style: plain
-      - options:
+        template: "   {{ .Full }} "
+      - type: go
+        foreground: p:sapphire
+        options:
           cache_duration: none
         template: "   {{ .Full }} "
-        foreground: p:sapphire
-        type: go
         style: plain
-      - options:
-          cache_duration: none
-        template: " \U000F08B1  {{ .Full }} "
+      - type: lua
         foreground: p:blue
-        type: lua
+        options:
+          cache_duration: none
         style: plain
-      - options:
+        template: " \U000F08B1  {{ .Full }} "
+      - type: node
+        options:
           cache_duration: none
         template: "   {{ .Full }} "
         foreground: p:green
-        type: node
         style: plain
-      - options:
-          cache_duration: none
-        template: "  {{ if .Venv }} {{ .Venv }}{{end}} {{ .Full }} "
+      - type: python
         foreground: p:yellow
-        type: python
-        style: plain
-      - options:
+        options:
           cache_duration: none
+        style: plain
+        template: "  {{ if .Venv }} {{ .Venv }}{{end}} {{ .Full }} "
+      - type: ruby
+        foreground: p:red
+        options:
+          cache_duration: none
+        style: plain
         template: "   {{ .Full }} "
-        foreground: p:red
-        type: ruby
-        style: plain
-      - options:
-          cache_duration: none
-        template: "   {{ .Full }} "
+      - type: dotnet
         foreground: p:mauve
-        type: dotnet
-        style: plain
-      - options:
+        options:
           cache_duration: none
-        template: " \U000F1617  {{ .Full }} "
-        foreground: p:red
-        type: rust
         style: plain
+        template: "   {{ .Full }} "
+      - type: rust
+        foreground: p:red
+        options:
+          cache_duration: none
+        style: plain
+        template: " \U000F1617  {{ .Full }} "
       - type: spotify
         style: plain
         foreground: p:green
@@ -128,6 +129,7 @@ blocks:
         options:
           always_enabled: true
       - type: time
+        foreground: p:rosewater
         style: plain
         template: " {{ .CurrentDate | date .Format }}"
 version: 4
