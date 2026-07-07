@@ -21,10 +21,10 @@ map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
 map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
 -- Resize windows
-map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
-map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
-map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
-map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+map("n", "<M-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
+map("n", "<M-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
+map("n", "<M-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
+map("n", "<M-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
 -- Buffers
 map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
@@ -60,6 +60,44 @@ map("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
 -- Terminal
 map("n", "<c-/>", function() Snacks.terminal() end, { desc = "Terminal" })
 map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+
+-- <c-\> toggles floating term N (defaults to 1). Prefix with count: 2<c-\>, 3<c-\>, etc.
+local function toggle_term()
+  Snacks.terminal.toggle(nil, { count = vim.v.count1, win = { position = "float" } })
+end
+map({ "n", "t" }, [[<c-\>]], toggle_term, { desc = "Toggle floating terminal (count-indexed)" })
+
+-- Terminal splits
+wk.add({
+  { "<leader>t", group = "Terminal" },
+  { "<leader>tv", function() Snacks.terminal(nil, { win = { position = "right" } }) end, desc = "Vertical Terminal" },
+}, { mode = "n" })
+
+-- Treesitter textobjects (select)
+map({ "x", "o" }, "af", function() require("nvim-treesitter-textobjects.select").select_textobject("@function.outer", "textobjects") end, { desc = "Around function" })
+map({ "x", "o" }, "if", function() require("nvim-treesitter-textobjects.select").select_textobject("@function.inner", "textobjects") end, { desc = "Inside function" })
+map({ "x", "o" }, "ac", function() require("nvim-treesitter-textobjects.select").select_textobject("@class.outer", "textobjects") end, { desc = "Around class" })
+map({ "x", "o" }, "ic", function() require("nvim-treesitter-textobjects.select").select_textobject("@class.inner", "textobjects") end, { desc = "Inside class" })
+map({ "x", "o" }, "aa", function() require("nvim-treesitter-textobjects.select").select_textobject("@parameter.outer", "textobjects") end, { desc = "Around parameter" })
+map({ "x", "o" }, "ia", function() require("nvim-treesitter-textobjects.select").select_textobject("@parameter.inner", "textobjects") end, { desc = "Inside parameter" })
+
+-- Treesitter textobjects (move)
+local ts_move = require("nvim-treesitter-textobjects.move")
+map({ "n", "x", "o" }, "]f", function() ts_move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function start" })
+map({ "n", "x", "o" }, "]F", function() ts_move.goto_next_end("@function.outer", "textobjects") end, { desc = "Next function end" })
+map({ "n", "x", "o" }, "]c", function() ts_move.goto_next_start("@class.outer", "textobjects") end, { desc = "Next class start" })
+map({ "n", "x", "o" }, "]C", function() ts_move.goto_next_end("@class.outer", "textobjects") end, { desc = "Next class end" })
+map({ "n", "x", "o" }, "]a", function() ts_move.goto_next_start("@parameter.inner", "textobjects") end, { desc = "Next parameter" })
+map({ "n", "x", "o" }, "[f", function() ts_move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function start" })
+map({ "n", "x", "o" }, "[F", function() ts_move.goto_previous_end("@function.outer", "textobjects") end, { desc = "Prev function end" })
+map({ "n", "x", "o" }, "[c", function() ts_move.goto_previous_start("@class.outer", "textobjects") end, { desc = "Prev class start" })
+map({ "n", "x", "o" }, "[C", function() ts_move.goto_previous_end("@class.outer", "textobjects") end, { desc = "Prev class end" })
+map({ "n", "x", "o" }, "[a", function() ts_move.goto_previous_start("@parameter.inner", "textobjects") end, { desc = "Prev parameter" })
+
+-- Treesitter textobjects (swap)
+local ts_swap = require("nvim-treesitter-textobjects.swap")
+map("n", "<leader>cs", function() ts_swap.swap_next("@parameter.inner", "textobjects") end, { desc = "Swap next parameter" })
+map("n", "<leader>cS", function() ts_swap.swap_previous("@parameter.inner", "textobjects") end, { desc = "Swap prev parameter" })
 
 -- Flash (jump/motion)
 map({ "n", "x", "o" }, "s", function() require("flash").jump() end, { desc = "Flash" })

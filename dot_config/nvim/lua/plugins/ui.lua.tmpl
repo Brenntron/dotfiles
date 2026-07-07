@@ -152,6 +152,38 @@ require("lualine").setup({
     },
     lualine_x = {
       {
+        function()
+          local status = require("sidekick.status").get()
+          return status and vim.tbl_get({
+            Error = " ",
+            Inactive = " ",
+            Warning = " ",
+            Normal = " ",
+          }, status.kind)
+        end,
+        cond = function()
+          return require("sidekick.status").get() ~= nil
+        end,
+        color = function()
+          local hl_map = { Error = "DiagnosticError", Inactive = "MsgArea", Warning = "DiagnosticWarn", Normal = "Special" }
+          local status = require("sidekick.status").get()
+          local hl = status and (status.busy and "DiagnosticWarn" or hl_map[status.kind])
+          return { fg = require("snacks").util.color(hl) }
+        end,
+      },
+      {
+        function()
+          local cli_status = require("sidekick.status").cli()
+          return " " .. ((#cli_status) > 1 and #cli_status or "")
+        end,
+        cond = function()
+          return #require("sidekick.status").cli() > 0
+        end,
+        color = function()
+          return { fg = require("snacks").util.color("Special") } 
+        end,
+      },
+      {
         require("noice").api.status.mode.get,
         cond = require("noice").api.status.mode.has,
         color = { fg = "#ff9e64" },

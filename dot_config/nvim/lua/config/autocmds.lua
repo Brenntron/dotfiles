@@ -14,6 +14,14 @@ vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   end,
 })
 
+-- Enable treesitter highlight/indent via FileType (nvim-treesitter v1.x)
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("treesitter"),
+  callback = function(ev)
+    pcall(vim.treesitter.start, ev.buf)
+  end,
+})
+
 -- Highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
@@ -114,14 +122,13 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- Terminal mode keymaps for toggleterm buffers
+-- <esc><esc> to enter normal mode in terminal buffers
+-- (single <esc> stays available for terminal apps)
 vim.api.nvim_create_autocmd("TermOpen", {
-  group = vim.api.nvim_create_augroup("bvim_toggleterm", { clear = true }),
-  pattern = "term://*toggleterm#*",
+  group = vim.api.nvim_create_augroup("bvim_term_esc", { clear = true }),
+  pattern = "*",
   callback = function()
-    local opts = { buffer = 0, silent = true }
-    -- <esc><esc> to enter normal mode (single <esc> stays available for terminal apps)
-    vim.keymap.set("t", "<esc><esc>", [[<C-\><C-n>]], opts)
+    vim.keymap.set("t", "<esc><esc>", [[<C-\><C-n>]], { buffer = 0, silent = true })
   end,
 })
 
