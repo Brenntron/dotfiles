@@ -62,10 +62,9 @@ map("n", "<c-/>", function() Snacks.terminal() end, { desc = "Terminal" })
 map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 
 -- <c-\> toggles floating term N (defaults to 1). Prefix with count: 2<c-\>, 3<c-\>, etc.
-local function toggle_term()
-  Snacks.terminal.toggle(nil, { count = vim.v.count1, win = { position = "float" } })
-end
-map({ "n", "t" }, [[<c-\>]], toggle_term, { desc = "Toggle floating terminal (count-indexed)" })
+map({ "n", "t" }, [[<c-\>]], function()
+  Snacks.terminal(nil, { count = vim.v.count1, win = { position = "float" } })
+end, { desc = "Toggle floating terminal (count-indexed)" })
 
 -- Terminal splits
 wk.add({
