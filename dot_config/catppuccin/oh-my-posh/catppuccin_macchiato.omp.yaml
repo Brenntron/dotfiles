@@ -6,6 +6,7 @@ palette:
   lavender: "#b7bdf8"
   maroon: "#ee99a0"
   mauve: "#c6a0f6"
+  peach: "#f5a97f"
   pink: "#f5bde6"
   red: "#ed8796"
   rosewater: "#f4dbd6"
@@ -19,6 +20,7 @@ blocks:
     alignment: left
     segments:
       - type: text
+        foreground: p:peach
         style: plain
         template: "╭─"
       - type: os
@@ -81,7 +83,7 @@ blocks:
         options:
           cache_duration: none
         style: plain
-        template: " \U000F08B1 {{ .Full }}"
+        template: " \U000F08B1  {{ .Full }}"
       - type: node
         options:
           cache_duration: none
@@ -111,7 +113,7 @@ blocks:
         options:
           cache_duration: none
         style: plain
-        template: " \U000F1617 {{ .Full }}"
+        template: " \U000F1617  {{ .Full }}"
       - type: spotify
         style: plain
         foreground: p:green
@@ -124,6 +126,7 @@ blocks:
     newline: true
     segments:
       - type: text
+        foreground: p:peach
         style: plain
         template: "╰─"
       - type: status
