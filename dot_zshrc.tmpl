@@ -23,10 +23,6 @@ eval "$(oh-my-posh init zsh --config ${omp_config})"
 _brew_openssl="$(brew --prefix openssl)"
 
 {{ if eq .chezmoi.os "linux" }}
-export PYENV_ROOT=$HOME/.pyenv
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
 export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe \
   --with-ssl=${_brew_openssl}"
 
