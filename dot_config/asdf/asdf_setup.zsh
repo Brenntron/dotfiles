@@ -12,7 +12,11 @@ autoload -Uz _asdf
 compdef _asdf asdf
 
 export ASDF_CONFIG_FILE="${HOME}/.config/asdf/.asdfrc"
-. ${ASDF_DATA_DIR:-$HOME/.asdf}/plugins/golang/set-env.zsh
+if [ -e ${ASDF_DATA_DIR:-$HOME/.asdf}/plugins/golang/set-env.zsh ]; then
+  . ${ASDF_DATA_DIR:-$HOME/.asdf}/plugins/golang/set-env.zsh
+fi
 
 # Set JAVA_HOME
-. ~/.asdf/plugins/java/set-java-home.zsh
+if [ -e ~/.asdf/plugins/java/set-java-home.zsh ]; then
+  . ~/.asdf/plugins/java/set-java-home.zsh
+fi
