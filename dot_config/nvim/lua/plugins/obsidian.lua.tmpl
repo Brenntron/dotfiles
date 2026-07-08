@@ -3,13 +3,13 @@ require("obsidian").setup({
   workspaces = {
     {
       name = "Second Brain",
-      path = "~/Documents/'Second Brain'",
+      path = "~/Documents/Second Brain",
     },
-{{ if .work_computer }}
+{{- if .work_computer }}
     {
       name = "Work Notes",
       path = "~/Documents/Notes",
     },
+{{- end }}
   },
-{{ end}}
 })
