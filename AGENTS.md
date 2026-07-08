@@ -32,6 +32,7 @@ Also `os` and `osRelease.id` are compound: e.g. `linux-ubuntu`, `darwin`.
   - `run_after_*` — post-apply (zsh, eza install)
   - `run_onchange_*` — triggered when data files change (apt, brew, snap,
     flatpak, asdf installs, and package removal)
+  - bash scripts must be compatible with Bash 3.2.
 - **`.chezmoitemplates/shared_script_utils.bash`** — shared bash library
   (logging, error handling, trap cleanup, `_uvBinaryPath_`, etc.) included by
   all scripts.
