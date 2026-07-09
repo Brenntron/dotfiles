@@ -4,20 +4,6 @@ local wk = require("which-key")
 wk.add({
   { "<leader>P", group = "Python", icon = " " },
 
-  { "<leader>Pd", group = "dbt" },
-  { "<leader>Pdc", "<cmd>DbtCompile<cr>", desc = "Compile" },
-  { "<leader>Pdr", "<cmd>DbtRun<cr>", desc = "Run" },
-  { "<leader>Pdb", "<cmd>DbtBuild<cr>", desc = "Build" },
-  { "<leader>PdR", "<cmd>DbtRunFull<cr>", desc = "Run (full refresh)" },
-  { "<leader>Pdt", "<cmd>DbtTest<cr>", desc = "Test" },
-  { "<leader>Pdy", "<cmd>DbtModelYaml<cr>", desc = "Model YAML" },
-  { "<leader>Pdd", "<cmd>DbtGoToDefinition<cr>", desc = "Go to definition" },
-  { "<leader>Pdu", "<cmd>DbtListUpstreamModels<cr>", desc = "Upstream models" },
-  { "<leader>Pds", "<cmd>DbtListDownstreamModels<cr>", desc = "Downstream models" },
-  { "<leader>PdC", "<cmd>DbtCompiledPreview<cr>", desc = "Compiled SQL preview" },
-  { "<leader>Pdl", "<cmd>DbtLineage<cr>", desc = "Lineage graph" },
-  { "<leader>Pde", "<cmd>DbtRerunLast<cr>", desc = "Re-run last command" },
-
   { "<leader>Pu", group = "uv" },
   { "<leader>Pur", "<cmd>UVRunFile<cr>", desc = "Run current file" },
   { "<leader>Pus", "<cmd>UVRunSelection<cr>", desc = "Run selected code" },
