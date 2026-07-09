@@ -137,6 +137,17 @@ vim.api.nvim_create_user_command('TermH1', function()
   vim.api.nvim_open_term(0, {})
 end, { desc = 'Highlights ANSI termcodes in curbuf' })
 
+-- Refresh dbt ref/source diagnostics on save/read (manifest-backed, U8).
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
+  group = augroup("dbt_diagnostics"),
+  pattern = "*.sql",
+  callback = function(event)
+    if vim.bo[event.buf].filetype == "sql.jinja" then
+      require("dbt-nvim.diagnostics").refresh(event.buf)
+    end
+  end,
+})
+
 -- Navigate between Claude terminal and editor windows in terminal mode
 vim.api.nvim_create_autocmd("TermOpen", {
   group = vim.api.nvim_create_augroup("bvim_claudecode", { clear = true }),
