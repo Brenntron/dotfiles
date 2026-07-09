@@ -4,7 +4,10 @@ end
 
 vim.opt_local.commentstring = "{# %s #}"
 
-vim.lsp.enable("dbt-language-server")
+-- dbt-language-server is enabled at startup in lua/plugins/lsp.lua, not
+-- here: vim.lsp.enable() registers a FileType autocmd to autostart future
+-- matching buffers, and calling it from inside this same FileType dispatch
+-- (ftplugin) is too late to catch the buffer that triggered it.
 
 local wk = require("which-key")
 
@@ -22,4 +25,10 @@ wk.add({
   { "<leader>DC", "<cmd>DbtCompiledPreview<cr>", desc = "Compiled SQL preview", buffer = 0 },
   { "<leader>Dl", "<cmd>DbtLineage<cr>", desc = "Lineage graph", buffer = 0 },
   { "<leader>De", "<cmd>DbtRerunLast<cr>", desc = "Re-run last command", buffer = 0 },
+  { "<leader>Df", "<cmd>DbtRunDefer<cr>", desc = "Run (defer to prod)", buffer = 0 },
+  { "<leader>Dg", "<cmd>DbtDiagnosticsRefresh<cr>", desc = "Refresh diagnostics", buffer = 0 },
+  { "<leader>Dp", "<cmd>DbtDeps<cr>", desc = "Deps", buffer = 0 },
+  { "<leader>Dh", "<cmd>DbtSeed<cr>", desc = "Seed", buffer = 0 },
+  { "<leader>Dn", "<cmd>DbtSnapshot<cr>", desc = "Snapshot", buffer = 0 },
+  { "<leader>Dm", "<cmd>DbtLogsTail<cr>", desc = "Logs (tail)", buffer = 0 },
 }, { mode = "n" })
