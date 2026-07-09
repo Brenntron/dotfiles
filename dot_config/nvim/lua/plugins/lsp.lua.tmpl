@@ -87,9 +87,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local buf = ev.buf
     local opts = { buffer = buf }
 
-    vim.keymap.set("n", "gd", function()
-      Snacks.picker.lsp_definitions()
-    end, vim.tbl_extend("force", opts, { desc = "Goto Definition" }))
+    -- sql.jinja owns its own buffer-local `gd` (dbt manifest -> LSP -> native
+    -- fallback chain, set in dbt-nvim's FileType autocmd) so it must not be
+    -- clobbered here.
+    if vim.bo[buf].filetype ~= "sql.jinja" then
+      vim.keymap.set("n", "gd", function()
+        Snacks.picker.lsp_definitions()
+      end, vim.tbl_extend("force", opts, { desc = "Goto Definition" }))
+    end
     vim.keymap.set("n", "gr", function()
       Snacks.picker.lsp_references()
     end, vim.tbl_extend("force", opts, { nowait = true, desc = "References" }))
