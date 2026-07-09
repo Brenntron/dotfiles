@@ -10,6 +10,7 @@ require("conform").setup({
     json = { "prettierd" },
     lua = { "stylua" },
     markdown = { "prettierd", "markdownlint-cli2" },
+    odin = { "odinfmt" },
     python = { "ruff_format" },
     ruby = { "rubocop" },
     rust = { "rustfmt" },
@@ -17,6 +18,7 @@ require("conform").setup({
     ["sql.jinja"] = { "sqlfluff_dbt" },
     typescript = { "prettierd" },
     yaml = { "prettierd", "yamlfmt" },
+    zig = { "zigfmt" },
   },
   format_on_save = function()
     if not vim.g.autoformat then

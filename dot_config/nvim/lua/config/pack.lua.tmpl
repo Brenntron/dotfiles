@@ -3,34 +3,12 @@
 -- Lockfile at stdpath("config")/nvim-pack-lock.json
 
 vim.pack.add({
-  -- Colorscheme
-  { src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
+  -- AI
+  "https://github.com/folke/sidekick.nvim",
 
-  -- UI
-  "https://github.com/folke/snacks.nvim",
-  "https://github.com/akinsho/bufferline.nvim",
-  "https://github.com/nvim-lualine/lualine.nvim",
-  "https://github.com/folke/noice.nvim",
-  "https://github.com/MunifTanjim/nui.nvim",
-  "https://github.com/nvim-mini/mini.icons",
-  "https://github.com/nvim-tree/nvim-web-devicons",
-
-  -- Treesitter
-  "https://github.com/nvim-treesitter/nvim-treesitter",
-  "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
-  "https://github.com/windwp/nvim-ts-autotag",
-
-  -- LSP
-  "https://github.com/neovim/nvim-lspconfig",
-  "https://github.com/mason-org/mason.nvim",
-  "https://github.com/mason-org/mason-lspconfig.nvim",
-
-  -- Completion
-  { src = "https://github.com/Saghen/blink.cmp", version = "v1.10.1" },
-
-  -- Formatting & Linting
-  "https://github.com/stevearc/conform.nvim",
-  "https://github.com/mfussenegger/nvim-lint",
+  -- Chezmoi
+  "https://github.com/alker0/chezmoi.vim",
+  "https://github.com/xvzc/chezmoi.nvim",
 
   -- Coding
   "https://github.com/nvim-mini/mini.ai",
@@ -43,34 +21,65 @@ vim.pack.add({
   "https://github.com/gbprod/yanky.nvim",
   "https://github.com/jiaoshijie/undotree",
 
+  -- Colorscheme
+  { src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
+
+  -- Completion
+  { src = "https://github.com/Saghen/blink.cmp", version = "v1.10.1" },
+
+  -- Diagnostics
+  "https://github.com/folke/trouble.nvim",
+
+  -- Formatting & Linting
+  "https://github.com/stevearc/conform.nvim",
+  "https://github.com/mfussenegger/nvim-lint",
+
   -- Database
   "https://github.com/tpope/vim-dadbod",
   "https://github.com/kristijanhusak/vim-dadbod-ui",
   "https://github.com/kristijanhusak/vim-dadbod-completion",
-
-  -- Terminal
-  "https://github.com/akinsho/toggleterm.nvim",
 
   -- Editor
   "https://github.com/folke/flash.nvim",
   "https://github.com/folke/which-key.nvim",
   "https://github.com/folke/persistence.nvim",
 
+  -- Git
+  "https://github.com/lewis6991/gitsigns.nvim",
+
+  -- LSP
+  "https://github.com/neovim/nvim-lspconfig",
+  "https://github.com/mason-org/mason.nvim",
+  "https://github.com/mason-org/mason-lspconfig.nvim",
+
   -- Python
   "https://github.com/benomahony/uv.nvim",
 
-  -- Chezmoi
-  "https://github.com/alker0/chezmoi.vim",
-  "https://github.com/xvzc/chezmoi.nvim",
-
-  -- AI
-  "https://github.com/folke/sidekick.nvim",
-
-  -- Diagnostics
-  "https://github.com/folke/trouble.nvim",
-
   -- Search and Replace
   "https://github.com/MagicDuck/grug-far.nvim",
+
+  -- Obsidian
+  {
+    src = "https://github.com/obsidian-nvim/obsidian.nvim",
+    version = vim.version.range("*"), -- use latest release, remove to use latest commit
+  },
+  
+  -- Terminal
+  "https://github.com/akinsho/toggleterm.nvim",
+
+  -- Treesitter
+  "https://github.com/nvim-treesitter/nvim-treesitter",
+  "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+  "https://github.com/windwp/nvim-ts-autotag",
+
+  -- UI
+  "https://github.com/folke/snacks.nvim",
+  "https://github.com/akinsho/bufferline.nvim",
+  "https://github.com/nvim-lualine/lualine.nvim",
+  "https://github.com/folke/noice.nvim",
+  "https://github.com/MunifTanjim/nui.nvim",
+  "https://github.com/nvim-mini/mini.icons",
+  "https://github.com/nvim-tree/nvim-web-devicons",
 
   -- Util
   "https://github.com/folke/edgy.nvim",
@@ -78,12 +87,6 @@ vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/dstein64/vim-startuptime",
 
-  -- Git
-  "https://github.com/lewis6991/gitsigns.nvim",
-
-  -- Obsidian
-  {
-    src = "https://github.com/obsidian-nvim/obsidian.nvim",
-    version = vim.version.range("*"), -- use latest release, remove to use latest commit
-  },
+  -- Zig
+  "https://codeberg.org/ziglang/zig.vim",
 })
