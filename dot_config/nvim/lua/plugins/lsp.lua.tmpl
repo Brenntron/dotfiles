@@ -80,6 +80,15 @@ vim.lsp.config("lua_ls", {
 -- Enable all configured servers
 vim.lsp.enable(lsps)
 
+-- dbt-language-server is a manually installed binary, not mason-managed, so
+-- it isn't in `lsps`/`ensure_installed`. Must be enabled at startup, not from
+-- inside after/ftplugin/sql.jinja.lua: vim.lsp.enable() registers a FileType
+-- autocmd to autostart *future* matching buffers, so calling it from within
+-- that same FileType dispatch is too late for the triggering buffer.
+if vim.fn.executable("dbt-language-server") == 1 then
+  vim.lsp.enable("dbt-language-server")
+end
+
 -- LspAttach: buffer-local keymaps using Snacks pickers
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("bvim_lsp_attach", { clear = true }),

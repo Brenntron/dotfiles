@@ -4,13 +4,10 @@ end
 
 vim.opt_local.commentstring = "{# %s #}"
 
--- dbt-language-server is only installed/configured on the work machine
--- (after/lsp/dbt-language-server.lua is gated on .work_computer via
--- chezmoi); guard the enable call the same way so non-work machines don't
--- try to spawn a client with no server binary.
-if vim.fn.executable("dbt-language-server") == 1 then
-  vim.lsp.enable("dbt-language-server")
-end
+-- dbt-language-server is enabled at startup in lua/plugins/lsp.lua, not
+-- here: vim.lsp.enable() registers a FileType autocmd to autostart future
+-- matching buffers, and calling it from inside this same FileType dispatch
+-- (ftplugin) is too late to catch the buffer that triggered it.
 
 local wk = require("which-key")
 
