@@ -56,6 +56,7 @@
     "rust",
     "uv",
     "v",
+    "zig",
   ]
 [packages.homebrew]
   to_remove=["btop", "htop", "istat-menus", "qlimagesize", "rocket", "shotrr"]
