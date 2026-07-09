@@ -114,6 +114,14 @@ blocks:
           cache_duration: none
         style: plain
         template: " \U000F1617  {{ .Full }}"
+      - type: zig
+        foreground: p:peach
+        style: plain
+        "template": "   {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} "
+      - type: v
+        foreground: p:blue
+        style: plain
+        template: "   {{ .Full }} "
       - type: spotify
         style: plain
         foreground: p:green
