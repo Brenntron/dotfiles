@@ -65,7 +65,7 @@ map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 -- Terminal splits
 wk.add({
   { "<leader>t", group = "Terminal" },
-  { "<leader>tv", function() Snacks.terminal(nil, { win = { position = "right" } }) end, desc = "Vertical Terminal" },
+  { "<leader>tv", function() Snacks.terminal(nil, { win = { position = "left" } }) end, desc = "Vertical Terminal" },
 }, { mode = "n" })
 
 -- Treesitter textobjects (select)
