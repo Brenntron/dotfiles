@@ -28,7 +28,7 @@ blocks:
         options:
           debian: " "
           display_distro_name: true
-        template: " {{.Icon}} "
+        template: " {{.Icon}}"
         style: plain
       - template: " {{ .UserName }}"
         foreground: p:blue
@@ -142,7 +142,7 @@ blocks:
         foreground: p:teal
         foreground_templates:
           - "{{ if .Error }}p:maroon{{ end }}"
-        template: "   {{ .String }}"
+        template: "  {{ .String }}"
         options:
           always_enabled: true
       - type: time
