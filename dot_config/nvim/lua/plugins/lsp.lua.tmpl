@@ -12,7 +12,7 @@ lsps = {
   "bashls",
 {{- if .work_computer }}
   "copilot",
-{{ end -}}
+{{ end }}
   "cssls",
   "docker_compose_language_service",
   "dockerls",
@@ -21,7 +21,7 @@ lsps = {
   "html",
 {{- if .work_computer }}
   "jinja_lsp",
-{{ end -}}
+{{ end }}
   "jsonls",
   "lua_ls",
   "marksman",
@@ -30,7 +30,7 @@ lsps = {
   "pyright",
 {{- if .work_computer }}
   "snyk_ls",
-{{ end -}}
+{{ end }}
   "taplo",
   "terraformls",
   "ts_ls",
@@ -58,14 +58,6 @@ vim.lsp.config("*", {
   capabilities = capabilities,
 })
 
-{{- if .work_computer }}
-vim.lsp.config('jinja_lsp', {
-  filetypes = {
-    "sql.jinja", -- Adding sql for use with dbt.
-  },
-})
-{{ end -}}
-
 vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
@@ -80,14 +72,14 @@ vim.lsp.config("lua_ls", {
 -- Enable all configured servers
 vim.lsp.enable(lsps)
 
+
+{{- if .work_computer }}
 -- dbt-language-server is a manually installed binary, not mason-managed, so
--- it isn't in `lsps`/`ensure_installed`. Must be enabled at startup, not from
--- inside after/ftplugin/sql.jinja.lua: vim.lsp.enable() registers a FileType
--- autocmd to autostart *future* matching buffers, so calling it from within
--- that same FileType dispatch is too late for the triggering buffer.
+-- it isn't in `lsps`/`ensure_installed`. Must be enabled at startup.
 if vim.fn.executable("dbt-language-server") == 1 then
   vim.lsp.enable("dbt-language-server")
 end
+{{ end -}}
 
 -- LspAttach: buffer-local keymaps using Snacks pickers
 vim.api.nvim_create_autocmd("LspAttach", {

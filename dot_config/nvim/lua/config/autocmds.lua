@@ -137,6 +137,51 @@ vim.api.nvim_create_user_command('TermH1', function()
   vim.api.nvim_open_term(0, {})
 end, { desc = 'Highlights ANSI termcodes in curbuf' })
 
+-- Buffer-local setup for dbt models (sql.jinja). Lives here instead of
+-- after/ftplugin/ because dotted filetypes source per-component ftplugins
+-- (sql.lua, jinja.lua) — a file named sql.jinja.lua is never sourced.
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("dbt_ftplugin"),
+  pattern = "sql.jinja",
+  callback = function(event)
+    if vim.g.vscode then
+      return
+    end
+
+    vim.bo[event.buf].commentstring = "{# %s #}"
+
+    -- dbt-language-server is enabled at startup in lua/plugins/lsp.lua, not
+    -- here: vim.lsp.enable() registers a FileType autocmd to autostart future
+    -- matching buffers, and calling it from inside this same FileType dispatch
+    -- is too late to catch the buffer that triggered it.
+
+    local wk = require("which-key")
+
+    wk.add({
+      { "<leader>D", group = "dbt", icon = " ", buffer = event.buf },
+      { "<leader>Dc", "<cmd>DbtCompile<cr>", desc = "Compile", buffer = event.buf },
+      { "<leader>Dr", "<cmd>DbtRun<cr>", desc = "Run", buffer = event.buf },
+      { "<leader>Db", "<cmd>DbtBuild<cr>", desc = "Build", buffer = event.buf },
+      { "<leader>DB", "<cmd>DbtBuildSelect<cr>", desc = "Build (scope: up/down/both)", buffer = event.buf },
+      { "<leader>DR", "<cmd>DbtRunFull<cr>", desc = "Run (full refresh)", buffer = event.buf },
+      { "<leader>Dt", "<cmd>DbtTest<cr>", desc = "Test", buffer = event.buf },
+      { "<leader>Dy", "<cmd>DbtModelYaml<cr>", desc = "Model YAML", buffer = event.buf },
+      { "<leader>Dd", "<cmd>DbtGoToDefinition<cr>", desc = "Go to definition", buffer = event.buf },
+      { "<leader>Du", "<cmd>DbtListUpstreamModels<cr>", desc = "Upstream models", buffer = event.buf },
+      { "<leader>Ds", "<cmd>DbtListDownstreamModels<cr>", desc = "Downstream models", buffer = event.buf },
+      { "<leader>DC", "<cmd>DbtCompiledPreview<cr>", desc = "Compiled SQL preview", buffer = event.buf },
+      { "<leader>Dl", "<cmd>DbtLineage<cr>", desc = "Lineage graph", buffer = event.buf },
+      { "<leader>De", "<cmd>DbtRerunLast<cr>", desc = "Re-run last command", buffer = event.buf },
+      { "<leader>Df", "<cmd>DbtRunDefer<cr>", desc = "Run (defer to prod)", buffer = event.buf },
+      { "<leader>Dg", "<cmd>DbtDiagnosticsRefresh<cr>", desc = "Refresh diagnostics", buffer = event.buf },
+      { "<leader>Dp", "<cmd>DbtDeps<cr>", desc = "Deps", buffer = event.buf },
+      { "<leader>Dh", "<cmd>DbtSeed<cr>", desc = "Seed", buffer = event.buf },
+      { "<leader>Dn", "<cmd>DbtSnapshot<cr>", desc = "Snapshot", buffer = event.buf },
+      { "<leader>Dm", "<cmd>DbtLogsTail<cr>", desc = "Logs (tail)", buffer = event.buf },
+    }, { mode = "n" })
+  end,
+})
+
 -- Refresh dbt ref/source diagnostics on save/read (manifest-backed, U8).
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   group = augroup("dbt_diagnostics"),

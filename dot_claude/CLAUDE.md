@@ -34,11 +34,10 @@ Before removing code: check `git log`/`git blame`, search for related issues/PRs
 - Re-read files after each prompt; preserve user edits.
 - Red-green TDD for bug fixes and regressions.
 - Use `&>/dev/null` instead of `>/dev/null 2>&1`.
-- May run as `sandvault-<user>` inside a macOS sandbox.
 - When asked to make targeted changes, stay focused on the specific scope. Do not broaden the scope (e.g., scanning all directories when only one is requested, adding recursive finds that pull in node_modules, or making unsolicited fixes to unrelated code).
 
 ### Communication Style
 
 - Motivating but realistic — no toxic positivity, shame, or sycophancy.
 - Clear, concise descriptions. Explain the `why` behind choices.
-- Use ASCII emoticons or nerd font symbols for expression.
+- Use ASCII emoticons or nerd font symbols for expression, never use emojis.

@@ -29,8 +29,8 @@ map("n", "<M-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window W
 -- Buffers
 map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
-map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+map("n", "[b", "<cmd>BufferLineMovePrev<cr>", { desc = "Prev Buffer" })
+map("n", "]b", "<cmd>BufferLineMoveNext<cr>", { desc = "Next Buffer" })
 
 -- Clear search
 map({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and Clear hlsearch" })
@@ -156,7 +156,6 @@ wk.add({
 -- Buffers
 wk.add({
   { "<leader>b", group = "Buffers" },
-  { "<leader>bb", "<cmd>e #<cr>", desc = "Switch to Other Buffer" },
   { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
   { "<leader>bo", function() Snacks.bufdelete.other() end, desc = "Delete Other Buffers" },
   { "<leader>bD", "<cmd>:bd<cr>", desc = "Delete Buffer and Window" },
@@ -237,6 +236,26 @@ wk.add({
   { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
   { "gai", function() Snacks.picker.lsp_incoming_calls() end, desc = "C[a]lls Incoming" },
   { "gao", function() Snacks.picker.lsp_outgoing_calls() end, desc = "C[a]lls Outgoing" },
+}, { mode = "n" })
+
+-- Obsidian
+wk.add({
+  { "<leader>o", group = "Obsidian", icon = " " },
+  { "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Note" },
+  { "<leader>oo", "<cmd>ObsidianOpen<cr>", desc = "Open in Obsidian" },
+  { "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
+  { "<leader>os", "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },
+  { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Backlinks" },
+  { "<leader>ot", "<cmd>ObsidianTags<cr>", desc = "Tags" },
+  { "<leader>oT", "<cmd>ObsidianTOC<cr>", desc = "Table of Contents" },
+  { "<leader>od", "<cmd>ObsidianToday<cr>", desc = "Today's Daily Note" },
+  { "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Yesterday's Daily Note" },
+  { "<leader>op", "<cmd>ObsidianPasteImg<cr>", desc = "Paste Image" },
+  { "<leader>or", "<cmd>ObsidianRename<cr>", desc = "Rename Note" },
+  { "<leader>oc", "<cmd>ObsidianToggleCheckbox<cr>", desc = "Toggle Checkbox" },
+  { "<leader>ol", "<cmd>ObsidianLink<cr>", mode = "x", desc = "Link Selection" },
+  { "<leader>oe", "<cmd>ObsidianExtractNote<cr>", mode = "x", desc = "Extract Note from Selection" },
+  { "<leader>of", "<cmd>ObsidianFollowLink<cr>", desc = "Follow Link" },
 }, { mode = "n" })
 
 -- Yanky
