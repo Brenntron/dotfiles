@@ -116,6 +116,7 @@
     "libxslt",                  # asdf-erlang dependency
     "mas",                      # Mac App Store command-line interface
     "mermaid-cli",              # Graph cli tool
+    "mcpsnoop",                 # Snoop on mcp traffic
     "arimxyer/tap/models",      # List LLM providers and models
     "nano",
     "ncdu",                     # NCurses Disk Usage
@@ -147,7 +148,11 @@
   casks=[
     "1password",
   ]
-  formulae=[]
+  formulae=[
+    "fanficfare",               # ebook downloader
+    "oh-my-reddit",             # reddit threads in terminal
+    "podcast-dl",               # podacst downloader
+  ]
 [packages.homebrew.dev_computer]
   casks=["bruno", "dbeaver-community", "httpie"]
   formulae=[
@@ -175,6 +180,7 @@
     "coreutils",
     "direnv",                   # ENV loading and unloading by dir.
     "eza",                      # ls replacement
+    "fanficfare",               # ebook downloader
     "fastfetch",
     "fd",                       # fd-find
     "findutils",                # GNU find, locate, updatedb, and xargs
