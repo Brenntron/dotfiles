@@ -7,6 +7,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 {{ end }}
 
 export PATH="${HOME}/.local/bin:$PATH"
+export PATH="${HOME}/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 
 export XDG_CONFIG_HOME="${HOME}/.config"
@@ -251,7 +252,7 @@ export CLAUDE_CODE_USE_BEDROCK=1
 export CLAUDE_CODE_NO_FLICKER=1
 
 claude() {
-  ~/bin/aws-signin -q
+  aws-signin -q
   command claude "$@" --permission-mode auto
 }
 
@@ -271,3 +272,18 @@ fi
 bindkey -v
 
 unset _brew_openssl
+
+python_venv() {
+  MYVENV=./venv
+  # when you cd into a folder that contains $MYVENV
+  if [[ -d $MYVENV ]]; then
+    source $MYVENV/bin/activate &>/dev/null
+  else
+    # when you cd into a folder that doesn't
+    type deactivate &>/dev/null && deactivate &>/dev/null
+  fi
+}
+autoload -U add-zsh-hook
+add-zsh-hook chpwd python_venv
+
+python_venv
