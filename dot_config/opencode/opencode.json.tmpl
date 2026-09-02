@@ -1,7 +1,58 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "catppuccin-macchiato",
   {{ if .work_computer -}}
   "enabled_providers": ["amazon-bedrock"],
   {{ end }}
+  "lsp": true,
+  "mcp": {
+  {{ if .work_computer -}}
+    "spree-flowstudio": {
+      "type": "remote",
+      "url": "https://mcp.flowstudio.app/mcp",
+      "headers": {
+        "x-api-key": "${FLOWSTUDIO_MCP_API_KEY}"
+      },
+      "enabled": true
+    },
+    "meeting-search": {
+      "type": "local",
+      "command": [
+        "node",
+        "/Users/brennan.willingham/code/tools/spreetail-multi-platform-plugins/plugins/spree-meetings/dist/meeting-search.js"
+      ],
+      "enabled": true
+    },
+    "dbt-mcp": {
+      "type": "remote",
+      "url": "https://dbt-mcp-proxy.prod01.tk.dev/",
+      "enabled": true
+    },
+    "sourcebot": {
+      "type": "remote",
+      "url": "https://sourcebot.ops.eks.dev01.tk.dev/api/mcp",
+      "enabled": true
+    },
+    "engineering-ai-agent": {
+      "type": "remote",
+      "url": "https://spreetail-engineering-ai-agent.prod01.tk.dev/mcp",
+      "enabled": true
+    },
+    "sce-memory": {
+      "type": "remote",
+      "url": "https://sce-memory-mcp.prod01.tk.dev/mcp",
+      "enabled": true
+    },
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v1/mcp/authv2",
+      "enabled": true
+    },
+    "dagster": {
+      "type": "remote",
+      "url": "https://mcp.agent.dagster.cloud/mcp",
+      "enabled": false
+    }
+{{ end }}
+  },
+  "plugin": []
 }
