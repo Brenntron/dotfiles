@@ -54,7 +54,6 @@
     "rebar",
     "ruby",
     "rust",
-    "uv",
     "v",
     "zig",
   ]
@@ -137,6 +136,7 @@
     "unixodbc",                 # Optional asdf-erlang dependency
     "vhs",                      # terminal recordings
     "vivid",                    # https://github.com/sharkdp/vivid
+    "uv",                       # Extremely fast Python package installer and resolver, written in Rust
     "wxwidgets",                # asdf-erlang dependency
     "yazi",                     # File Manager
     "zoxide",                   # A faster way to navigate your filesystem

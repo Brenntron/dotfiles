@@ -189,6 +189,11 @@ fi
 # vivid/colorls setup
 export LS_COLORS="$(vivid generate catppuccin-macchiato)"
 
+# Set mistake corrector if installed
+if brew list thefuck &>/dev/null; then
+  eval $(thefuck --alias)
+fi
+
 # Homebrew aliases
 alias bsc="brew services cleanup"
 alias bsl="brew services list"
@@ -275,11 +280,9 @@ unset _brew_openssl
 
 python_venv() {
   MYVENV=./venv
-  # when you cd into a folder that contains $MYVENV
   if [[ -d $MYVENV ]]; then
     source $MYVENV/bin/activate &>/dev/null
   else
-    # when you cd into a folder that doesn't
     type deactivate &>/dev/null && deactivate &>/dev/null
   fi
 }

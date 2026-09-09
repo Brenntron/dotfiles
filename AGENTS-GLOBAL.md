@@ -29,6 +29,7 @@ Before removing code: check `git log`/`git blame`, search for related issues/PRs
 
 ### General
 
+- Premature optimization is the root of all evil in programming.
 - Inline variables/functions used only once. Follow YAGNI/DRY. Keep diffs small.
 - Never remove comments. Prefer self-documenting code over explanatory comments.
 - Re-read files after each prompt; preserve user edits.
