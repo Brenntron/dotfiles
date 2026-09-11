@@ -1,1 +1,9 @@
-require("sidekick").setup({})
+require("sidekick").setup({
+  cli = {
+    win = {
+      keys = {
+        files = { "<c-f>", "files", mode = "nt", desc = "open file picker" },
+      }
+    }
+  }
+})
