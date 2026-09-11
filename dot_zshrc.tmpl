@@ -229,8 +229,13 @@ fi
 
 alias lzd='lazydocker'
 
-# Zsh aliases
-source ~/.config/zsh/zsh.zsh
+unalias run-help
+autoload -Uz run-help
+alias help="run-help"
+
+alias zshrc="chezmoi edit --apply /Users/brennan.willingham/.zshrc" # Quick access to the .zshrc file
+
+# Yarn aliases
 source ~/.config/zsh/yarn.zsh
 
 # use bat as a colorizing pager for man
