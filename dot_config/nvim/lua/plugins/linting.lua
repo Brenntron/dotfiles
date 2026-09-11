@@ -26,14 +26,14 @@ end
 lint.linters_by_ft = {
   ["*"] = { "snyk_ls" },
   go = { "golangcilint" },
-  javascript = { "eslint_d" },
+  javascript = { "eslint" },
   markdown = { "markdownlint-cli2" },
   python = { "ruff" },
   ruby = { "rubocop" },
   sh = { "shellcheck" },
   sql = { "sqlfluff" },
   ["sql.jinja"] = { "sqlfluff_dbt" },
-  typescript = { "eslint_d" },
+  typescript = { "eslint" },
   yaml = { "yamllint" },
 }
 
