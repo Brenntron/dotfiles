@@ -1,16 +1,3 @@
 .DS_Store
 
 # Prepend with a `/` to specify a specific path relative to $HOME.
-
-# migrate to XDG directories
-/.curlrc
-/.gitignore
-/.nanorc
-/.digrc
-/.wget-hsts
-/.python_history
-/.sed/htmlDecode.sed
-/.sed/htmlEncode.sed
-/.sed/stopwords.sed
-/.git_stop_words
-/.config/dotfile_source/third-party/jdfile.sh
