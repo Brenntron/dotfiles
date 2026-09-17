@@ -1,6 +1,10 @@
 .DS_Store
 README.md
 .assets # used to save symlink destinations files
+AGENTS.md
+AGENTS-GLOBAL.md
+
+# Keep repository instructions local; the sync script manages ~/AGENTS.md.
 
 # Manage files that have different locations on different machines
 # https://www.chezmoi.io/user-guide/manage-machine-to-machine-differences/#ignore-files-or-a-directory-on-different-machines

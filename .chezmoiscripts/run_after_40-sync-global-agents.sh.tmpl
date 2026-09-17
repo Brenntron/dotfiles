@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+{{ template "shared_script_utils.bash" . }}
+
+header "Syncing global agent instructions"
+if ! cmp -s "{{ .chezmoi.sourceDir }}/AGENTS-GLOBAL.md" "${HOME}/AGENTS.md"; then
+    cp "{{ .chezmoi.sourceDir }}/AGENTS-GLOBAL.md" "${HOME}/AGENTS.md"
+fi
+
+_safeExit_
