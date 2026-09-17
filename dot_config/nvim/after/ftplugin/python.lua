@@ -1,6 +1,6 @@
 local wk = require("which-key")
 
--- Python
+-- Python specific keymappings
 wk.add({
   { "<leader>P", group = "Python", icon = " " },
 
@@ -14,3 +14,8 @@ wk.add({
   { "<leader>Pud", "<cmd>lua require('uv').remove_package()<cr>", desc = "Remove package" },
   { "<leader>Puc", "<cmd>lua require('uv').run_command('uv sync')<cr>", desc = "Sync packages" },
 }, { mode = "n" })
+
+-- Set indent depth to 4 from standard 2
+vim.opt_local.shiftwidth = 4
+vim.opt_local.tabstop = 4
+vim.opt_local.softtabstop = 4
