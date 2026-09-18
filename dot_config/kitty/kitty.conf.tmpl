@@ -1,7 +1,7 @@
 # vim:fileencoding=utf-8:foldmethod=marker
 # vim:ft=kitty
 
-#: Fonts {{{
+#: Fonts {{ "{{{" }}
 
 #: kitty has very powerful font management. You can configure
 #: individual font faces and even specify special fonts for particular
@@ -199,7 +199,7 @@
 
 #: }}}
 
-#: Cursor customization {{{
+#: Cursor customization {{ "{{{" }}
 
 # cursor #cccccc
 
@@ -250,7 +250,7 @@
 
 #: }}}
 
-#: Scrollback {{{
+#: Scrollback {{ "{{{" }}
 
 # scrollback_lines 2000
 
@@ -319,7 +319,7 @@
 
 #: }}}
 
-#: Mouse {{{
+#: Mouse {{ "{{{" }}
 
 # mouse_hide_wait 3.0
 
@@ -440,7 +440,7 @@
 #: The default shape of the mouse pointer when dragging across text.
 #: Valid values are: arrow, beam and hand.
 
-#: Mouse actions {{{
+#: Mouse actions {{ "{{{" }}
 
 #: Mouse buttons can be mapped to perform arbitrary actions. The
 #: syntax is:
@@ -595,7 +595,7 @@
 
 #: }}}
 
-#: Performance tuning {{{
+#: Performance tuning {{ "{{{" }}
 
 # repaint_delay 10
 
@@ -626,7 +626,7 @@
 
 #: }}}
 
-#: Terminal bell {{{
+#: Terminal bell {{ "{{{" }}
 
 # enable_audio_bell yes
 
@@ -675,7 +675,7 @@
 
 #: }}}
 
-#: Window layout {{{
+#: Window layout {{ "{{{" }}
 
 # remember_window_size  yes
 # initial_window_width  640
@@ -846,7 +846,7 @@ hide_window_decorations titlebar-only
 
 #: }}}
 
-#: Tab bar {{{
+#: Tab bar {{ "{{{" }}
 
 # tab_bar_edge bottom
 
@@ -997,7 +997,7 @@ hide_window_decorations titlebar-only
 
 #: }}}
 
-#: Color scheme {{{
+#: Color scheme {{ "{{{" }}
 
 # foreground #dddddd
 # background #000000
@@ -1071,7 +1071,7 @@ hide_window_decorations titlebar-only
 #: to be used unchanged. Note that these colors can be overridden by
 #: the program running in the terminal.
 
-#: The color table {{{
+#: The color table {{ "{{{" }}
 
 #: The 256 terminal colors. There are 8 basic colors, each color has a
 #: dull and bright version, for the first 16 colors. You can set the
@@ -1145,7 +1145,7 @@ hide_window_decorations titlebar-only
 
 #: }}}
 
-#: Advanced {{{
+#: Advanced {{ "{{{" }}
 
 # shell .
 
@@ -1414,7 +1414,7 @@ hide_window_decorations titlebar-only
 
 #: }}}
 
-#: OS specific tweaks {{{
+#: OS specific tweaks {{ "{{{" }}
 
 # wayland_titlebar_color system
 
@@ -1438,8 +1438,9 @@ hide_window_decorations titlebar-only
 #: background_opacity. If you want to use both, you are probably
 #: better off just hiding the titlebar with hide_window_decorations.
 
-macos_option_as_alt no
-
+{{ if eq .chezmoi.os "darwin" -}}
+macos_option_as_alt yes
+{{ end }}
 #: Use the Option key as an Alt key on macOS. With this set to no,
 #: kitty will use the macOS native Option+Key to enter Unicode
 #: character behavior. This will break any Alt+Key keyboard shortcuts
@@ -1528,7 +1529,7 @@ macos_option_as_alt no
 
 #: }}}
 
-#: Keyboard shortcuts {{{
+#: Keyboard shortcuts {{ "{{{" }}
 
 #: Keys are identified simply by their lowercase Unicode characters.
 #: For example: a for the A key, [ for the left square bracket key,
@@ -1636,7 +1637,7 @@ macos_option_as_alt no
 #: cause all invocations of the hints kitten to have the --hints-
 #: offset=0 option applied.
 
-#: Clipboard {{{
+#: Clipboard {{ "{{{" }}
 
 #: Copy to clipboard
 
@@ -1678,7 +1679,7 @@ macos_option_as_alt no
 
 #: }}}
 
-#: Scrolling {{{
+#: Scrolling {{ "{{{" }}
 
 #: Scroll line up
 
@@ -1770,7 +1771,7 @@ macos_option_as_alt no
 
 #: }}}
 
-#: Window management {{{
+#: Window management {{ "{{{" }}
 
 #: New window
 
@@ -1909,7 +1910,7 @@ macos_option_as_alt no
 
 #: }}}
 
-#: Tab management {{{
+#: Tab management {{ "{{{" }}
 
 #: Next tab
 
@@ -1966,7 +1967,7 @@ macos_option_as_alt no
 #:     map ctrl+t new_tab !neighbor [optional cmd to run]
 #: }}}
 
-#: Layout management {{{
+#: Layout management {{ "{{{" }}
 
 #: Next layout
 
@@ -1990,7 +1991,7 @@ macos_option_as_alt no
 #:     map ctrl+alt+z toggle_layout stack
 #: }}}
 
-#: Font sizes {{{
+#: Font sizes {{ "{{{" }}
 
 #: You can change the font size for all top-level kitty OS windows at
 #: a time or only the current one.
@@ -2027,7 +2028,7 @@ macos_option_as_alt no
 #:     map kitty_mod+f6 change_font_size current 10.0
 #: }}}
 
-#: Select and act on visible text {{{
+#: Select and act on visible text {{ "{{{" }}
 
 #: Use the hints kitten to select text and either pass it to an
 #: external program or insert it into the terminal or copy it to the
@@ -2095,7 +2096,7 @@ macos_option_as_alt no
 #: <https://sw.kovidgoyal.net/kitty/kittens/hints/>.
 #: }}}
 
-#: Miscellaneous {{{
+#: Miscellaneous {{ "{{{" }}
 
 #: Show documentation
 
