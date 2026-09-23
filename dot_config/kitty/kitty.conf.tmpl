@@ -2288,7 +2288,13 @@ map ctrl+shift+1 goto_layout tall
 map ctrl+shift+2 goto_layout horizontal
 map ctrl+shift+3 goto_layout vertical
 
-# BEGIN_KITTY_THEME
+# save session shortcut
+
+map alt+s save_as_session ~/.config/kitty/new_session.conf
+
 # Catppuccin-Macchiato
 include current-theme.conf
-# END_KITTY_THEME
+
+{{ if .work_computer -}}
+startup_session ./work_session.conf
+{{ end }}
