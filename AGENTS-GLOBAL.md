@@ -1,5 +1,10 @@
 ## Global Development Principles
 
+### Programming Paradigms and Styles
+
+Favor Data Oriented Design and Functional Programming over Object Oriented Programming when it doesn't violate convention.
+Favor composition over inheritance.
+
 ### Simplicity First
 
 - Simple > clever. Obvious > elegant.
