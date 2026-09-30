@@ -229,7 +229,8 @@ fi
 
 alias lzd='lazydocker'
 
-unalias run-help
+export HELPDIR="$(brew --prefix zsh)/share/zsh/help"
+unalias run-help 2>/dev/null
 autoload -Uz run-help
 alias help="run-help"
 

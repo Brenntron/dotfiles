@@ -121,8 +121,8 @@
     "ncdu",                     # NCurses Disk Usage
     "ncurses",                  # Text-based UI library
     "neovim",
-    "opencode",
     "openssl",                  # SSL/TLS cryptography library
+    "pi-coding-agent",          # Minimal coding agent/runtime harness
     "postgresql",
     "redis",
     "rip2",                     # A safer, rust-based rm
@@ -241,7 +241,6 @@
     "doggo",            # DNS Client
     "goaccess",
     "httpie",
-    "sst/tap/opencode",
   ]
 [packages.linuxbrew.homelab_member]
   formulae=["ffmpeg", "iperf", "nmap", "tailspin"]
