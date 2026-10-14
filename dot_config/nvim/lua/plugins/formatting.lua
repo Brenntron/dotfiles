@@ -1,5 +1,7 @@
 -- Formatting: conform.nvim
 
+local sqlfluff = require("config.sqlfluff")
+
 require("conform").setup({
   formatters_by_ft = {
     cs = { "csharpier" },
@@ -28,15 +30,13 @@ require("conform").setup({
   end,
   formatters = {
     sqlfluff_dbt = {
-      command = function()
-        local cwd = vim.fn.getcwd()
-        local venv_path = cwd .. "/.venv/bin/sqlfluff"
-        if vim.fn.filereadable(venv_path) == 1 then
-          return venv_path
-        end
-        return "sqlfluff"
+      command = function(_, ctx)
+        return sqlfluff.command(ctx.dirname)
       end,
       args = { "fix", "$FILENAME" },
+      cwd = function(_, ctx)
+        return sqlfluff.project_root(ctx.dirname)
+      end,
       stdin = false,
       require_cwd = true,
       timeout_ms = 100000,

@@ -1,21 +1,15 @@
 -- Linting: nvim-lint
 
 local lint = require("lint")
+local sqlfluff = require("config.sqlfluff")
 
 -- Custom sqlfluff linter for dbt projects
 local sqlfluff_linter = lint.linters.sqlfluff
 if sqlfluff_linter then
-  local function get_sqlfluff_cmd()
-    local cwd = vim.fn.getcwd()
-    local venv_sqlfluff = cwd .. "/.venv/bin/sqlfluff"
-    if vim.fn.executable(venv_sqlfluff) == 1 then
-      return venv_sqlfluff
-    end
-    return "sqlfluff"
-  end
-
   lint.linters.sqlfluff_dbt = vim.tbl_deep_extend("force", sqlfluff_linter, {
-    cmd = get_sqlfluff_cmd(),
+    cmd = function()
+      return sqlfluff.command(vim.api.nvim_buf_get_name(0))
+    end,
     stdin = false,
     args = { "lint", "--format=json" },
     append_fname = true,
@@ -40,7 +34,8 @@ lint.linters_by_ft = {
 -- Lint on save and insert leave
 vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave", "BufReadPost" }, {
   group = vim.api.nvim_create_augroup("bvim_lint", { clear = true }),
-  callback = function()
-    lint.try_lint()
+  callback = function(args)
+    local project_root = sqlfluff.project_root(vim.api.nvim_buf_get_name(args.buf))
+    lint.try_lint(nil, project_root and { cwd = project_root } or nil)
   end,
 })
