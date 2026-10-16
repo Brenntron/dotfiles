@@ -69,6 +69,27 @@ vim.lsp.config("lua_ls", {
   },
 })
 
+vim.lsp.config("pyright", {
+  before_init = function(_, config)
+    local root = config.root_dir
+    if not root then
+      return
+    end
+
+    for _, venv in ipairs({ ".venv", "venv" }) do
+      if vim.fn.isdirectory(vim.fs.joinpath(root, venv)) == 1 then
+        config.settings = vim.tbl_deep_extend("force", config.settings or {}, {
+          python = {
+            venvPath = root,
+            venv = venv,
+          },
+        })
+        break
+      end
+    end
+  end,
+})
+
 -- Enable all configured servers
 vim.lsp.enable(lsps)
 
