@@ -39,9 +39,9 @@ lsps = {
 }
 
 -- Mason (LSP/tool installer)
-require("mason").setup(
-  PATH = "append"
-)
+require("mason").setup({
+  PATH = "append",
+})
 
 -- Mason-lspconfig (ensures servers are installed)
 require("mason-lspconfig").setup({

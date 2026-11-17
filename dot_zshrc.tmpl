@@ -303,6 +303,10 @@ DOTNET_CLI_TELEMETRY_OPTOUT=1
 # aikido-endpoint-cert-config-start
 # Allow Node.js tooling to trust the SafeChain MITM CA while preserving public roots.
 export NODE_EXTRA_CA_CERTS="/Library/Application Support/AikidoSecurity/EndpointProtection/run/endpoint-protection-node-combined-ca.pem"
+case "${NODE_OPTIONS:-}" in
+  *--use-openssl-ca*) unset NODE_USE_SYSTEM_CA ;;
+  *) export NODE_USE_SYSTEM_CA=1 ;;
+esac
 # aikido-endpoint-cert-config-end
 # aikido-endpoint-pip-cert-config-start
 # Allow Python package managers to trust the SafeChain MITM CA while preserving user-provided roots.
@@ -320,9 +324,6 @@ export BUNDLE_SSL_CA_CERT="/Library/Application Support/AikidoSecurity/EndpointP
 export SSL_CERT_FILE="/Library/Application Support/AikidoSecurity/EndpointProtection/run/endpoint-protection-openssl-combined-ca.pem"
 export CURL_CA_BUNDLE="/Library/Application Support/AikidoSecurity/EndpointProtection/run/endpoint-protection-openssl-combined-ca.pem"
 # aikido-endpoint-curl-cert-config-v2-end
-# aikido-endpoint-pip-uv-legacy-start
-export UV_NATIVE_TLS=true
-# aikido-endpoint-pip-uv-legacy-end
 # Pi
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)

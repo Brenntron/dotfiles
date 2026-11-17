@@ -130,7 +130,7 @@
     "ssh-copy-id",              # Add a public key to a remote machine's authorized_keys file
     "gromgit/brewtils/taproom", # Homebrew TUI
     "thefuck",                  # Mistake corrector
-    "tldr",                     # TLDR man pages
+    "tealdeer",                 # TLDR man pages in rust
     "tre-command",              # Display directories as trees (with optional color/HTML output)
     "unixodbc",                 # Optional asdf-erlang dependency
     "vhs",                      # terminal recordings
@@ -222,7 +222,7 @@
     "ssh-copy-id",              # Add a public key to a remote machine's authorized_keys file
     "gromgit/brewtils/taproom", # Homebrew TUI
     "thefuck",                  # Mistake corrector
-    "tldr",                     # TLDR man pages
+    "tealdeer",                 # TLDR man pages in rust
     "tre-command",              # Display directories as trees (with optional color/HTML output)
     "util-linux",
     "vhs",                      # terminal recordings
