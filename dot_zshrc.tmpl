@@ -296,6 +296,9 @@ autoload -U add-zsh-hook
 add-zsh-hook chpwd python_venv
 
 python_venv
+
+# Disable dotnet telemetry
+DOTNET_CLI_TELEMETRY_OPTOUT=1
 {{ if .work_computer -}}
 # aikido-endpoint-cert-config-start
 # Allow Node.js tooling to trust the SafeChain MITM CA while preserving public roots.
